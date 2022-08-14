@@ -1,0 +1,120 @@
+☢️# Comandos:
+
+ ctrl + d = para salvar e sair da edição
+ cat = abrir arquivos
+ cat > = criar arquivos e inserir conteúdo nele ou trocar por outro conteúdo
+ cat >> = adicionar conteúdo ao arquivo
+ cat + nome_arquivo + nome_arquivo + > + nome_novo_arquivo = unir o conteúdo dos dois arquivos em um arquivo só
+ sort < + nome_arquivo = colocar o conteúdo em ordem alfabética (não altera o conteúdo, apenas mostra em ordem alfabética)
+ sort < + nome_arquivo + > + nome_novo_arquivo = um novo arquivo com o conteúdo do antigo em ordem alfabética
+ who = saber quem tem acesso ao computador e os usuários
+ 
+🎃️ | = canaliza a saída do primeiro comando para a entrada do segundo
+ EXEMPLOS DO PIPE | :
+ who + | + sort = vai lista todos os usuários do computador em ordem alfabética
+ who + | + wc -l = vai mostrar o número de linhas de usuários que tem em who
+ grep F + nome_arquivo + | + sort = mostra as palavras com a letra F e em ordem alfabética
+ 
+ 
+☢️ ls -l = ver pastas e arquivos, quem tem acesso, tamanho, quando foi criado, entre outros
+ 
+   Permissões | Links  | Proprietário | Grupo | Tamanho | Data e Hora   | Nome
+  ----------- |--------|--------------|-------|---------|---------------|---------
+  drwxr-xr-x  | 2      | root 	      | root  | 4096    | Out 19 09:10  | composer/
+  
+Permissões => É possível verificar o tipo do item e nível de permissão para Leitura, Escrita e Execução de item ou diretório;
+Links => Número de ligações que o item possui, no caso do diretório, número de subdiretórios que possui;
+Proprietário => Quem é a pessoa dona, quem criou. É o diretório padrão da pessoa usuária, o home;
+Grupo => Grupo ao qual pertence o item ou diretório. Utilizado para dar permissões à outras pessoas;
+Tamanho => Em Bytes;
+Data e Hora => Momento em que foi criado ou última modificação;
+Nome => Nome do item ou diretório;
+
+Leitura r - 4
+Escrita w - 2
+Execução x - 1
+ 
+ "R" - pode ler
+ "W" - pode editar
+ "X" - pode acessar pelo comando "cd"
+ "D" - no início é um diretório
+ "-" - no início é um arquivo comum
+ 
+⛔️ DICA - É O PRIMEIRO GRUPO, OU SEJA AS QUATRO PRIMEIRAS LETRAS, O SEGUNDO GRUPO TEM 3 LETRAS QUE É O GRUPO DE USUÁRIOS TEM ACESSO, O TERCEIRO TAMBÉM TEM 3 LETRAS QUE SÃO OUTROS USUÁRIOS TEM ACESSO.
+ EX:
+ -RW- = ou seja não é um diretório, pois não começa com "D". podemos ler e editar, pois tem o "R" e o "W". e não podemos executar, pois não tem o "X" apenas um "-".
+ 
+ 
+☢️ ALTERAR PERMISSÕES:
+ chmod u = alterar apenas pro meu usuário que estou utilizando
+ chmod g = alterar apenas para o grupo de usuários
+ chmod o = alterar apenas para outros usuários
+ chmod a = alterar para todos os usuários
+ SINAIS:
+ + - acrescenta
+ - - tira
+ = - deixa igual
+ EX:
+ chmod u+w nome_arquivo = altera para o usuário que estou usando o arquivo adicionando a permissão de ler o arquivo
+
+
+🎃️ * = coringa para completar toda e qualquer frase que esqueceu. EX: '*.txt' = vai buscar todos os arquivos .txt
+ ctrl + z = interrompe o processo
+ fg = volta a rodar o processo
+ jobs = mostra os processos em execução
+ ls -la = mostra tudo e os processos
+ bg = coloca o processo em segundo plano e libera o acesso do terminal
+ ps = mostra os números do processo
+ kill + número_processo = mata o processo
+ kill -9 número_processo = matar caso tenha permissões impedindo
+ & = colocando no final do código vai deixar o processo em background
+ ctrl + c = pra matar o processo caso esteja em primeiro plano
+ 
+☢️ COMANDO 'echo' PROCURAR:
+ O echo é um comando utilizado em scripts ou no terminal para exibir mensagens na tela ou em um arquivo.
+ 
+ echo "Este é um teste"
+ # Resultado
+ Este é um teste
+
+ # Pode ser usado para colocar textos dentro de arquivos.
+ echo "Este é mais um teste" > teste.txt
+ cat teste.txt
+ Este é mais um teste
+ 
+☢️ COMANDO 'history' PROCURAR:
+ O history é um comando que mostra o histórico de comandos que você executou no terminal. A quantidade ou o tamanho desse "histórico" podem ser configurados para um número arbitrário de comandos ou para ver todo o histórico.
+ # Mostra o histórico de comandos
+ history
+ # Pegar os últimos 10 comandos
+ history | tail
+ # Pegar os 10 primeiros comando
+ history | head
+ 
+☢️ COMANDO 'find' PROCURAR:
+ O find é um comando para pesquisar em diretórios por arquivos ou outras pastas, de acordo com os parâmetros passados a ele. Esses parâmetros podem ser name, date, size e type. Caso nenhum atributo seja passado, ele pesquisará tudo que estiver dentro do diretório atual. Veja abaixo alguns exemplos de como usá-lo:
+ # Para listar todos os arquivos que terminam em .txt
+ find . -name "*.txt"
+
+ # Para localizar todos os diretórios
+ find . -type d
+
+ # Para localizar todos os arquivos
+ find . -type f
+
+ # Localizar tanto arquivos quanto diretórios que comecem
+ # por algum trecho
+ find ./teste -name "exemplo*"
+ # Resultado
+ ./teste/exemplo.txt
+ ./teste/exemplo
+
+ # Localizar somente arquivos que comecem por algum trecho
+ find ./teste -type f -name "exemplo*"
+ # Resultado
+ ./teste/exemplo.txt
+ 
+ # Localizar somente diretórios que comecem por algum trecho
+ find ./teste -type d -name "exemplo*"
+ # Resultado
+ ./teste/exemplo

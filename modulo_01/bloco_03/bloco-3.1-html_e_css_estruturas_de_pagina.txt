@@ -1,0 +1,38 @@
+🎃️-Estruturar páginas web com HTML utilizando as tags html, head e body;
+-Utilizar o HTML para estruturar textos e títulos;
+-Utilizar o HTML para criar listas, links e adicionar imagens;
+
+☢️#TAGS:
+<> = o que estiver dentro é uma tag
+alguma_coisa= = atributo
+*3 = depois da tag indica que vc quer 3 vezes ela, otimiza tempo
+
+🎃️
+<!DOCTYPE html>   = tipo do documento, serve para o navegador saber e reconhecer que tipo de linguagem se trata que é o HTML 5.
+<html lang="pt-br">   = primeiro temos a tag "html" que é a raiź de toda a página html, pois começa com ela e termina com ela. Em seguida tem o tipo de idioma que estamos usando nela com o atributo "lang".
+  <head>    = é onde inicia e fica as configurações da página, onde ficam os dados. 
+    <meta charset="UTF-8">   = aqui define qual o conjunto de caracteres que vai ser utilizado na página, com o atributo "charset".
+    <title>HTML</title>   = aqui define qual o nome que vai aparecer lá em cima na guia do navegador ao acessar a página.
+  </head>   = aqui termina onde fica as configurações da minha página.
+  <body>   = aqui é onde inicia e fica o corpo da página, onde vai conter textos, títulos, listas, links, imagens, etc. É a parte visível.
+    <h1>Exercícios</h1>   = aqui é o título máximo da página.
+    <h2>Tarefas</h2>   = aqui é o segundo título um pouco menor, é como se fosse um sub título.
+    <p>Hoje começo a aprender HTML 5, estou muito animado!</p>   = aqui é um parágrafo! Onde adiciono textos.
+    <ul>   = serve para criar uma lista não ordenado ou seja com pontos.
+      <li>Lista</li> inserir oas palavras que quero na minha lista.
+      <li>Não ordenada</li> adicionando o que quero na minha lista.
+    <ul>   = fechamento da minha lista não ordenada.
+    <ol>   = serve para criar uma lista ordenado ou seja com números.
+      <li>Lista</li> inserir oas palavras que quero na minha lista.
+      <li>Ordenada</li> adicionando o que quero na minha lista.
+    <ol>   = fechamento da minha lista ordenada.
+    <img src="link_ou_pode_colocar_na_pasta_para_add" alt="descrição da imagem" width="300px">   = "img" serve para adicionar imagem, "src=" é o atributo que serve para adicionar o link ou endereço dessa pasta, "width=" atributo que ser para adicionar a largura da imagem, "alt=" atributo que serve para descrever a imagem, caso não carregue ou questões de acessibilidade.
+  </body>   =   é o fechamento do meu corpo, de tudo que tem na página que é visível.
+  <a href="www.algum_link.com target="_blank">currículo</a>     = "a" serve para ancora ou seja adicionar um link em uma palavra da página ou se refirir para a propria página em uma determinada seção. "href" = link para o qual a pessoa queira encaminhar ou pode ser um externo definindo um "id". "target" define se a página no qual queira encaminhar vai abrir uma nova aguia e entrar nela ou vai sair do meu site e e ntrar nela. 
+</html>   =   é o fechamento da minha raiz HTML.
+
+☢️#TAGS:
+<br> ele quebra a linha, adiciona espaços aonde você quer dentro do próprio parágrafo ou outros e não precisa de fechamento. (pode ser usado várias vezes em sequência ou não)
+<strong>exex_exex</strong>  = ele deixa em negrito onde eu colocar e precisa de fechamaneto.
+<em>ex_ex</em>  = deixa como se fosse em itálico, a parte selecionada e precisa de fechamento.
+

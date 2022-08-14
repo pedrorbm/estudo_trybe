@@ -1,0 +1,40 @@
+
+☢️CSS é configurado emm "head" de html ou seja em configuraçoes.
+
+🎃️tags:
+
+<head>
+<style>
+
+h1 {
+  color: green;    = serve para deixar todos os títulos "h1" com as letras verde, define as cores delas.
+  }
+  
+body {
+  background-color: red ou rgb(255,400,200);    = serve para definir a cor do plano de fundo da página, podendo escolher a cor diretamente ou uma cor específica usando o rgb. (está dentro de body, pois é onde fica todas as informações.
+  }
+  
+#paragrafo_1 {    = quando definir o id específico e quiser editar ela usa o ponto "#" e depois po nome em específico.
+  background-color: blue;    = definir a cor do background que contem a parte em específico. No caso foi dado um nome diferente ao primeiro parágrafo para mudar o background apenas dele. atras do parágrafo 1 ficou o fundo azul.
+  }
+  
+.list_style {    = quando definir a classe e quiser editar ela usa o ponto "." e depois po nome da classe.
+  background-color: yellow;   = definir um plano de fundo de todos que tem essa classe em amarelo.
+  color: white;   = definie que as letras da lista fiquem brancas, edita a cor delas.
+  }  
+
+</style>
+</head>
+
+<body>
+   <p id="paragrafo_1">Eu estudo na trybe!</p>   = o "id" serve para atribuir a tag um nome em específico para editar somente ele.
+   <ul class="list_style">   = o "class" serve para atribuir a tag uma classe em específico para editar somente quem tem essa classe.
+     <li>Pedro</li>
+   </ul>
+   <ol class="list_style">   = o "class" serve para atribuir a tag uma classe em específico para editar somente quem tem essa classe.
+     <li>Roberto</li>
+     <li>Roberto</li>
+   </ol>
+</body>
+
+

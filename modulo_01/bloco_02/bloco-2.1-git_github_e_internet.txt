@@ -1,0 +1,48 @@
+⛔️o que é GIT?
+é nele que tem todo o código, toda a programação para armezenar alterações, mudanças, códigos feito pelo usuário.
+
+⛔️o que é GitHub, GitLab, entre outras?
+são repositórios que armazena o GIT.
+
+☢️#COMANDOS:
+git init = serve para criar um repositório no git, tem que ser usado quando estiver dentro da pasta que deseja criar um repositório.
+git status = que retorna o status do repositório, informando quais arquivos foram modificados, quais estão sendo monitorados, etc.
+git branch nome_arquivo = criar uma nova branch
+git add ou git add nome_arquivo.txt = adicionar o arquivo ao repositório do git.
+git commit -m "Mensagem sobre a alteração feita" = comitar o arquivo no git é colocar uma nota sobre a atualização do arquivo. (sempre é bom comitar, pois deixa atualizado do progresso do projeto, sendo uma descrição resumida).
+git remote add apelido_repositório URL_gerada_pelo_SSH = conectar o repositório local com o remoto.
+git remote -v = para verificar se a conexão do local com o remoto está funcionando normalmente.
+git checkout nome_branch = para mudar de branch
+git push nome_repositório nome_branch = mandar para o github
+* - indica a branch atual sendo modificada
+
+Resumo
+Em suma, todo esse processo acontece nessa ordem:
+Uma pasta é criada para armazenar um repositório local (mkdir <nome da pasta>);
+Nos movemos para a pasta criada (cd <nome da pasta criada>);
+Um repositório local é criado nessa pasta, e aqui já será possível ter controle de versionamento (git init);
+Modificamos os arquivos que queremos modificar;
+Verificamos quais arquivos foram alterados (git status);
+Arquivos selecionados pelo usuário são adicionados ao que será modificado na próxima versão (git add);
+Uma nova versão desse repositório local é criada com uma descrição do que essa versão muda em relação à antiga (git commit -m "<mensagem desejada>");
+Empurra as alterações do repositório local para o repositório remoto (git push).
+
+
+
+
+pull: Com esta operação é possível pegar a versão de outra área de trabalho e mesclar com a sua.
+push: Com esta operação temos o processo inverso do pull, ou seja, enviando para outra área a sua versão do projeto.
+merge: fusão de branchs
+
+-branch: são ramificações do arquivo principal, atalizações que vai adicionando ao arquivo principal.
+-merge: é a junção dos arquivos, como por exemplo duas branch.
+-SSH ou Secure Shell: é um protocolo de criptografia de rede que serve para transferir dados de forma segura mesmo em redes inseguras. Usando o protocolo SSH, você pode se conectar ao GitHub sem precisar digitar seu nome e chave de acesso pessoal a cada comando executado.
+-HTTPS ou Hypertext Transfer Protocol Secure: é uma extensão do protocolo de internet HTTP (você verá mais sobre esse protocolo no dia de conteúdo que trata sobre internet!) que utiliza certificados digitais para autenticar os dados e permitir que eles sejam criptografados de forma segura.
+
+
+
+
+
+
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKjPoW/+6hUZHHxj8tSuMwqnixON9Rr39xkePS8KBBqC pedropwks@gmail.com

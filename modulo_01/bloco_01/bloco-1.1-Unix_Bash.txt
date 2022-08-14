@@ -1,0 +1,78 @@
+❓️# O que é Kernel? 
+R: Kernel é o que liga o hardware com o sofware. EX: Ao ligar o PC ou executar um software (aplicativo) ele vai verificar seu hardware, como placa de vídeo, memória RAM, entre outros. Ele é remponsável também pelo gerenciamento de memória, processos e arquivos.
+
+❓️# O que é Shell?
+R: É a interface gráfica ou o próprio terminal, é o que liga o usuário ao kernel.
+
+☢️# Comandos do Unix:
+
+🎃️* ATALHOS:
+ ctrl + alt + t - atalho para abrir o terminal.
+ ctrl + l - atalho para limpar o terminal.
+ 
+⛔️* DICAS:
+ Apertando a tecla TAB complementa o nome do arquivo ou diretório.
+ 
+☢️* PRINCIPAIS:
+
+🎃️# COMANDOS TERMINAL:
+ clear = limpa o terminal (não apaga, apenas limpa)
+ pwd = mostra o caminho até chegar no diretório que você está
+ whatis + comando = saber o que o comando faz
+
+🎃️# COMANDO GREP:
+ grep + palavra ou letra + arquivo = para procurar palavras ou letras no arquivo
+ grep -i + nome_do_arquivo = para procurar palavras ou letras no arquivo sem ter diferença entre letras maiúsculas e minúsculas
+ grep -i 'palavra' + nome_do_arquivo = para buscar frases no arquivo
+ grep -iv 'palavra' + nome_do_arquivo = para achar todos os valores que não corresponde a busca
+ grep -in 'palavra' + nome_do_arquivo = para encontrar a frase mais a linha que se encontra
+ grep -ic 'palavra' + nome_do_arquivo = quantidade de vezes que é repetido
+
+🎃️# COMANDO CD:
+ cd + nome_do_arquivo = troca de diretório
+ cd . = fala em qual diretório está
+ cd .. = volta pro diretório anterior
+ 
+🎃️# COMANDO LS:
+ ls + nome_do_arquivo = lista todos os diretórios que contém naquele diretório
+ ls -a + nome_do_arquivo = mostra todos diretórios até os ocultos
+ ls * = mostra tudo e os arquivos que tem nos diretórios
+
+🎃️# COMANDO WC:
+ wc + nome_do_arquivo = 1- núimeros de linhas que o arquivo tem, 2- número de palavras que o arquivo tem, 3- número de caracteres que o arquivo tem
+ wc + -w + nome_do_arquivo = número de palavras que o arquivo tem
+ wc + -l + nome_do_arquivo = número de linhas que o arquivo tem
+ wc + -c + nome_do_arquivo = número de caracteres que o arquivo tem
+
+🎃️# COMANDOS DE DIRETÓRIOS:
+ mkdir + nome_do_diretório = cria um diretório
+ rmdir + nome_do_diretório = apaga um diretório (só apaga se estiver vazio, sem arquivos, então tem que apagar os arquivos antes)
+ rmdir -rf + nome_do_diretório = apaga o diretório mesmo tendo arquivos dentro
+ cp + /diretório_que_deseja = copia um arquivo
+ mv + + nome_do_arquivo ou nome_do_diretório = para mover de um lugar para o outro
+ mv + nome_do_arquivo_que_quer_renomear + nome_novo_arquivo = para renomear o arquivo
+
+🎃️# COMANDOS DE ARQUIVOS:
+ touch + nome_do_arquivo = cria um arquivo
+ mv + + nome_do_arquivo ou nome_do_diretório = para mover de um lugar para o outro
+ mv + nome_do_arquivo_que_quer_renomear + nome_novo_arquivo = para renomear o arquivo
+ rm + nome_do_arquivo = para remover arquivos
+ cat + nome_do_arquivo = mostra o conteúido do arquivo
+ less + nome_do_arquivo = para criar uma página contendo tudo que tem no arquivo, apertar espaço para ir para a próxima página (para sair aperta a letra "Q"
+ head + nome_do_arquivo = mostra os 10 primeiros valores (se quiser 5 colocar "-5")
+ tail + nome_do_arquivo = os 10 últimos valores (se quiser 5 colocar "-5")
+ 
+
+☢️* SECUNDÁRIOS:
+ / - diretório raiz
+ boot - arquivos de configuração para inicialização
+ bin - aplicativos binários
+ dev - arquivos do dispositivo
+ etc - scripts de inicialização
+ home - diretório home para diferentes usuários
+ proc - diretório dinâmico e especial, tem informações do estado do sistema e os processos atualmente executados.
+ root - diretório home do usuário root
+ sbin - são os binários dos sistemas importantes
+ tmp - arquivos temporários
+ usr - aplicativos e arquivos, que na maioria das vezes são disponiveis a todos os usuários
+ var - arquivos variáveis como logs e bancos de dados

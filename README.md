@@ -1,2 +1,2 @@
-# estudo_trybe
-Anotações das aulas/estudo da Trybe 🚀️
+Todas as anotações feitas durante o curso da Trybe estão aqui!
+Divididos em módulos, blocos e dias.
