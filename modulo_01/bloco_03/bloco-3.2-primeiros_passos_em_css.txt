@@ -37,4 +37,9 @@ body {
    </ol>
 </body>
 
+☢️#Também tem como adicionar o CSS externamente e ocupar menos espaço no código, para isso precisa criar um outro arquivo com ".css" no final e colocar o código que fizemos na parte style nele, mas sem colocar a tag "style".
+
+🎃️Agora para ligar o código html com o arquivo CSS, tem que colocar o seguinte código:
+
+<link rel="stylesheet" type="text/css" href="nome_do_arquivo">  = o "type" informa o tipo de arquivo q é um arquivo de texto em css e "href" escolhe o arquivo q tem o código em css.
 
