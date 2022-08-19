@@ -1,0 +1,51 @@
+#TAGS:
+
+<span>texto</span>   = serve para modificar uma parte ou palavra específica do texto adicionando uma classe ou id, sem interferir no texto todo.
+
+<div>    = serve para selecionar um grupo que está entre ela para modificar. Funciona como um bloco.
+</div>
+
+#ATRIBUTOS CSS:
+
+-para aplicar um mesmo produto pra dois tipos de tag é só usar a "," separando eles. ex: h1, h4.
+
+width: 200px;   = largura
+
+height: 200px;   = altura
+
+overflow: auto;    = serve para ter visibilidade, caso o texto esteja passando da "<div>" indicada, pode usar overflow no auto para ter visibilidade dela, acaba criando um scroll para descer e ver o resto do texto. (também pode definir eixo y=vertical e o x=horizontal, tem os dois caso de overflow.)
+
+position: absolute   = ficar naquela posiçãoabsoluta, pode sobrepor outra imagem. (também tem o fixed, que no qualk fica fixado, bom para menu).
+
+top: 100px;   = define a que distância do topo da página vai ficar o elemento.
+
+left: 100px;   = define que distancia vai ficar da esquerda da página.
+
+z-index: 30pc;   = define em ordem númerica o que vai aparecer primeiro em sequência, bom para sobrepor imagem.
+
+margin-right: 10px;   = aumenta a margem.
+
+float: left;   = fica flutuando.
+
+#TERMOS DO MODELO DE CAIXAS DO CSS:
+
+width e height = largura e altura do conteúdo sem conta as bordas, apenas do conteúdo.
+padding = indica o espaço vazio entre o conteúdo e a borda da caixa.
+border = é a borda da caixa.
+margin = ela é um campo de força, se passar dela vc n vai ver o conteúdo, mas ele vai estar lá.
+
+#PSEUDOCLASSES:
+
+psedoclasses sempre vem acompanhada por dois ponto, ex: li: ou h4: e podem ser usadas em qualquer tag.
+alguns tipos de pseudoclasses.
+
+li: hover {
+  background-color: green;   = esse código faz com que quando eu passe o mouse em cima de qualquer item da minha lista o background daquele item fique verde.
+}
+li: active {
+  color: white;   = esse código faz com que quando eu clique em um item da lista, a cor da fonte dele fique branca.
+}
+
+*DICA: CLASSES - ao usar uma classe em uma tag, para usar outra classe para a mesma é só entre as aspas dar um espaço e definir a outra classe para ele. ex: <p class:"pedro joyce">.
+
+se quiser definir um item em específico da classe que não tenha uma borda por exemplo, é só colocar os itens que você quer q tenha a borda e apagar da classe. ex: p.class_criada {...
