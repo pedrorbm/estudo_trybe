@@ -1,0 +1,41 @@
+seletores e posicionamento
+
+
+.super-mario {
+  width: 200px;
+  position: absolute;
+  margin-left: 0px;
+}
+
+.goomba {
+  width: 100px;
+  margin-top: 290px;
+  margin-left: 50px;
+}
+
+.baloon {
+  margin-top: 25px;
+  margin-left: 110px;
+  position: absolute;
+  z-index: 2pc;
+}
+
+.speech {
+  font-size: 25px;
+}
+
+.bowser {
+  width: 200px;
+  margin-left: 400px;
+  margin-top: 200px; 
+  position: absolute;
+  z-index: 3pc;
+}
+
+p {
+  margin-top: -350px;
+  margin-left: 280px;
+  position: absolute
+  z-index: 1;
+}
+
