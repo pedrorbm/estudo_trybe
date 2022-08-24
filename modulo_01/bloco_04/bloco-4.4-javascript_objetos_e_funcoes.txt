@@ -1,0 +1,86 @@
+#OBJETOS:
+
+- o objeto é um tipo de valor de uma variável como a string, number, e boolean. mas ele consegue armazenar muitos valores, dando nome a cada um, podendo adicionar, arrays, números e strings.
+ex:
+let objeto = {
+   name: 'pedro',
+   age: 23,
+   city: 'natal'
+   sobrenome: 'medeiros'
+};
+
+- o objeto sempre inicia com chaves e ao final de cada valor declarado, se quiser colocar outros tem que colocar uma vírgula no final.
+
+* para acessar o valor de cada objeto definido, existem dois jeitos.
+ex:
+objeto.name    = mostra o name que está definido em objeto, que no caso é pedro.
+     ou
+objeto['name']     = vai mostrar a mesma coisa.
+
+- também utilizando a última forma de acessar o valor do obejeto podemos acrescentar um outro objeto e definir o valor dele.
+ex:
+objeto['fullName'] = objeto.name + objeto.sobrenome     = vai ser igual a pedro medeiros e adicionamos um objeto com esse valor.
+
+- dentro de um objeto podemos formar outro objeto.
+ex:
+let objeto = {
+   name: 'pedro',
+   age: 23,
+   city: 'natal'
+   sobrenome: 'medeiros'
+   internet: {                  = dentro de um objeto inserimos outro objeto, para acessar é o mesmo jeito. ex: objeto['internet']['tim']
+       oi: operadora,
+       tim: celular
+   }
+};
+
+#REGRAS:
+
+- existem algumas regras de formato, são 3.
+1- camelcase para nomear os objetos.
+2- nome-sobrenome
+3- 'sendo-uma-string'     = nesse caso para acessar o valor tem q ser da mesma maneira objeto['sendo-uma-string']
+
+
+#COMANDOS:
+
+console.table(objeto)     = mostra em forma de tabela os objetos e seus respectivos valores.
+
+#FOR IN:
+
+ex objeto:
+for (let key in objeto) {
+    console.log(key)     = vai mostrar todas as chaves que tem no objeto.
+    console.log(objeto[key])     = mostra os valores das chaves que tem em objeto.
+    console.log(key, objeto[key])     = mostra as chaves e os valores.
+}
+
+ex array:
+for (let key in array) {
+    console.log(key)     = vai mostrar todas os indices que tem no array. ex: 0, 1, 2
+    console.log(array[key])     = mostra os valores dos indices que tem em objeto.
+    console.log(key, array[key])     = mostra os indices e os valores.
+}
+
+
+#FOR OF:
+
+ex:
+let food = ['hamburguer', 'bife', 'acarajé'];
+for (let value of food) {
+  console.log(value);       = ao contrário do for in ele já exibe os valores e não as chaves ou indices.
+};
+//resultado: hamburguer, bife, acarajé;
+
+#FUNÇÃO:
+
+ex:
+function bomDiaTryber(nome) {                        = serve para encapsular códigos e dividir em partes organizados.
+  console.log('Bom dia, ' + nome);
+}
+
+bomDiaTryber('João'); // Bom dia, João
+bomDiaTryber('Julia'); // Bom dia, Julia
+bomDiaTryber('Marcelo'); // Bom dia, Marcelo
+
+
