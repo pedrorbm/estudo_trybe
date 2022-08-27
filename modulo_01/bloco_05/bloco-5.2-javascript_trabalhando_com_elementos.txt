@@ -1,0 +1,38 @@
+#BUSCANDO ELEMENTOS:
+
+- .parentNode  = vai buscar o pai daquele nó, sempre que ele for se repetindo vai buscando o pai de cada um.
+ex:
+document.querySelector(.class).parentNode      = vai buscar o pai da classe "class", que por exemplo seria a tag section.
+document.querySelector(.class).parentNode.parentNode      = vai buscar o pai da tag section, que por exemplo seria a tag body.
+document.querySelector(.class).parentNode.parentNode.parentNode      = vai buscar o pai da tag body, que por exemplo seria a tag html.
+
+#OUTROS CÓDIGOS:
+- .parentNode: retorna o nó pai.
+- .parentElement: retorna o elemento pai.
+- .childNodes: retorna um NodeList com todos os nós filhos.
+- .children: retorna um HTMLCollection com todos os elementos filhos.
+- .firstChild: retorna o primeiro nó filho.
+- .firstElementChild: retorna o primeiro elemento filho.
+- .lastChild: retorna o último nó filho.
+- .lastElementChild: retorna o último elemento filho.
+- .nextSibling: retorna o próximo nó.
+- .nextElementSibling: retorna o próximo elemento.
+- .previousSibling: retorna o nó anterior.
+- .previousElementSibling: retorna o elemento anterior.
+
+- .createElement     = vai criar um elemento, como o "li" que é item de lista ou um "p" que é parágrafo. 
+ex: 
+document.createElement("li")     = vai criar o elemento "li" que é lista.
+
+- .appendChild    =  vai adicionar o conteúdo como filho de uma tag pai, no caso aqui não seleciona document e sim a tag pai, é aconsalhavel criar a variável colocando a tag pai nela.
+ex:
+variavelQueTemTagPai.appenChild(tag que vau ser adicionada)    =  vai adicionar a tag como filha da tag pai
+
+#EX DE COMO CRIAR UM ELEMENTO E COLOCAR ELE NO HTML EM FORMA DE FUNCTION E CRIANDO VARIÁVEL PARA ARMAZENAR:
+
+const body = document.getElementsTagName("body")[0]
+
+function nomeDaFuncao(param1) {
+  let adiciona = document.createElement(param1);
+  body.adiciona(param1) 
+} 
