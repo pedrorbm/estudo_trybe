@@ -36,3 +36,7 @@ function nomeDaFuncao(param1) {
   let adiciona = document.createElement(param1);
   body.adiciona(param1) 
 } 
+
+- .removeChild     = vai remover o filho.
+ex:
+document.querySelector("body").removeChild("header")     = vai remover o header de body.
