@@ -1,0 +1,33 @@
+#CÓDIGOS:
+
+#INLINE EVENT HANDLERS: = ação feita pelo navegador.
+
+- window.onload      = chama uma função para ser mostrada, assim que a página for carregada completamente.
+ex:
+window.onload = function
+
+function function() {
+   alert("página carregada.")          = quando a página terminar de carregar, vai ser mostrado esse aviso.
+}
+
+#ON-EVENT HANDLERS:  = ação feita pela pessoa usuária.
+
+- onclick=""         = fica dentro da tag buttom, ele é carregado quando o usuário faz alguma ação.
+ex:
+<button onclick="function();">chama a função</button>       = ele vai chamar uma determinada função quando o usuário apertar.
+
+#CÓDIGO CORRETO:
+
+- .addEventListener     = vai fazer a mesma coisa que acima, só que dentro do meu código javascript. Ele define qual o tipo de evento e define qual função mostrar.
+ex:
+<p id="exemploDeId">alguma coisa</p>              = código HTML que tem o parágrafo.
+
+let p = document.getElementByID("exemploDeId");       = caminho para chegar no parágrafo.
+
+p.addEventListener("click", nomeDaFuncao);      = adiciona qual tipo de vento é e qual função chamar quando for feito.
+
+function nomeDaFuncao() {
+   console.log(event.target)         = vai fazer com que quando clicar no parágrafo, mostre a origem dele.
+}
+
+- Existem muitos tipos de eventos.

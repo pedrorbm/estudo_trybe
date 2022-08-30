@@ -40,3 +40,5 @@ function nomeDaFuncao(param1) {
 - .removeChild     = vai remover o filho.
 ex:
 document.querySelector("body").removeChild("header")     = vai remover o header de body.
+
+- .includes      = significa estar incluido.
