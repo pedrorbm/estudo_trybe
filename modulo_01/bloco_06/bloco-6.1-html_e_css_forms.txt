@@ -1,0 +1,46 @@
+#CÓDIGOS:
+
+#TAGS:
+
+- form = tag que indica que é um formulário, nela colocamos as informações de que tipo é e para onde é para enviar.
+ex:
+<form action="" method="GET">     = o formulário vai enviar as informações para a URL.
+
+- input = inserir um campo do tipo texto (lembrando que o imput tem vários tipos).
+ex:
+<input type="text" name="text">      = vai colocar um espaço no site para digitar algo.
+
+#INPUT TYPES:
+- type checkbox = ficar com um quadradrinho para marcar.
+- type radio = fica uma bolinha para marcar.
+- type password = campo de senha, ao digitar vai ficar aparecendo as bolinhas quando colocamos uma senha.
+- type file = seleciona para enviar um arquivo. (Ao selecionar esse tipo tem que usar o atributo enctype e eswcolher um que pega tanto texto como arquivos.)
+
+*[DICA] - COLOCAR O ID DO INPUT NO LABEL PARA LIGAR, ASSIM QUANDO CLICAR NO NOME O INPUT VAI SER SELECIONADO. 
+*[DICA] - COLOCAR O MESMO NAME NOS INPUTS VAI FAZER COM QUE SÓ UMA OPÇÃO SEJA MARCADA, CASO QUEIRA QUE MAIS DE UMA SEJA SELECIONADA É SÓ COLOCAR NAMES DIFERENTES.
+
+#ATRIBUTOS DO INPUT:
+- placeholder = colocar texto flutuante no espaço do input.
+- required = só vai poder ser enviado se preencher o campo.
+- value = vai definir um valor que já vai vir preenchido no campo.
+- id = também podemos colocar um id no input.
+
+- button = inserir um botão.
+ex:
+<button type="submit">Enviar</button>      = coloca um botão do tipo submit com nome enviar.
+
+- label = vai colocar um texto antes do input, do espaço para escrever.
+ex:
+<label for="aqui coloca o id do input para ligar os dois">Digite seu nome:</label>
+
+- textarea = vai colocar um campo maior de texto para ser preenchido ou vir um valor já definido.
+ex:
+<textarea name="" id="" cols="10" rows="5"></textarea>      = vai vir com um limite de 10 colunas e 5 linhas.
+
+- select = vai colocar as opções em forma de lista, geralmente usado em estados e sempre vem acompanhado de option, que são as opções.
+ex:
+<select name="" id="">
+   <option value="SP">São Paulo</option>
+</select>
+
+- event.preventDefault()  = evento que redefine o objetivo de um butão como por exemplo do submit, que ao apertar nele ele recarrega a página! Caso eu queira o valor que foi digitado no botão que tem o submit é prciso utilizar esse evento, pois só assim a página não vai ser recarregada.
