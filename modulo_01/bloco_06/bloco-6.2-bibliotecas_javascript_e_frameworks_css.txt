@@ -1,0 +1,17 @@
+#BIBLIOTECAS E FRAMEWORKS:
+
+- bibliotecas = tem pequenas partes de códigos mais especificado para uma coisa só.
+- frameworks = tem várias functions já criadas, é mais amplo.
+
+#FRAMEWORKS MAIS FAMOSOS:
+
+- bulma
+- bootstrap
+- semantic ui
+- materialize
+
+#BIBLIOTECAS MAIS FAMOSAS:
+
+- moment.js
+- highcharts
+
