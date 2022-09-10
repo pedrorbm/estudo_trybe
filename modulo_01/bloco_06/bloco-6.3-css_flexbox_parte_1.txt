@@ -1,0 +1,40 @@
+# PARA USAR O FLEXBOX:
+
+.flex-container {
+    display: flex;
+}
+
+- código no css para usar o flexbox.
+
+* Lembrando que o display flex é usado para containers.
+
+# FLEX AXIS:
+- O layout do Flexbox é baseado em flex-directions (direções flex). Essas direções são determinadas por eixos (axis). A imagem abaixo mostra os eixos definidos em um Flex container:
+
+- Os flex items são dispostos dentro de um Flex container seguindo o Main Axis. O Main Axis tem a direção definida pela propriedade flex-direction, que pode ser horizontal, quando flex-direction é row ou row-reverse, e vertical, quando é column ou column-reverse.
+
+# CÓDIGOS:
+- flex-direction  = pode ser definida como row ou row-reverse que seria em forma horizontal e column ou column-reverse que seria forma vertical.
+
+- flex-wrap = pode ser de forma em uma única linha ou de multilinha. Para quebrar o conteúdo seria wrap, para não quebrar é nowrap.
+
+- flex-flow = vai unir o flex-direction e o flex-wrap, sen o primeiro valor de flex-direction e o segundo valor de flex-wrap.
+
+- justify-content = vai definir os espaçamentos entre os elementos ou posicionamento entre eles na linha. (é ligado com a main axis = linha.)
+
+- align-content = vai alinhar o conteúdo dos itens em forma de linha. (é ligado ao main axis.)
+
+- align-items = vai definir o posicionamento em forma de altura. (é ligado com o cross axis.)
+
+- align-self = aplicado diretamente no elemento, para definir apenas a posição dele em coluna. Caso o container já esteja com um definido e queira mudar somente um, utiliza ele.
+
+- order = caso queira trocar a posição de um item usa essa expressão, ele funciona como um array.
+ex:
+.yellow {
+  order: 1       = vai ficar na posição 1 da linha.
+}
+
+*main axis = horizontal
+*cross axis = vertical
+
+box-sizing = border box
