@@ -1,0 +1,11 @@
+#CÓDIGOS:
+
+- ESSAS SÂO PROPRIEDADES APLICADAS DIRETAMENTE AO FILHOS E NÂO AOS PAIS
+
+- align-self = vai ser aplicado no eixo cruzado diretamente no objeto.
+- flex-grow: = vai definir a largura de um elemento (entre 0 ou 1).
+- flex-shrink: = vai difenir a diminuição do elemento (entre 0 ou mais).
+- flex-basis: = vai definir a largura padrão do elemento.
+- flex: 0, 0, auto = o primeiro é o grow, o segundo shrink e o segundo basis.
+
+- DICA: lembrando que são padrões do display flex, ou seja aplicados nos filhos, caso queira que seja aplicado apenas em um elemento usa o align-self. Para aplicar em um filho usamos o container e depois a div:nth-child() entre parenteses colocamos o número do filho. 
