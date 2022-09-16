@@ -1,0 +1,25 @@
+#CÓDIGOS:
+
+- @media screen and (max-width: 768px) = para definir até um determinada largura como vai ficar a estilização no site.
+ex:
+@media screen and (max-width: 768px) {
+  body {
+    background-color: red;          = quando a tela tiver até 768px de largura vai aplicar estes efeitos.
+  }
+}
+
+caso queira fazer um arquivo css separado e linkar ele no html:
+ex:
+vai somente adicionar o atributo media no link:
+ex:
+media= "screen and (max-width: 768px)"
+
+!important = é colocado apos o estilo definido do css, para caso abaixo dele venha uma outra configuração do mesmo, ele continuar fazendo esse.
+ex:
+body {
+  background-color: blue !important;     = mesmo tendo outro comando abaixo, esse vai permanecer.
+}
+
+body {
+  background color: red;
+}
