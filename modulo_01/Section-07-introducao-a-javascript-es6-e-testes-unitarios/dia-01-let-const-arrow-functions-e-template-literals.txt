@@ -1,0 +1,47 @@
+# NOVAS FUNCIONALIDADES:
+
+# VAR, LET, CONST:
+
+- var = não é uma boa prática, foge do escopo em if, for entre outros, não usar!
+
+- let = pode mudar seu valor depois, não foge do escopo.
+
+- const = não muda seu valor, apenas pode adicionar, não foge do escopo.
+
+# TEMPLATE LITERALS:
+
+- `alguma coisa` = com aspas invertida, não precisa adicionar o sinal de mais para concatenar e nem para cortar linha, apenas apertar enter.
+ex:
+`alguma coisa
+corta linha`   = desse jeito ele quebra a linha e fica tudo separado.
+
+- ${let ou const} = serve para inserir uma variável.
+ex:
+${let ou const} = para inserir a variável.
+
+juntando os dois forma o template literals.
+ex:
+`alguma coisa ${let ou const} alguma coisa` = fica mais simples e descomplicado! 
+
+# ARROW FUNCTIONS:
+
+- DICA: SE FOR UM OBJETO É PRECISO COLOCAR ELE DENTRO DE PARÊNTESES NO ARROW FUNCTIONS.
+
+const arrow = () => {
+   return `alguma coisa` = sem parâmetro.
+}
+
+ou pode ter parâmetros:
+
+const arrow = (idade) => {
+   return `alguma coisa ${idade} anos` = com parâmetro, pode ter mais parâmetros.
+}
+
+# TERNARY OPERATOR:
+
+- condição ? se for verdadeira : se for falsa = funciona como se fosse um if e else junto.
+ex:
+const arrow = (idade) => {
+   return idade >= 18 ? `você tem ${idade} anos, é maior ou igual a 18 anos` : `você tem ${idade} anos, é menor que 18 anos`
+}
+
