@@ -1,0 +1,64 @@
+#CÓDIGOS:
+
+- throw new Error = throw serve para lançar o erro, new cria um novo objeto que o Error de erro mesmo.
+ex: 
+const sum = (value1, value2) => {
+  if (typeof value1 !== 'number' || typeof value2 !== 'number') {
+    throw new Error('Os valores devem ser numéricos');
+  }
+  return value1 + value2;
+};
+
+console.log(sum(2, '3'));
+
+- try = serve para caso o código funcione bem.
+ex:
+const sum = (value1, value2) => {
+  try {
+    verifyIsNumber(value1, value2);
+    return value1 + value2;
+  }
+
+- catch = serve para quando o código der errado chamar a mensagem de error que foi lançado pelo throw.
+ex:
+} catch (error) {
+    return error.message;
+  }
+};
+
+JUNTANDO OS 3:
+ex:
+const verifyIsNumber = (value1, value2) => {
+  if (typeof value1 !== 'number' || typeof value2 !== 'number') {
+    throw new Error('Os valores devem ser numéricos');
+  }
+};
+
+const sum = (value1, value2) => {
+  try {
+    verifyIsNumber(value1, value2);
+    return value1 + value2;
+  } catch (error) {
+    return error.message;
+  }
+};
+
+console.log(sum(2, '3'));
+
+#OBJETOS:
+
+- DICA: USAR O 'console.table()' VAI AJUDAR BASTANTE EM ALGUNS CASOS.
+
+- Object.keys(objeto) = vai mostrar todas as chaves do objeto.
+
+- Object.values(objeto) = vai mostrar todas os valores do objeto.
+
+- Object.entries(objeto) = vai mostrar cada chave:valor do objeto.
+
+- Object.assign(objeto) = vai atribuir ou reatribuir um objeto a outro, funciona como um +=.
+ex:
+Object.assign(objeto1, objeto2) = o objeto1 vai ter as chaves e valores de objeto2, caso o objeto1 já tenha chaves e valores ele só vai acrescentar, funciona como um +=.
+
+ou
+
+Object.assign({}, objeto2) = vai atribuir ao objeto vazio chaves e valores do objeto2.
