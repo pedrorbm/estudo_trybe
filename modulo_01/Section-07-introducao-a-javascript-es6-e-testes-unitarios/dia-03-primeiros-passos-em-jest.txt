@@ -8,3 +8,18 @@
 - mudar o valor da chave 'test' para 'jest'.
 - voltar ao terminal.
 - comando: npm install --save-dev jest
+
+#COMO FAZER OS TESTES:
+
+- module.exports = function = ele exporta a função para o arquivo de testes.
+ex:
+module.exports = function 
+module.exports = {function, function, function} 
+
+- require
+
+- it
+
+- expect
+
+- toBe 
