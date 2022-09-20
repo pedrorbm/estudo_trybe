@@ -1,0 +1,10 @@
+#TESTES:
+
+#COMO CRIAR O ARQUIVO DE TESTES:
+
+- entrar no repositório que vai ter o projeto.
+- comando: npm init -y
+- abrir o vs code: code .
+- mudar o valor da chave 'test' para 'jest'.
+- voltar ao terminal.
+- comando: npm install --save-dev jest
