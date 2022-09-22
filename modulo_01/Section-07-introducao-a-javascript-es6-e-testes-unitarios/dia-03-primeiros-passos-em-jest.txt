@@ -16,10 +16,41 @@ ex:
 module.exports = function 
 module.exports = {function, function, function} 
 
-- require
+- require = no arquivo de teste ele busca o arquivo '.js' a ser testado.
+ex:
+const sum = require('./sum.js')
+const {
+function,
+function,
+function,
+} = require('./nomeDoArquivo.js')
 
-- it
+- it ou test = vai fazer uma função teste para testar a função do arquivo principal.
+ex:
+test('soma dois valores', () => {
+  expect(sum(2, 3)).toBe(5);
+});
 
-- expect
+ou
 
-- toBe 
+it("greetingMessage() retorna uma mensagem no formato: `Hello, ${user}! Que bom ter você de volta`", () => {
+    expect(greetingMessage("Lucas")).toBe(
+      "Hello, Lucas! Que bom ter você de volta"
+    );
+});
+
+- expect = faz o teste colocando parâmetros na função.
+ex:
+expect(greetingMessage("Lucas")).toBe(
+   "Hello, Lucas! Que bom ter você de volta"
+);
+
+- toBe = o resultado que é esperado.
+ex:
+.toBe("Hello, Lucas! Que bom ter você de volta")
+- DICA: ELE É USADO APENAS PARA TIPOS PRIMITIVOS COMO: BOOLEAN, NUMBER, STRING.
+
+- toEqual = o resultado que é esperado. 
+ex:
+.toEqual("Hello, Lucas! Que bom ter você de volta")
+- DICA: ELE É USADO APENAS PARA OBJETOS COMO: OBJETOS, ARRAY, FUNÇÃO.
