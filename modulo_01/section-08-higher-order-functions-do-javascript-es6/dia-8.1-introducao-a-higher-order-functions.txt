@@ -1,0 +1,44 @@
+#FIRST-CLASS FUNCTIONS:
+
+- pelo próprio javascript conseguimos armazenar uma função dentro de uma variável, que é o que acontece quando usamos o arrow functions.
+- também podemos usar uma função como parâmetro de outra.
+ex:
+const sayHello = () => {
+  return ('hello trybers');
+}
+
+const printGreeting = (callback) => {
+    console.log(callback());
+}
+
+printGreeting(sayHello);
+
+#CALLBACK:
+
+- é a função que é passada por parâmetro.
+
+#HIGH ORDER FUNCTIONS:
+
+- é uma função que recebe outra função como parâmetro ou retorna uma função.
+- criamos outra função e passamos o parametro para ela, quando chamamos essa função só precisamos colocar a outra função como parâmetro e assim não precisamos chamar a outra função colocando os parâmetros nela.
+ex:
+const repeat = (number, action) => {
+  for (let count = 0; count <= number; count += 1) {
+    action(count);
+  }
+};
+
+const isEven = (number) => {
+  if (number % 2 === 0) {
+    console.log(number, 'is even');
+  }
+};
+
+const isOdd = (number) => {
+  if ((number % 2) > 0) {
+    console.log(number, 'is odd');
+  }
+};
+
+repeat(3, isEven); // Testa quais números serão pares;
+repeat(3, isOdd); // Testa quais números serão ímpares;
