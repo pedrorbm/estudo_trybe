@@ -1,0 +1,30 @@
+#ARRAY FILTER:
+
+- array.filter = serve para filtrar os resultados! Reece uma condição para executar algo, gera um array novo.
+ex:
+const arrayObject = [
+    {
+        number: 15
+    },
+    {
+        number: 90
+    }
+]
+
+const filter = arrayObject.filter((elements) => elements.number <= 20);
+console.log(filter)       = retorna o array objeto com o number menor ou igual a 20.
+
+- array.map = recebe um array de callback, retorna um novo array com o mesmo tamanho do array callback e posso adicionar mais coisas no array que eu adicionar.
+ex:
+const arrayObject = ['pedro']
+
+const filter = arrayObject.map((elements) => {
+    const object = {};
+    object.empresa = 'Trybe'
+    object.name = elements;
+    object.age = 23
+    return object
+});
+
+console.log(filter)
+
