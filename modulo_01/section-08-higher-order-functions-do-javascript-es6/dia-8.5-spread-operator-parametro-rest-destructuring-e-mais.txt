@@ -1,0 +1,26 @@
+#SPREAD OPERATOR:
+
+- ...array ou objeto = ele aplica em um novo array ou objeto as mesmas coisas que estão no array ou objeto, mas sem alterar eles, pois vai ser uma nova variável. Podendo também adicionar mais coisas.
+ex:
+const numbers = [1, 2, 3];
+
+const copyNumbers = [...numbers];    = o mesmo array de numbers, posso adicionar mais coisas se quiser.
+
+ou
+
+const numbers = {
+   number: 1,
+   number: 2
+};
+
+const copyNumbers = {
+   ...numbers            = mesmo objeto de numbers, posso adicionar mais coisas se quiser.
+};
+
+#REST:
+
+- Mesma coisa do spread, mas a diferença é que o rest é passado por parâmetro para colocar quantos quiser.
+ex:
+const funcao = (...param) => param.reduce((acc, curr) => acc + curr, 0) 
+
+console.log(funcao(1, 2, 3, 4))     = a vantagem é que posso colocar quantos parâmetros eu quiser.
