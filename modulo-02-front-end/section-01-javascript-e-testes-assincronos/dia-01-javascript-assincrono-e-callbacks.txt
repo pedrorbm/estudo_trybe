@@ -1,0 +1,54 @@
+#SETTIMOUT E CALLBACK NOVAS FUNÇÕES:
+
+- setTimout = função que onde você coloca um determinado tempo para ela ser executada, um exemplo é qunado temos um console.log antes da função e colocamos um determinado tempo para a função ser exibido, então mesmo que a função esteja depois do console.log, ela só vai mostar a mensagem depois do console.log.
+ex:
+// linhaDeProducao.js
+
+const TWO_SECONDS = 2000;    = tempo para executar a ação, só vai ser executado a função depois desse tempo.
+
+setTimeout(() => {
+  console.log('Comprar parafusos'); // Comprar parafusos
+  console.log('Adicionar ao estoque'); // Adicionar ao estoque
+}, TWO_SECONDS);
+
+console.log('1 - Receber roda'); // 1 - Receber roda
+console.log('2 - Encaixar parafusos'); // 2 - Encaixar parafusos
+console.log('3 - Fixar roda no carro'); // 3 - Fixar roda no carro
+
+// Saída:
+// 1 - Receber roda
+// 2 - Encaixar parafusos
+// 3 - Fixar roda no carro
+// Comprar parafusos
+// Adicionar ao estoque
+
+- callback = mesma lógica das HOFS, que recebiam uma função como parâmetro que era chamado de callback. essa é do mesmo jeito uma função que recebe outra como parâmetro e retorna o resultado dela, chamando ela de callback.
+ex:
+const funcao = (resultado) => console.log(resultado);
+
+const soma = (number1, number2) => number1 + number2;
+let test = soma(2, 2)
+funcao(test)
+
+ou
+
+const funcao = (resultado) => console.log(resultado);
+
+const soma = (number1, number2) => {
+    const test = number1 + number2;
+    funcao(test)
+}    
+
+soma(2, 2)
+
+ou
+
+const funcao = (resultado) => console.log(resultado);
+
+const soma = (number1, number2, callback) => {
+    const test = number1 + number2;
+    callback(test)
+}    
+
+soma(2, 2, funcao)
+callback(função)
