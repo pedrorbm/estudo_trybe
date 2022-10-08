@@ -1,0 +1,37 @@
+#API:
+
+- api = meio que interliga dois sistemas, ele serve como meio de comunicação entre sistemas.
+
+#CÓDIGOS:
+
+- fetch(url) = ele que vai pegar o código da URL do api.
+ex:
+const url = 'api.chucknorris.io/jokes/random?category=dev';
+
+fetch(url)
+
+- .json() = transforma em um json.
+ex:
+.then((response) => response.json())
+
+- .then = é uma função que vai receber uma promisse que pode estar em estado de pendente ou finalizado mostrando o resultado.
+ex:
+.then((data) => console.log(data.value))
+
+- .catch = em caso de erro na api ao buscar informação, ele executa esse erro que já vem associado ao then.
+ex:
+.catch((error) => console.log(`Algo deu errado :( \n${error}`))
+
+- EX COMPLETO:
+const fetch = require('node-fetch');
+
+const fetchJoke = () => {
+  const url = 'api.chucknorris.io/jokes/random?category=dev';
+
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => console.log(data.value))
+    .catch((error) => console.log(`Algo deu errado :( \n${error}`));
+}
+
+fetchJoke();
