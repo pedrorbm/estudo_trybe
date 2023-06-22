@@ -1,0 +1,2 @@
+# ARQUITERURA DE SOFTWARE  = Precisamos, em suma, criar padrões de organização para nossa aplicação. Em Ciência da Computação, chamamos isso de Arquitetura de Software. É um campo de estudo rico em análises e experimentos com diferentes organizações de aplicação. Em Desenvolvimento Web, um modelo se destaca em popularidade e reconhecida eficácia, e iremos estudá-lo nesta seção.
+
