@@ -1,0 +1,175 @@
+# Sobre Docker
+
+* Docker: conjunto de ferramentas (Daemon, API, CLI) para gerenciar imagens e containers.
+
+* Arquivo Dockerfile: arquivo com linguagem própria, com os passos necessários para criar uma nova imagem Docker usando o código-fonte de um projeto.
+
+* Imagem Docker: é o projeto “compactado”, que foi construído de acordo com os passos contidos no arquivo Dockerfile. Pode ser usado como base para criar novas imagens Docker.
+
+* Container: é a execução de projeto através da sua imagem Docker já construída anteriormente.
+
+* Registry: é o local remoto onde podemos enviar e baixar imagens Docker. Um registry pode ser público ou privado.
+
+* Docker Hub:É o registry oficial da empresa Docker Inc. Ele é público, porém possui alguns limites. É possível assinar o serviço para utilizá-lo como registry privado.
+_________________________________________________________________________________________________________________________________________________
+
+# Docker Comandos
+
+* Comando padrão do Docker: docker container run <flags>? <imagem>:<tag> <argumentos>?
+* flags: ex: --rm
+* imagem: ex: alpine
+* tag: ex: 3.14 (versão)
+* imagem:tag ex: alpine:3.14 (alpine na versão 3.14)
+* argumentos: ex: echo "Hello World" (usa o comando echo do terminal para mostrar "Hello World")
+
+- docker images = mostrar as imagens que já foram rodadas no seu docker.
+
+- docker container ls = visualizar os containers que estão rodando.
+
+- docker container ls -a = visualizar todos os container até os que já foram fechados.
+
+- docker create <flags> <nome-da-imagem> = apenas para criar o container sem rodar ele.
+
+- docker container run alpine:3.14 = vai rodar um container contendo a imagem do alpine versão 3.14.
+
+- docker container run --name container1 alpine:3.14 = definimos o nome do container com a flag (--name e depois definindo o nome) para container1.
+
+- docker container run --name container1 alpine:3.14 echo "Hello World" = usamos o comando (echo) e logo em seguida o que eu quero que apareça no terminal, que no caso seria "Hello World" como foi digitado.
+
+- docker container rm <nome-do-container> = para apagar o container (apenas se ele estiver parado ou se já terminou).
+
+- docker container rm -f <nome-do-container> = para forçar e apagar o container.
+
+- docker container run --rm alpine:3.14 echo "Hello World" = usamos a tag (--rm) para assim que for executado apagar o container.
+
+- docker container run (-d ou --detach) alpine:3.14 sleep 300 = usamos a flag (-d ou --detach) para colocar em segundo plano e o argumento (sleep) para deixar ele rodando por 300 segundos.
+
+- docker container stop <nome-do-container> = usando a flag (stop) pedir para o container terminar tudo e parar.
+
+- docker container -t 0 <nome-do-container> = usando a flag (-t 0) faz com que force a parada imediatamente do container.
+
+- docker exec -it <nome-do-container> sh = usamos as flags (-i de interativa e -t para abrir sessão no terminal) para executar no container determinado uma imagem de modo interativo (o container tem que estar em execução).
+
+- docker container prune = remove todos os container inativos do computador.
+
+- docker pull <nome-da-imagem> = para adicionar uma imagem no docker, sem iniciar um container.
+
+- docker rmi <id-da-imagem> = para remover a imagem do docker.
+
+_________________________________________________________________________________________________________________________________________________
+
+# Dockerfile
+
+ex:
+FROM alpine:3.14
+CMD ["echo", "Teste Dockerfile"] ou CMD echo "Teste Dockerfile"
+
+* FROM = nossa imagem vai ser contruida através da imagem já existente chamada alpine na versão 3.14.
+* CMD = qual comando vai ser utilizado assim que a imagem for iniciada no container.
+
+ex mais robusto:
+FROM httpd:2.4.54
+COPY index.html /usr/local/apache2/htdocs/
+EXPOSE 80
+CMD ["httpd-foreground"]
+
+* FROM = a imagem que vai ser baseada a contrução da nossa imagem.
+* COPY = vai pegar o arquivo do computador local e colocar em um caminho onde a imagem selecionada que no exemplo é a (httpd) vai procurar e achar, pois é um caminho da imagem selecionada.
+* EXPOSE = informa a porta no qual pode receber conexões, que no caso é a 80 que é a padrão do httpd.
+* CMD = estamos especificando que o programa httpd-foreground seja executado ao iniciar essa imagem como um container, este programa já veio junto com a imagem base, portanto não precisamos nos preocupar.
+
+ex mais completo:
+FROM nginx:1.21.3-alpine AS primeiro-estagio
+WORKDIR /site
+
+COPY config.toml config.toml
+COPY index.html /site/layouts/index.html
+COPY _index.md /site/content/_index.md
+
+RUN apk add hugo
+RUN hugo --minify --gc
+RUN mv /site/public/* /usr/share/nginx/html
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+* FROM = a imagem que vai ser baseada a contrução da nossa imagem.
+* AS = nomeamos o estágio, serve para se basear.
+* WORKDIR = indica qual é a pasta atual de trabalho dentro da imagem.
+* COPY = vai pegar o arquivo do computador local e colocar em um caminho onde a imagem selecionada que no exemplo é a (httpd) vai procurar e achar, pois é um caminho da imagem selecionada.
+* RUN = indica que o comando deve ser executado imediatamente =
+A primeira linha com RUN instala o ferramenta Hugo na nossa imagem Docker;
+A segunda linha executa o comando hugo –minify –gc para gerar as páginas finais em HTML, baseados nos arquivos de templates (index.html) e conteúdos (_index.md);
+A terceira linha executa o comando mv para mover as páginas resultantes do Hugo para o caminho onde o nginx espera que tenha páginas HTML para serem servidas.
+* ENTRYPOINT = indica qual comando deve ser executado ao iniciar.
+
+ex mais sofisticados deixando no computador apenas o que é necessário para usar:
+# Primeiro Estágio
+FROM alpine:3.14 AS primeiro-estagio
+WORKDIR /site
+
+COPY config.toml config.toml
+COPY index.html /site/layouts/index.html
+COPY _index.md /site/content/_index.md
+
+RUN apk add hugo
+RUN hugo --minify --gc
+
+# Segundo Estágio
+FROM nginx:1.21.3-alpine AS segundo-estagio
+COPY --from=primeiro-estagio /site/public/ /usr/share/nginx/html
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+* Aqui tem o segundo estágio denominado pela tag (AS) e no arquivo Dockerfile temos dois (FROM) que indica o início de um novo estágio e o que prevalece é sempre o último.
+* No segundo estágio, a linha COPY possui uma flag extra -from=primeiro-estagio:
+Esse é o segredo principal de construção de múltiplos estágios;
+O (COPY) possui a capacidade de copiar arquivos entre os estágios;
+A flag (--from) indica que devemos copiar o seguinte arquivo ou pasta de um estágio para o estágio atual;
+Neste caso acima, estamos copiando as páginas HTML resultantes do Hugo diretamente para uma imagem Docker limpa de nginx!
+* Serve para deixar a imagem mais leve e apenas deixando instalado o que necessita.
+
+# Construção da imagem
+
+* Comando padrão: docker build <flags> -t <nome-da-imagem> <contexto>
+
+ex: 
+docker build -t primeira-imagem . = a flag (-t) indica qual será o nome da imagem e a tag, o (.) no final é o contexto que serve para indicar o caminho da pasta, que o atual.
+- depois é só rodar a imagem criada em um container.
+
+- docker container run --rm -d -p 3000:80 --name container-web imagem-web = vai rodar a imagem utilizando as flags (--rm para excluir automaticamente quando parar, -d que é o detach para rodar em segundo plano, -p para selecionar a porta do meu computador que foi a 3000 para rodar como a porta 80 do container, --name para nomear o container.) por final colocamos o nome da imagem que criamos para rodar, para ver o html é só abrir o navegador e acessar o endereço localhost:3000, que dá acesso a porta 3000 do computador para acessar a imagem que subimos.
+
+- docker system prune -af = para remover todos os containers e imagens que tem do docker no computador.
+
+# RUN vs ENTRYPOINT vs CMD?
+
+* RUN <comando> <argumento1> <argumento2> <argumentoN>:
+
+Indica que o comando dado deve ser executado durante a construção da imagem Docker!
+Ou seja, é muito comum utilizar o RUN para fazer instalações de dependências.
+
+* ENTRYPOINT <comando> <argumento1> <argumento2> <argumentoN>:
+(ELE É EXECUTADO OBRIGATORIAMENTE)
+Indica qual é o comando (e seus argumentos) que deve ser executado ao iniciar esta imagem Docker como um container;
+Considere o ENTRYPOINT como obrigação de comando a ser executado;
+Ele sempre será utilizado como ponto de entrada da imagem.
+
+* CMD <comando> <argumento1> <argumento2> <argumentoN>:
+(ELE É UMA SUGESTÃO QUE PODE SER MUDADA)
+Indica qual é o comando (e seus argumentos) que pode ser executado ao iniciar esta imagem Docker como um container;
+Conside o CMD como sugestão de comando a ser executado;
+Ele pode ser substituído ao executar o comando docker run imagem <comando> <argumento1>.
+
+_________________________________________________________________________________________________________________________________________________
+
+# Compose
+
+* Usando o Compose, definimos em um arquivo de configuração YAML todos os detalhes para executar nosso ambiente de desenvolvimento local, aproveitando todas as vantagens que o Docker oferece, porém sem se preocupar em subir cada um dos containers que envolvem uma aplicação com seus parâmetros específicos no run.
+
+* Do mesmo jeito que comparamos o Dockerfile a uma receita para construir imagens Docker, podemos dizer que o arquivo Compose também é uma receita, a qual indica todos os componentes que serão utilizados e também em que ordem cada container deve ser executado.
+
+* Outro recurso importante que também precisamos entender são os volumes. Eles são componentes do Docker responsáveis por preservar uma pasta dentro do container, mesmo se ele terminar sua execução. Isso é muito útil, pois é comum precisarmos de soluções para que os dados ou arquivos (como em um banco de dados) possam persistir entre uma execução e outra de container.
+
+
+	
+
+
+
