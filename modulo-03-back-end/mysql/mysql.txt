@@ -1,0 +1,179 @@
+# COMANDOS MYSQL
+
+* SELECT = vai selecionar algo da tabela ou mostrar algo.
+
+* FROM = de onde deve pegar as informações.
+
+* AS = funciona para definir o nome de algo na coluna e ser mais fácil de identificar. (caso tenha mais de uma palavra na coluna, temos que usar aspas simples na hora de nomear a coluna.
+
+EX:
+SELECT 2019 AS ano; = 2019 foi definido como ano e vai mostrar assim no resultado para ser mais fácil de identificar.
+
+EX:
+SELECT 'Pedro' AS nome, 'Medeiros' AS sobrenome, 'Natal' AS cidade, 24 AS idade;
+
+EX:
+SELECT * FROM nome_do_banco.nome_da_tabela; = vai pegar todas as informações dessa tabela. (No lugar do * que pega todas as colunas, poderia colocar apenas o nome da coluna que queira pegar.)
+
+EX:
+SELECT nome_da_coluna, outra_coluna FROM nome_do_banco.nome_da_tabela = mostra as respectivas colunas do banco de dados selecionado.
+
+* CONCAT() = vai concatenar duas ou mais colunas.
+EX:
+SELECT CONCAT(first_name, ' ', last_name) AS 'Nome Completo' FROM sakila.actor; = junta o primeiro nome e o segundo nome mostrando na coluna de Nome Completo.
+
+* DISTINCT = vai retornar apenas valores diferentes, se tiver algum repetido ele não mostra, apenas o primeiro.
+EX:
+SELECT DISTINCT first_name FROM sakila.actor; = mostra apenas os primeiros nomes, sem ter nenhum repetido, todos diferentes.
+
+* COUNT() = vai retornar quantas linhas tem o do que for pedido.
+EX:
+SELECT COUNT(*) FROM sakila.actor; = vai retornar o número de linhas que tem n atgabela actor.
+
+EX:
+SELECT COUNT(first_name) FROM sakila.actor; = vai retorna o número de linhas que tem na coluna first_name.
+
+EX:
+SELECT COUNT(DISTINCT first_name) FROM sakila.actor; =vai retornar o número de linhas que tem na coluna first_name, mas sem se repetir apenas valores diferentes.
+
+* LIMIT = para limitar quantos resultados aparece.
+EX:
+SELECT * FROM sakila.rental LIMIT 10; = vai mostrar apenas os 10 primeiros resultados.
+
+* OFFSET = pular linhas e começar da próxima em diante.
+EX:
+SELECT * FROM sakila.actor LIMIT 10 OFFSET 4; = vai pular os 4 primeiros resultados e mostrar a partir do quinto resultado em diante.
+
+* ORDER BY (ASC ou DESC) = vai ordernar em forma crescente ASC ou em forma decrescente DESC.
+EX:
+SELECT * FROM sakila.address
+ORDER BY district ASC, address DESC; = vai ordenar a coluna district em forma crescente e address em forma decrescente.
+
+* WHERE = inserir a condição que vou fazer em uma coluna.
+EX:
+SELECT * FROM sakila.payment
+WHERE (amount = 0.99 OR amount = 2.99) AND staff_id = 2; = vai retornar a coluna amount que tem o valor igual a 0.99 ou 2.99 e coluna staff_id = 2.
+
+# OPERADORES NUMÉRICOS = são operadores como =, >, que são usados em conjunto com o WHERE.
+=   IGUAL
+>   MAIOR QUE
+<   MENOR QUE
+> =  MAIOR QUE OU IGUAL
+< =  MENOR QUE OU IGUAL
+<>  DIFERENTE DE
+AND OPERADOR LÓGICO E
+OR  OPERADOR LÓGICO OU
+NOT NEGAÇÃO
+IS  COMPARA COM VALORES BOOLEANOS (TRUE, FALSE, NULL)
+EX:
+SELECT * FROM sakila.customer
+WHERE email = 'LEONARD.SCHOFIELD@sakilacustomer.org'; = para pegar as informações da linha que tem esse email cadastrado.
+
+EX:
+SELECT * FROM sakila.customer
+WHERE active IS FALSE AND store_id = 2 AND first_name <> 'KENNETH'
+ORDER BY first_name ASC; = pegar os usuários inativos, da loja com o id 2 e com o primeiro nome diferente do determinado e por fím mostrar em forma alfabética de A a Z.
+
+* LIKE = serve para fazer buscas mais específicas, como por exemplo ter alguma letra em uma coluna e sempre usa dois operadores.
+
+# OPERADORES
+_ = cada tracinho desse representa uma letra.
+% = é como se fosse um auto-complete, não importa do valor depois ou antes quando ele é usado.
+
+EX:
+SELECT * FROM sakila.film
+WHERE title LIKE '%ace%'; = vai pegar as linnhas que tem a palavra 'ace' em qualquer canto no título.
+
+SELECT * FROM sakila.film
+WHERE description LIKE '%china'; = vai pegar as linhas onde a descrição termina com 'china'.
+
+SELECT * FROM sakila.film
+WHERE description LIKE '%girl%' AND title LIKE '%lord'; = vai pegar as linhas que em algum canto da descrição tem a palavra 'girl' e o título termina com 'lord'.
+
+SELECT * FROM sakila.film
+WHERE title LIKE '___gon%'; = vai pegar as linhas onde a partir do quarto caractere vem a palavra 'gon'.
+
+* IN () = funciona como um "OR" mas sem ficar repetindo, apenas colocar as condições nos parenteses.
+EX:
+SELECT * FROM sakila.customer
+WHERE customer_id IN (1, 2, 3, 4, 5); = vai pegar todas as linhas que tem o customer id igual a 1 ou 2 ou 3 ou 4 ou 5.
+
+* BETWEEN = vai pegar todas as linhas que tiverem no intervalo de tempo definido por ele.
+EX:
+SELECT title, length FROM sakila.film
+WHERE length BETWEEN 50 AND 120; = vai pegar todas as linhas que tem a coluna length entre 50 a 120.
+
+* DATE = procurar uma data. (LEMBRANDO QUE O PADRÃO DO MYSQL É YYYY-MM-DD OU YYYY-MM-DD HH-MM-SS)
+EX:
+SELECT * FROM sakila.payment
+WHERE DATE(payment_date) = '2005-07-31'; = vai buscar a linha com a data definida.
+
+* BUSCAR APENAS ALGUMAS PARTES DA DATA:
+SELECT DATE(payment_date) FROM sakila.payment; -- YYYY-MM-DD
+SELECT YEAR(payment_date) FROM sakila.payment; -- Ano
+SELECT MONTH(payment_date) FROM sakila.payment; -- Mês
+SELECT DAY(payment_date) FROM sakila.payment; -- Dia
+SELECT HOUR(payment_date) FROM sakila.payment; -- Hora
+SELECT MINUTE(payment_date) FROM sakila.payment; -- Minuto
+SELECT SECOND(payment_date) FROM sakila.payment; -- Segundo
+
+* DESCRIBE = para ver as propriedades das colunas na tabela.
+EX:
+DESCRIBE banco_de_dados.nome_tabela;  = para ver as propriedades das colunas da tabela selecionada.
+
+* INSERT INTO = vai adicionar algo em uma tabela.
+* OBS: é bom dar um "DESCRIBE banco_de_dados.nome_tabela" para olhar as colunas e ver suas propriedades, para n colocar número em coluna que só aceitar string ou esquecer de adicionar uma coluna que é obrigatório e dar erro, entre outras...
+
+EX:
+INSERT INTO sakila.actor (first_name, last_name)
+	VALUES ('Pedro', 'Roberto');  = vai adicionar na tabela "actor" do banco de dados "sakila", na coluna "first_name" o nome 'Pedro' e na coluna "last_name" o nome 'Roberto'.
+
+EX:
+INSERT INTO sakila.actor (first_name, last_name)
+	SELECT first_name, last_name FROM sakila.staff;  = vai adicionar todos os "first_name" e "last_name" da tabela "staff" do banco de dados "sakila", na tabela "actor" exatamente no lugar de "first_name" e "last_name" do banco de dados "sakila". (Lembrando que para transferir os nomes das colunas não precisa ser igual, só basta estar na ordem.)
+
+EX:
+INSERT INTO tabelaA (coluna1, coluna2)
+    SELECT tabelaB_coluna1, tabelaB_coluna2
+    FROM tabelaB
+    WHERE tabelaB_nome_da_coluna <> 'algumValor'
+    ORDER BY tabelaB_coluna_de_ordenacao;
+
+
+* UPDATE SET = vai atualizar algo na tabela.
+EX:
+UPDATE sakila.staff
+SET first_name = 'Rannveig'
+WHERE first_name = 'Ravein';  = altera o "first_name" para um novo selecionado.
+
+EX:
+UPDATE sakila.actor
+SET first_name = 'JOE'
+WHERE actor_id IN (1,2,3);  = altera o "first_name" para 'JOE', onde tem o "actor_id" = 1, 2 ou 3.
+
+
+* DELETE = vai deletar algo na tabela.
+OBS: caso ocorra erros pode habilitar esse comando: "SET SQL_SAFE_UPDATES = 0;"
+
+EX:
+DELETE FROM sakila.film_text
+WHERE title = 'ACADEMY DINOSAUR';  = vai excluir da coluna "title" o que tem o texto selecionado.
+OBS: caso ocorra algum erro dizendo que a propriedade está ligada a outras colunas, tem que excluir de uma por uma.
+
+# TIPOS AO CRIAR TABELAS.
+
+* BOOL  = para inserir um valor booleano como true ou false, 0 ou 1.
+
+* CHAR(5)  = para inserir um determinado números de caracteres, que no caso está definido como 5, mas se for colocado 2 vai ser armazenado com espaço de 5.
+
+* VARCHAR(24)  = também pode ser inserido apena so número determinado de caracteres que no caso é 24, mas se for inserido apenas 3 vai ser armazenado de tamanho de 3.
+
+* INT  = significa que vai receber um valor numérico inteiro.
+
+* DOUBLE  = armazena um número com 2 casas decimais.
+
+* DATE  = vai colocar o ano-mês-dia
+
+* DATETIME  = vai colocar o ano-mês-dia hora-minutos-segundos
+
+
