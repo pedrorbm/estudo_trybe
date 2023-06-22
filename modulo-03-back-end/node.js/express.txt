@@ -1,0 +1,161 @@
+# ADICIONAR O EXPRESS NO PROJETO
+
+EX:
+- primeiro instalar o pacote com o código:
+npm install express
+
+- depois exportar ele em um arquivo separado:
+const express = require('express');
+
+const app = express();
+
+module.exports = app;
+
+* .listen  = é o que dá o start na aplicação e dentro dele podemos passar até 2 parâmetros. Primeiro parâmetro é o port (ou porta): Aqui passamos 3001, mas poderia ser qualquer número não utilizado acima de 1023, segundo parâmetro é uma função: Aqui passamos apenas um console.log exibindo uma mensagem “que estamos no ar”;
+
+EX:
+const app = require('./app');
+
+app.listen(3001, () => console.log('server running on port 3001'));
+
+* nodemon  = ele faz com que qualquer alteração no servidor já atualize automaticamente.
+- para instalar ele:
+npm i nodemon@2.0.15 --save-dev --save-exact
+
+- adicionar ele no script para executar:
+"dev": "nodemon src/server.js"
+
+- agora só executar o comando:
+npm run dev
+
+* rota  = uma rota é a parte de uma URL que usamos para acessar uma API e fazer uma requisição a ela.
+
+* .get  = Dentro da constante app, temos vários recursos, um deles é a função get. Usamos essa função toda vez que queremos pedir algum dado.
+
+Observe que a função get recebe dois parâmetros:
+
+1° parâmetro '/': Aqui é rota que tanto falamos. Podem ser /login, /produtos, /pessoas, ou qualquer outra coisa! Neste caso, colocamos apenas /.
+Chamamos a rota / de rota raiz;
+
+2° parâmetro (req, res) => {}: Este espera uma função de callback. Esta função pode receber de 2 a 4 parâmetros, sendo eles:
+req: Essa é a Request (ou requisição), é por meio dela que recebemos os dados (envio por query, params e body);
+res: Essa é a Response (ou resposta), é por meio dela que respondemos o que nos é solicitado;
+next: Não vamos trabalhar com ele nesta aula;
+err: Não vamos trabalhar com ele nesta aula.
+Essa função é responsável por responder nossas requisições. Então, observe o trecho res.status(200).json({ message: 'Olá Mundo!' }) e reflita sobre o que cada coisa deve significar.
+
+res como comentado, responde as requisições. Estas requisições podem ser respondidas de vários jeitos, tais como:
+Formato text/JSON, como o caso do res.json({ message: 'Olá Mundo!' });
+Formato text/HTML, como o caso do res.send('<h1>Olá Mundo!</h1>');
+Redirecionamentos, como o caso do res.redirect('https://www.betrybe.com/');
+Páginas completas ou partes dela, como o caso do res.render('index.html');
+Finalizando, como o caso do res.end();
+⚠️ Aviso: Vamos usar apenas o formato JSON por enquanto.
+
+É de costume enviar um status code, como é demostrado no trecho res.status(200).... Estes status code são importantes para identificarmos o que está acontecendo com nossas requisições, mas não se preocupe em decorá-los, com o tempo você vai aprendendo a usá-los e, se tiver dúvidas, pode consultar a documentação do MDN.
+
+Os status code mais conhecidos são:
+
+200: Que quer dizer ‘ok’;
+500: Que quer dizer erro no servidor;
+404: Este muitas pessoas já viram, ele quer dizer que a página não foi encontrada;
+De olho na dica 👀: associe os status a constantes nomeadas, desse modo você facilita a leitura! const OK = 200, const INTERNAL_SERVER_ERROR = 500 e const NOT_FOUND = 404 são ótimos começos!
+
+- tipos de request ou req = Envio por consulta, ou req.query
+Quando pesquisamos algo no Google, usamos esse método!
+
+Construção: /rota?variavel1=valor&variavel1=valor&variavelN=valor
+Explicação:
+/rota é o caminho, por exemplo, /produtos, /pessoas, /pesquisa, …;
+? é o indicador que vamos passar dados em para a rota;
+& é o separador que se usa quando queremos enviar muitos dados;
+variavelN é uma chave identificadora, por exemplo, nome, frequenciaMinima, q, …;
+valor é o valor da variável, por exemplo, nome=Tobias, frequenciaMinima=144, q=express, …;
+⏰ Hora da prática: Experimente pesquisar alguma coisa no Google e observe a mudança na URL, por exemplo: https://www.google.com.br/search?q=Express. Quando nós pesquisamos algo, a URL recebe a rota /search e o parâmetro q com o valor pesquisado (aqui no caso foi a palavra Express).
+
+Essa é uma requisição GET 😉
+
+* Envio por parâmetro ou req.params
+Esse exemplo é mais visível em e-commerces ou sites que têm produtos cadastrados.
+
+Construção: /rota/:variavelN
+Explicação:
+/rota é o caminho, por exemplo, /produto, /pessoa,, …;
+/: é o indicador que vamos passar um dado para a rota;
+variavelN é uma chave identificadora, por exemplo, id, …; (aqui geralmente passamos ids mas não se restringe a isso)
+Um exemplo prático é quando usamos algum site de compras para ver as informações do produto, vamos usar o site da Kabum por exemplo: https://www.kabum.com.br/produto/117767/. Quando nós entramos para ver mais detalhes de um produto, a URL recebe a rota /produto e o parâmetro 117767 que é o id deste produto.
+
+Como o envio anterior, essa também é uma requisição GET. 😉
+
+* Envio por corpo ou req.body
+Este exemplo nós não vemos na barra de endereços, mas usamos muito!
+
+Sabe quando preenchemos um formulário de pagamento após uma compra online ou entramos no course com nosso e-mail e senha? Aí está o envio de informações pelo corpo da requisição.
+
+O envio de informações vai pelo corpo e não mais pela URL, onde podemos ver explicitamente… Isso se dá por duas questões:
+
+A primeira é por segurança, que é a mais importante! Imagine sua senha ou código de segurança do seu cartão de crédito escritos na URL do seu computador e quem está perto de você podendo ler. 😱
+
+O segundo motivo é pelo tamanho do que enviamos. Imagina que inviável enviar todo um cadastro de um formulário gigante pela URL! 😁
+
+Também chamamos esse envio de envio tipo POST. Vamos aprofundar nele logo mais! 😉
+
+EX:
+app.get('/', (req, res) => res.status(200).json({ message: 'Olá Mundo!' }));  = vai aparecer no meu navegador (localhost:porta_escolhida_no_server) o objeto { "message":"Olá Mundo!" }
+
+OBS: LEMBRAR DE USAR O SEGUINTE CÓDIGO PARA TER EFEITO USANDO O BODY: (app.use(express.json());)
+
+* .post  = para inseir algo.
+
+EX:
+app.post('/sum/:id', (req, res) => {
+  console.log(req.params.id);
+  res.status(200).json({ message: 'Olá Mundo!' });
+});
+
+EX:
+app.post('/teams', (req, res) => {
+  const newTeam = { ...req.body };
+  teams.push(newTeam);
+
+  res.status(201).json({ team: newTeam });
+});
+
+* .put = alterar algo.
+
+EX:
+app.put('/teams/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, initials } = req.body;
+
+  const updateTeam = teams.find((team) => team.id === Number(id));
+
+  if (!updateTeam) {
+    res.status(404).json({ message: 'Team not found' });
+  }
+
+  updateTeam.name = name;
+  updateTeam.initials = initials;
+  res.status(200).json({ updateTeam });
+});
+
+* .delete = para excluir algo.
+
+EX:
+app.delete('/teams/:id', (req, res) => {
+  const { id } = req.params;
+  const arrayPosition = teams.findIndex((team) => team.id === Number(id));
+  teams.splice(arrayPosition, 1);
+
+  res.status(200).end();
+});
+
+* REST é um conjunto de boas práticas utilizadas durante a construção de uma API;
+
+* RESTful é um serviço web (desenvolvido por nós ou não) que segue as regras definidas pelo REST;
+
+* SEQUÊNCIA A SER RESPEITADA PELO CRUD(Create: Criar; Read: Ler; Update:Alterar; Delete: Deletar;):
+app.get(...)
+app.post(...)
+app.put(...)
+app.delete(...)

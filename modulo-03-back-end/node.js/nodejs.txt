@@ -1,0 +1,69 @@
+# EXPORTAÇÃO DE MÓDULOS:
+* usando o (module.exports) é o meio de exportar módulos no node.js.
+
+EX:
+// brlValue.js
+const brl = 5.37;
+
+const usdToBrl = (valueInUsd) => valueInUsd * brl;
+
+module.exports = usdToBrl;
+
+EX: IMPORTANDO PARA O HTML
+// index.js
+const convert = require('./brlValue');
+
+const usd = 10;
+const brl = convert(usd);
+
+console.log(brl) // 53.7
+
+# IMPORTAÇÃO DE MÓDULO
+* para importar módulos no node.js usamos o (require) como nos exemplos.
+
+EX: = para exportar um módulo local
+// minha-aplicacao/index.js
+const meuModulo = require('./meuModulo');
+
+console.log(meuModulo); // { funcionalidade1: [Function: funcionalidade1], funcionalidade2: [Function: funcionalidade2] }
+
+meuModulo.funcionalidade1(); 
+
+EX: = para exportar um módulo interno ou de terceiros.
+const fs = require('fs');
+
+fs.readFileSync('./meuArquivo.txt');
+
+# CRIAR UM PACOTE NO NPM
+
+EX:
+npm init -y  = para criar um pacote npm e vai criar um arquivo package.json que pode ser alterado depois com informações no projeto.
+
+EX:
+npm instal nome_do_pacote  = para instalar um pacote já existente do npm no projeto.
+
+EX:
+{
+  "scripts": {
+    "start": "node imc.js"
+  }
+}  = na aba scripts podemos adicionar comando que vai rodar com o "npm run nome_do_script".
+
+# FUNÇÕES ASSÍNCRONAS QUE RETORNA UMA PROMISSE
+
+EX:
+function dividirNumeros(num1, num2) {
+  const promise = new Promise((resolve, reject) => {
+    if (num2 == 0) 
+      reject(new Error("Não pode ser feito uma divisão por zero"));
+
+    const resultado = num1 / num2;
+    resolve(resultado)
+  });
+
+  return promise;
+}
+
+const doSomething = async () => {
+  console.log(await dividirNumeros(2,2));
+};

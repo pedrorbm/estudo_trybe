@@ -1,0 +1,29 @@
+# PARA INSTALAR O MOCHA E O CHAI:
+npm install mocha@8.4.0 chai@4.3.4 --save-dev --save-exact
+
+* ESTRUTURA DE UM TESTE:
+
+EX:
+const { expect } = require('chai');
+
+const calculaSituacao = require('../examples/calculaSituacao');
+
+describe('Quando a média for menor que 7', function () {
+  it('retorna "reprovação"', function () {
+    const resposta = calculaSituacao(4);
+
+    expect(resposta).to.be.equals('reprovação');
+  });
+});
+*OBS: PELA DOCUMENTAÇÃO O CERTO É USAR UMA FUNCTION E NÃO UMA ARROW FUNCTION.
+
+* PARA RODAR O TESTE TEM QUE COLOCA O SEGUINTE COMANDO NOS SCRIPTS:
+"test": "mocha src/*.test.js --exit"  = no meio coloca onde está seus testes e no final é para quando terminar de executtar os testes ele encerre.
+
+# PARA FAZER OS TESTES USANDO O GET, POST, PUT OU DELETE PRECISA DO CHAI E PARA INSTALAR É O COMANDO:
+npm install chai-http@4.3.0 --save-dev --save-exact
+
+* DEPOIS DE INSTALAR PARA IMPLEMENTAR:
+const chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);  = precisa usar esse comando para ter acesso as requisições http.

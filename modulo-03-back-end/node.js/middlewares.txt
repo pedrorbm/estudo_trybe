@@ -1,0 +1,280 @@
+# middlewares são as funções que verificam algo. Elas servem para não ficar repetindo funções de verificações nos métodos GET, POST, PUT e DELETE.
+
+
+* middlewares são compostos por req, res e a função next.  = req é a mesma de requisição, res de resposta a mesma também e a função next() chama o próximo passo ou o próximo middleware.
+
+EX:
+
+// src/app.js
+
+const validateTeam = (req, res, next) => {
+  const requiredProperties = ['nome', 'sigla'];
+  if (requiredProperties.every((property) => property in req.body)) {
+    next(); // Chama o próximo middleware
+  } else {
+    res.sendStatus(400); // Ou já responde avisando que deu errado
+  }
+};
+
+// Arranja os middlewares para chamar validateTeam primeiro
+app.post('/teams', validateTeam, (req, res) => {
+  const team = { id: nextId, ...req.body };
+  teams.push(team);
+  nextId += 1;
+  res.status(201).json(team);
+});
+
+app.put('/teams/:id', validateTeam, (req, res) => {
+  const id = Number(req.params.id);
+  const team = teams.find(t => t.id === id);
+  if (team) {
+    const index = teams.indexOf(team);
+    const updated = { id, ...req.body };
+    teams.splice(index, 1, updated);
+    res.status(201).json(updated);
+  } else {
+    res.sendStatus(400);
+  }
+});
+
+// module.exports = app;
+
+* middleware universal. (ele só tem efeito no que estiver abaixo dele.)
+
+EX:
+
+//...
+const app = express();
+const teams = { ... };
+
+app.use(express.json());
+// não precisa passar pelo apiCredentials pra chegar aqui
+app.get('/teams', (req, res) => res.json(teams));
+// se chegou até aqui, então vai passar pelo apiCredentials
+app.use(apiCredentials); 
+// só vai chegar aqui se tiver credenciais
+app.post('/teams', ...);
+app.put('/teams', ...);
+// ...
+
+* middleware assíncrono. (olhar GIF na pasta explicando a execução.) utilizar o header assim como mostra no gif.
+
+EX:
+
+// src/middlewares/apiCredentials.js
+
+const fs = require('fs/promises');
+
+// como vamos ler arquivos assincronamente, precisamos do async
+module.exports = async function apiCredentials(req, res, next) {
+  // pega o token do cabeçalho, se houver
+  const token = req.header('X-API-TOKEN');
+  // lê o conteúdo do `./authdata.json` (relativo à raiz do projeto)
+  const authdata = await fs.readFile('./authdata.json', { encoding: 'utf-8' });
+  // readFile nos deu uma string, agora vamos carregar um objeto a partir dela
+  const authorized = JSON.parse(authdata);
+
+  if (token in authorized) {
+    next(); // pode continuar
+  } else {
+    res.sendStatus(401); // não autorizado
+  }
+};
+
+// src/app.js
+
+const app = express();
+const apiCredentials = require('./middlewares/apiCredentials');
+//...
+app.use(express.json());
+app.use(apiCredentials); 
+
+app.get('/teams', (req, res) => res.json(teams));
+app.post('/teams', ...);
+app.put('/teams', ...);
+// ...
+
+* middleware erro, em caso de erro instalar e fazer o require do pacote para mostrar o erro do middleware.
+
+EX:
+
+npm install express-async-errors@3.1.1 --save-dev --save-exact
+
+require('express-async-errors'); // não precisa definir uma variável
+
+* é sempre bom informar o motivo do erro.
+
+EX:
+
+const validateTeam = (req, res, next) => {
+  const { nome, sigla } = req.body;
+  if (!nome) return res.status(400).json({ message: 'O campo "nome" é obrigatório'});
+  if (!sigla) return res.status(400).json({ message: 'O campo "sigla" é obrigatório'});
+  next();
+};
+
+* middlewares de terceiros:
+
+* express.static()  = serve para acessar algo estático como imagem ou algo do tipo.]
+
+EX:
+
+// src/app.js
+
+//...
+const app = express();
+// configura para procurar o path no diretório ./images
+app.use(express.static('./images'));  = caso queira acessar um domínio específico ficaria (app.use('/static', express.static('./images'));)
+//....
+
+acessando alguma imagem pelo link seria (http://localhost:3001/imagem.png) ou com uma rota definida seria (http://localhost:3001/static/imagem.png)
+
+* morgan  = ele vai dar um console.log automaticamente na requisição que estiver fazendo, como o GET, POST, PUT, DELETE.
+
+EX:
+
+npm install morgan@1.10.0 --save-exact
+
+// src/app.js
+
+const express = require('express');
+require('express-async-errors');
+const morgan = require('morgan');
+//...
+const app = express();
+app.use(morgan('dev'));  = aqui esta selecionado 'dev' ou seja vai funcionar quando colocar (npm run dev).
+app.use(express.static('./images'));
+
+* cors  = ele serve para que independente do dominio faça requisições a nossa api, serve para que outras pessoas e sites usem nossa api.
+
+EX:
+
+npm install cors@2.8.5 --save-exact
+
+const cors = require('cors');
+app.use(cors());
+
+* middleware de erro  = ele fica no final do arquivo, para caso não seja encontrado nada.
+
+EX:
+
+// src/app.js
+
+app.put('/teams/:id', validateTeam, ... );
+app.delete('/teams/:id', ... );
+
+// se ninguém respondeu, vai cair neste middleware
+app.use((req, res) => res.sendStatus(404));
+
+module.exports = app;
+
+* helmet  = O Helmet pode ajudar a proteger seu aplicativo de algumas vulnerabilidades da Web conhecidas, definindo os cabeçalhos HTTP de forma adequada. Ele é uma coleção de várias funções de middleware menores que definem cabeçalhos de resposta HTTP relacionados à segurança. Exemplos de proteção são: ataques de script entre sites, impor conexões seguras (HTTPS) ao servidor, dentre outras.
+
+EX:
+
+npm install helmet@6.0.1 --save-exact
+
+const express = require("express");
+const helmet = require("helmet");
+
+const app = express();
+
+app.use(helmet());
+
+* express-rate-limit  = é um middleware para limitar solicitações repetidas a APIs e/ou endpoints públicos
+
+EX:
+
+npm install express-rate-limit@6.7.0 --save-exact
+
+const express = require("express");
+
+const rateLimit = require("express-rate-limit");
+const app = express();
+
+// Configuramos um limitador para uma taxa máxima de 100 requisições em um intervalo de 15 minutos
+const limiter = rateLimit({
+   max: 100, // número máximo de requisições
+   windowMs: 15 * 60 * 1000, // intervalo de tempo, em milissegundos, para atingir o número máximo de requisições
+   message: "Muitas requisições originadas desta IP" // mensagem personalizada quando atinge o limit rate
+});
+
+app.use(limiter);
+
+* middleware de error  = serve para mostrar o erro é um middleware universal de erro, sempre fica no final de todas os middlewares e rotas.
+
+EX:
+
+ app.get('/teams', async (req, res, next) => {
+    try {
+         const data = await fs.readFile(path.resolve(__dirname, './teams.json'));
+         const teams = JSON.parse(data);
+         return res.status(200).json({ teams })
+     } catch (error) {
+        return next(error);
+    }
+ });
+
+app.use((error, _req, res, _next) => {
+   return res.status(500).json({ error: error.message });
+});
+
+# ROUTES  = para organizar mais cada rota.
+
+* dentro de (src) cria uma pasta chamada (routes) e dentro dela cria o arquivo nome_da_rota.routes.js e dentro dele coloca o seguinte código.
+
+EX:
+// src/routes/teamsRouter.js
+
+const express = require('express');
+// os requires são relativos ao arquivo, então o path muda ligeiramente
+const existingId = require('../middlewares/existingId');
+const validateTeam = require('../middlewares/validateTeam');
+const apiCredentials = require('../middlewares/apiCredentials');
+
+// cria um router middleware
+const router = express.Router();
+
+let nextId = 3;
+const teams = [
+  { id: 1, nome: 'São Paulo Futebol Clube', sigla: 'SPF' },
+  { id: 2, nome: 'Sociedade Esportiva Palmeiras', sigla: 'PAL' },
+];
+
+// o path é relativo à rota em que o router foi montado (2)
+router.get('/', (req, res) => res.json(teams));
+
+// configurações globais afetam apenas este router (3)
+router.use(apiCredentials);
+
+router.get('/:id', existingId, (req, res) => {
+  const id = Number(req.params.id);
+  const team = teams.find(t => t.id === id);
+  res.json(team);
+});
+
+router.post('/', validateTeam, (req, res) => {
+  const team = { id: nextId, ...req.body };
+  teams.push(team);
+  nextId += 1;
+  res.status(201).json(team);
+});
+
+router.put('/:id', existingId, validateTeam, (req, res) => {
+  const id = Number(req.params.id);
+  const team = teams.find(t => t.id === id);
+  const index = teams.indexOf(team);
+  const updated = { id, ...req.body };
+  teams.splice(index, 1, updated);
+  res.status(200).json(updated);
+});
+
+router.delete('/:id', existingId, (req, res) => {
+  const id = Number(req.params.id);
+  const team = teams.find(t => t.id === id);
+  const index = teams.indexOf(team);
+  teams.splice(index, 1);
+  res.sendStatus(204);
+});
+
+module.exports = router;
