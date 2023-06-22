@@ -1,0 +1,21 @@
+npm i eslint@6.8.0 --save-dev --save-exact  = par5a adicionar o eslint ao projeto.
+
+touch .eslintignore .eslintrc.json  = para adicionar dois arquivos do lint.
+
+- .eslintignore  = para ignorar uma pasta ou arquivos que no cado sempre vai ser a pasta node_modules.
+NESTE ARQUIVO ADICIONAR A SEGUINTE LINHA DE CÓDIGO:
+// .eslintignore
+node_modules
+
+- .eslintrc.json  = para sobrescrever algumas regras do linter.
+NESTE ARQUIVO ADICIONAR A SEGUINTE LINHA DE CÓDIGO:
+// .eslintrc.json
+{
+  "env": {
+    "es2020": true
+  },
+  "extends": "trybe-backend",
+  "rules": {
+    "sonarjs/no-duplicate-string": ["error", 5]
+  }
+}
