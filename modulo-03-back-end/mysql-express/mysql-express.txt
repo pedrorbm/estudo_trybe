@@ -1,0 +1,615 @@
+# INTEGRAR O EXPRESS COM O MYSQL ATRAVÉS DO DOCKER:
+
+* primeiro criar as pastas, instalar o node no projeto, criar arquivo "server.js" que vai iniciar o express, instalar o nodemon e definir os scripts no arquivo package.json.
+
+EX:
+mkdir trybecash-api
+cd trybecash-api
+npm init -y
+npm i nodemon@2.0.15 --save-dev --save-exact
+mkdir src   = nessa pasta criar o arquivo server.js.
+mkdir tests
+
+* depois no diretório trybecash-api criar o arquivo "docker-compose.yml" para subir no docker a imagem mysql e dentro dela escrever o código para subir a imagem no constainer.
+
+EX:
+
+version: '3'
+services:
+  database:
+    image: mysql:8.0.29
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: trybecashdb
+    ports:
+      - "33060:3306"
+      
+* No arquivo docker-compose.yaml criado, foi definido um serviço chamado database. Esse serviço inicializará um container Docker com a imagem do Servidor MySQL versão 8.0.29.
+
+* O parâmetro restart define a política de reinício do container como always. Assim, o container sempre será reiniciado automaticamente em caso de parada. Na seção environment foi definido o valor de duas variáveis dentro do container:
+MYSQL_ROOT_PASSWORD: Essa variável define a senha do usuário root do MySQL (será a senha que utilizaremos para acessar o MySQL);
+MYSQL_DATABASE: Essa variável define o nome do banco de dados que será criado ao iniciar MySQL, caso ele não exista.
+
+* Já a seção ports está vinculando uma porta do seu computador local (a porta 33060) a uma porta dentro do container (a porta 3306).
+
+* Para iniciar nossos containers, precisaremos criar um arquivo chamado "Dockerfile" na raiz do projeto, com o seguinte conteúdo:
+
+EX:
+
+FROM node:16
+
+# o expose serve apenas para sinalizar em qual porta rodaremos o container
+# a definição da porta se dá no arquivo docker-compose.yaml
+EXPOSE 3000
+
+WORKDIR /
+
+# aqui copiamos apenas o package.json e o package-lock.json, pois assim
+# garantimos que quando as dependências forem instaladas, suas versões não vão ser alteradas.
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+CMD [ "npm", "start" ]
+
+* Após a criação do Dockerfile, devemos configurar um container para rodar nossa aplicação Node.js em nosso arquivo docker-compose.yaml. Dessa forma, garantimos que ambos os ambientes funcionarão corretamente. Feito isso vamos adicionar mais informações no arquivo "docker-compose.yml" que vai ficar assim:
+
+EX:
+
+version: '3'
+services:
+  node:
+    # Faz o docker construir (build) de uma imagem personalizada
+    # baseada no arquivo Dockerfile
+    build: 
+      dockerfile: ./Dockerfile
+      context: .
+    # Nome do container para facilitar execução
+    container_name: trybecash_api
+    # Restarta a imagem caso algo a faça parar
+    restart: always
+    # Diretório padrão de execução
+    working_dir: /app
+    # Lista de volumes (diretórios) mapeados de fora para dentro do container
+    volumes:
+      # Monta o diretório atual, com todos os dados da aplicação, dentro do diretório /app
+      - ./:/app
+    ports:
+      # Expõe a porta padrão da aplicação: altere aqui caso use outra porta
+      # na notação porta_de_fora:porta_de_dentro
+      - 3000:3000
+    # Informa ao docker, para que o container node seja iniciado após o container database
+    depends_on:
+      - "database"
+
+  database:
+    image: mysql:8.0.29
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: trybecashdb
+    ports:
+      - "33060:3306"
+      
+* Após a criação dos arquivos com o conteúdo apresentado. Comece inicializando o container em segundo plano com o uso do seguinte comando:
+
+EX:
+
+docker-compose up -d ou docker compose up -d
+
+* depois disso abrir o mysql workbanch e adicionar a rede com o mesmo nome, porta e senha. Com isso precisamos criar os dados para o banco de dados e tem 2 formas para fazer isso, pegando o código e colocando em uma query na workbanch ou criando um arquivo na pasta raiz do diretório "trybecash" e inicializando junto com o "docker-compose.yml".
+
+EX: 
+
+1 - primeira forma colocando o código direto em uma query na workbench.
+
+USE trybecashdb;
+
+CREATE TABLE people (
+    id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(45) NOT NULL,
+    last_name VARCHAR(45) NOT NULL,
+    email VARCHAR(60) NOT NULL,
+    phone VARCHAR(20),
+    PRIMARY KEY(id),
+    UNIQUE(email)
+);
+
+CREATE TABLE transactions(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL,
+    description VARCHAR(100),
+    price DECIMAL(10,2) NOT NULL,
+    type INT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_transaction_person_id FOREIGN KEY (person_id)
+    REFERENCES people(id)
+);
+
+CREATE TABLE logs(
+    id INT NOT NULL AUTO_INCREMENT,
+    event VARCHAR(100) NOT NULL,
+    timestamp BIGINT NOT NULL,
+    person_id INT NOT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_logs_person_id FOREIGN KEY (person_id)
+    REFERENCES people(id)
+);
+
+EX:
+
+2 - criando um arquivo "trybecash_script.sql" na pasta raiz, colocando o mesmo código para criar as tabelas dentro desse arquivo e anexando para iniciar junto ao docker-compose.yml. (adiciona só a parte volumes)
+
+# version: '3'
+# services:
+#   database:
+#     image: mysql:8.0.29
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: trybecashdb
+#     ports:
+#       - "33060:3306"
+    volumes:
+      - ./trybecash_script.sql:/docker-entrypoint-initdb.d/trybecash_script.sql
+      
+* Pronto! Agora podemos subir nosso banco com as tabelas já criadas toda vez que inicializarmos o container! Para isso utilize o comando abaixo para derrubar e subir o container com a imagem MySQL novamente.
+
+EX:
+
+docker compose down && docker-compose up -d
+
+* depois disso instalar os pacotes node do express e do mysql no projeto.
+
+EX:
+
+npm i express@4.17.1 mysql2@2.3.3 --save-exact
+
+* criar um pasta no diretório "src" para o banco de dados chamado "db" e dentro dele o arquivo "connection.js" para fazer a conexão com o mysql utilizando a biblioteca mysql12. dentro do arquivo "connection.js" colocar os seguintes códigos:
+
+EX:
+
+// src/db/connection.js
+
+const mysql = require('mysql2/promise');
+
+const connection = mysql.createPool({
+  host: 'localhost',
+  port: 33060,
+  user: 'root',
+  password: 'root',
+  database: 'trybecashdb',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+module.exports = connection;
+
+No trecho de código acima estamos importando a biblioteca mysql2 com o recurso de promises. Isso permitirá utilizar o MySQL de forma assíncrona com async/await. Em seguida, criamos uma constante connection que recebe um pool de conexões criado com a função createPool.
+
+Um pool de conexões é um repositório que contém um conjunto de conexões estabelecidas previamente com o banco de dados. Essas conexões serão reutilizadas durante a execução da aplicação conforme a necessidade. Em outras palavras, quando uma operação no banco de dados for necessária nossa aplicação irá:
+
+Requisitar uma conexão no pool de conexões;
+Utilizar essa conexão para enviar uma operação SQL ao servidor MySQL;
+Devolver a conexão para o pool de conexões ao final da operação com o MySQL;
+Tornar a conexão disponível para ser utilizada em requisições futuras.
+
+host:  = O endereço IP do MySQL	Como temos um container docker sendo executado em nossa máquina local, o valor será localhost ou 127.0.0.1 (ambos são equivalentes)
+
+user:  =	O nome de usuário que nossa aplicação utilizará para acessar o MySQL, estamos utilizando o usuário root do MySQL
+
+port:  =	O número da porta que nossa aplicação utilizará para acessar o MySQL, estamos utilizando a porta 33060 (a porta do computador local que vinculamos com o container no docker compose)
+
+password:  =	A senha do usuário que nossa aplicação utilizará para acessar o MySQL, estamos utilizando a senha root que foi definida na variável de ambiente MYSQL_ROOT_PASSWORD no docker compose criado anteriormente
+
+database:  =	O nome do banco de dados MySQL, o qual queremos que nossa aplicação realize uma conexão, estamos utilizando o nome do banco que foi definido na variável de ambiente MYSQL_DATABASE no docker compose
+
+waitForConnections:  =  Determina qual será a ação da pool de conexões quando nenhuma conexão estiver disponível na pool e quando o limite de criação de novas conexões tiver sido alcançado, se o valor for true, será criada uma fila de espera por conexões, caso contrário a pool retornará uma callback com um erro. Caso este parâmetro seja omitido, o valor padrão será true
+
+connectionLimit:  =  O número máximo de requisições de conexão que a pool criará de uma vez, caso este parâmetro seja omitido, o valor padrão será 10
+
+queueLimit:  =  O número máximo de requisições de conexão que a pool irá enfileirar antes de retornar um erro, se o valor deste parâmetro for igual a 0 significa que não existe limite. Caso este parâmetro seja omitido, o valor padrão será 0
+
+depois disso vamos criar os arquivos express para funcionar junto com o mysql, primeiro criamos o arquivo "app.js" e colocamos o seguinte código.
+
+EX:
+
+// src/app.js
+
+const express = require('express');
+
+const app = express();
+
+app.use(express.json());
+
+module.exports = app;
+
+* o arquivo "express.js" já está criado só vamos colocar o mesmo código para iniciar o express, mas agora com uma parte a mais que é para iniciar o a conexão com o mysql também.
+
+EX:
+
+// src/server.js
+const app = require('./app');
+const connection = require('./db/connection');
+
+const PORT = 3001;
+
+app.listen(PORT, async () => {
+  console.log(`API TrybeCash está sendo executada na porta ${PORT}`);
+
+  // O código abaixo é para testarmos a comunicação com o MySQL
+  const [result] = await connection.execute('SELECT 1');
+  if (result) {
+    console.log('MySQL connection OK');
+  }
+});
+
+Dentro da função app.listen() foi adicionado um trecho de código que executa a função connection.execute(), que recebe como parâmetro uma consulta SQL SELECT 1. Essa função realiza uma conexão com o MySQL, executa o SQL passado como parâmetro e recebe uma resposta que é armazenada na constante result (note que o processo de desestruturação de variáveis está sendo utilizado! 😎).
+
+Depois é verificado com um if se o objeto result contém alguma coisa e, em caso de positivo, é impresso no console a mensagem MySQL connection OK.
+
+* antes de avançarmos, vamos refatorar nosso arquivo src/server.js para retirar o código que utilizamos para testar se a comunicação com o MySQL estava ocorrendo, pois esse código não será mais útil para nós de agora em diante. O arquivo deverá estar assim:
+
+EX:
+
+// src/server.js
+
+const app = require('./app');
+
+const PORT = 3001;
+
+app.listen(PORT, () => {
+  console.log(`API TrybeCash está sendo executada na porta ${PORT}`);
+});
+
+* esse projeto vai ser feito pelo TDD ou seja orientado a testes. Então já vamos instalar o mocha, chai, chai-http e sinon.
+
+EX:
+
+npm i mocha@10.0.0 chai@4.3.6 sinon@14.0.0 chai-http@4.3.0 -D
+
+* Que tal começarmos criando uma pessoa no banco de dados? Então antes de escrever o teste e, consequentemente, nosso código, vamos entender o fluxo de cadastro de pessoas que iremos implementar.
+
+O fluxo se dará da seguinte maneira:
+
+1 - Primeiramente receberemos uma requisição para o endpoint POST /people. Essa requisição terá no seu corpo um JSON com os dados a serem cadastrados no banco de dados similar ao seguinte:
+
+{
+  "firstName": "Luke",
+  "lastName": "Skywalker",
+  "email": "luke.skywalker@trybe.com",
+  "phone": "851 678 4453"
+}
+
+2 - Em seguida, o express passará o JSON recebido na requisição para um componente de software (o qual iremos desenvolver 😉) que irá enviar uma declaração SQL INSERT para o MySQL;
+
+3 - Após o envio do comando SQL inserção da pessoa no MySQL, receberemos uma resposta do MySQL sobre a operação;
+
+4 - Enviamos a resposta para a requisição com o código de estado 201 se a operação ocorreu com sucesso, ou o código de estado 500 caso algum erro ocorrer durante o processo de cadastro da pessoa no MySQL.
+
+(na pasta se encontra um gif de como funciona as requisições.)
+
+* agora vamos criar a pasta "testes" no src e dentro dela a pasta "integration" para colocar os testes de integração.
+
+* dentro da pasta "integration" criar o arquivo de teste "people.test.js" e dentro dele colocar o seguinte código de teste.
+
+EX:
+
+//  tests/integration/people.test.js
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const sinon = require('sinon');
+
+const app = require('../../src/app');
+const connection = require('../../src/db/connection');
+
+const { expect, use } = chai;
+
+use(chaiHttp);
+
+describe('Testando os endpoints de people', function () {
+  it('Testando o cadastro de uma pessoa ', async function () {
+    sinon.stub(connection, 'execute').resolves([{ insertId: 42 }]);
+
+    const response = await chai
+      .request(app)
+      .post('/people')
+      .send(
+        {
+          firstName: 'Luke',
+          lastName: 'Skywalker',
+          email: 'luke.skywalker@trybe.com',
+          phone: '851 678 4453',
+        },
+      );
+
+    expect(response.status).to.equal(201);
+    expect(response.body).to.
+      deep.equal({ message: 'Pessoa cadastrada com sucesso com o id 42' });
+  });
+
+  afterEach(sinon.restore);
+});
+
+Com esse código, fazemos as importações necessárias para realizar os testes de integração.
+
+Em seguida são criadas as variáveis app e connection que fazem referência aos módulos src/app.js e src/db/connection.js. Teremos apenas um describe que agrupará os testes relacionados ao endpoint people.
+
+Dentro do describe criado, temos um caso de teste (declaração it) que realiza duas tarefas:
+
+Cria um stub com o sinon na função execute de connection, de maneira que quando essa função for chamada no teste, ela retornará um array contendo um objeto com a chave insertId com o valor 42.
+
+Uma requisição ao endpoint POST /people passando um JSON com os dados da pessoa a ser cadastrada no corpo da requisição.
+
+⚠️ Atenção: o fato de estarmos colocando um objeto dentro de um array nos testes de integração é para garantir que o retorno do stub tenha o mesmo formato do retorno das funções do mysql2.
+
+Também foi adicionado um afterEach após a declaração it, que desfaz o stub criado, fazendo com que o método execute de connection se comporte conforme nossa implementação.
+
+Você deve estar se perguntando o seguinte: por que estamos criando um stub no método execute de connection? 🤔
+
+Nós temos acesso ao método execute através da biblioteca mysql2, que possui seus testes de integração e testes unitários. Como a biblioteca mysql2 realiza os testes nas funções que ela disponibiliza, podemos assumir em nossos testes que, da chamada da função connection.execute() em diante, tudo está sendo testado!
+
+👀 De olho na dica: caso tenha curiosidade em saber como são os testes da biblioteca mysql2, acesse a pasta tests do github da biblioteca.
+
+Em resumo: só precisamos testar o comportamento da nossa aplicação até a chamada da função connection.execute() (que criamos o mock), que retornará um resultado conhecido e, de posse desse resultado, verificará se a aplicação gera a resposta apropriada.
+
+⚠️ Atenção: essa premissa é válida para qualquer biblioteca que estivermos utilizando em nossa aplicação e não apenas para mysql2. Teste de software é uma boa prática de desenvolvimento, principalmente em bibliotecas escritas pela comunidade. Logo, não precisamos testar o que já está testado!
+
+* agora configurar o script no package.json o script de test.
+
+EX:
+
+  "scripts": {
+    ...
+    "test": "mocha tests/**/*$NAME*.test.js --exit"
+  },
+
+* depois disso vamos executar o teste "npm test" para ver o resultado.
+
+* após isso vamos começar a criar os endpoints, para isso criar no "src" a pasta "routes" para os endpoints e dentro dessa pasta o arquivo "peopleRoutes.js" e nela colocar o seguinte código.
+
+EX:
+
+// src/routes/peopleRoutes.js
+
+const express = require('express');
+
+const router = express.Router();
+
+router.use(express.json());
+
+router.post('/', (req, res) => {
+  const person = req.body;
+  res.status(201).json(person);
+});
+
+module.exports = router;
+
+* no arquivo "app.js" adicionamos a rota people que vai ficar desse jeito.
+
+EX:
+
+// src/app.js
+
+// const express = require('express');
+const peopleRoutes = require('./routes/peopleRoutes');
+
+// const app = express();
+
+// app.use(express.json());
+
+app.use('/people', peopleRoutes);
+
+// module.exports = app;
+
+* Vamos criar arquivo src/db/peopleDB.js, que tem como responsabilidade agrupar todas as operações SQL relacionadas a tabela people. Inicialmente vamos escrever o código necessário para inserir uma pessoa no banco de dados, mas ao longo do dia adicionaremos código referente a outras operações.
+
+EX:
+
+// src/db/peopleDB.js
+
+const conn = require('./connection');
+
+const insert = (person) => conn.execute(
+    `INSERT INTO people 
+      (first_name, last_name, email, phone) VALUES (?, ?, ?, ?)`,
+    [person.firstName, person.lastName, person.email, person.phone],
+  );
+
+module.exports = {
+  insert,
+};
+
+Inicialmente importamos a conexão com o MySQL do nosso outro módulo e, em seguida, editamos a função insert para receber como parâmetro um objeto person. Nela escrevemos o código referente a um INSERT no banco de dados. Então, chamamos a função conn.execute(), a qual recebe dois parâmetros:
+
+Uma string que contém um INSERT de dados na tabela people. Note que a string foi definida utilizando-se crase para possibilitar a quebra de linhas, mas pode-se utilizar as aspas simples ou duplas;
+Um array de valores que são extraídos do objeto person;
+Vale destacar que no final da string que contém o SQL INSERT, existem quatro sinais de interrogação. Você pode estar se perguntando: “Esse SQL não está escrito errado?” 🤔
+
+Esses símbolos de interrogação são chamados de placeholders (ou marcadores, em português). Sua função é de justamente marcar os locais que serão substituídas pelos valores dentro da consulta SQL.
+
+E quais são esses valores que substituirão os sinais de interrogação? 🤔
+
+São justamente os valores do array que passamos como segundo parâmetro da função conn.execute()! A chamada da função conn.execute() com os dois parâmetros citados é o que caracteriza uma prepared statement no mysql2.
+
+Podemos pensar nas Prepared Statements como um template ou um molde para consultas SQL que uma aplicação deseja executar, e que pode ser customizado utilizando variáveis de parâmetros (os placeholders ou marcadores). Isso nos oferece dois grandes benefícios:
+
+As consultas SQL só necessitam ser preparadas uma única vez, entretanto podem ser executadas múltiplas vezes com os mesmos parâmetros ou com parâmetros diferentes. Quando uma consulta é preparada, o banco de dados irá analisar, compilar e otimizar a execução da consulta;
+Os parâmetros das prepared statements não devem ser vinculadas diretamente na consulta SQL (utilizando concatenação de string, por exemplo). O recurso das prepared statements identifica os parâmetros para o banco de dados, evitando que ele erroneamente interprete strings como parte da consulta. Se uma aplicação utiliza prepared statements em todas as operações que realiza com o banco de dados, essas operações estão seguras contra o ataque do tipo SQL injection.
+⚠️ Atenção: SQL injection é um tipo de ataque malicioso que uma aplicação Web pode sofrer através de injeção de código SQL em entradas que não tratam os dados de forma adequada (e.g. formulários, APIs REST, etc). O relatório anual de 2021 da Open Web Application Security Project (OWASP) apontou os ataques de injeção (categoria do SQL injection) como o terceiro maior vetor de ataques maliciosos contra aplicações Web. 😨
+
+Na execução dessa prepared statement, os placeholders serão substituídos pelos valores do array seguindo a mesma ordem nos quais eles foram declarados, ou seja, o primeiro placeholder será substituído pelo primeiro valor do array; o segundo placeholder será substituído pelo valor do segundo valor do array e assim sucessivamente até o último. Dessa forma, podemos reutilizar esse INSERT apenas passando valores diferentes para o array!
+
+* após isso vamos mudat o nosso arquivo people com o endpoint post.
+
+EX:
+
+// src/routes/peopleRoutes.js
+
+// const express = require('express');
+const peopleDB = require('../db/peopleDB');
+
+// const router = express.Router();
+
+router.post('/', async (req, res) => {
+  const person = req.body;
+  try {
+    const [result] = await peopleDB.insert(person);
+    res.status(201).json({
+      message: `Pessoa cadastrada com sucesso com o id ${result.insertId}` });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Ocorreu um erro ao cadastrar uma pessoa' });
+  }
+});
+// module.exports = router;
+
+* agora vamos adicionar mais 2 casos de teste.
+
+EX:
+
+// src/tests/integration/people.test.js
+
+// const chai = require('chai');
+// ...
+
+const peopleList = [
+  {
+    id: 1,
+    firstName: 'Luke',
+    lastName: 'Skywalker',
+    email: 'luke.skywalker@trybe.com',
+    phone: '851 678 4453',
+  },
+  {
+    id: 2,
+    firstName: 'Dart',
+    lastName: 'Vader',
+    email: 'dart.vader@trybe.com',
+    phone: '851 678 5665',
+  },
+];
+
+// describe('Testando os endpoints de people', function () {
+  
+//  ...
+
+  it('Testando a listagem de todas as pessoas', async function () {
+    sinon.stub(connection, 'execute').resolves([peopleList]);
+    const response = await chai
+      .request(app)
+      .get('/people');
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.deep.equal(peopleList);
+  });
+
+  it('Testando a listagem da pessoa com id 1', async function () {
+    sinon.stub(connection, 'execute').resolves([[peopleList[0]]]);
+    const response = await chai
+      .request(app)
+      .get('/people/1');
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to.deep.equal(peopleList[0]);
+  });
+
+  // afterEach(sinon.restore);
+// });
+
+Aqui, criamos a constante peopleList com um array de pessoas. Em seguida, adicionamos dois casos de testes:
+
+Um stub para a função connection.execute(), que retornará um array que contém outro array de pessoas armazenadas em peopleList e um caso de teste responsável por listar todas as pessoas do banco de dados a partir do endpoint GET /people, no qual é esperado retornar uma lista de pessoas no formato JSON;
+
+Outro stub para a função connection.execute(), que retornará um array que contém outro array com a primeira pessoa de peopleList e outro caso de teste para listar uma pessoa a partir do seu id através do endpoint GET /people/:id, onde :id é um parâmetro de rota que indica o id da pessoa no banco de dados.
+
+⚠️ Atenção: o fato de estarmos colocando um array dentro de um array ou um objeto dentro de um array nos testes de integração, é para garantir que o retorno do stub tenha o mesmo formato do retorno das funções do mysql2. 😉
+
+* para os testes passar precisamos fazer as funções no arquivo que faz a requisição para o banco de dados, que é o arquivo "peopleDB.js".
+
+EX:
+
+// const conn = require('./connection');
+// ...
+
+const findAll = () => conn.execute('SELECT * FROM people');
+
+const findById = (id) => conn.execute('SELECT * FROM people WHERE id = ?', [id]);
+
+// module.exports = {
+//   insert,
+  findAll,
+  findById,
+// };
+
+Foram adicionadas as constantes findAll e findById onde:
+
+A função findAll realiza uma consulta no banco de dados, que retorna todas as pessoas cadastradas;
+A função findById realiza uma consulta no banco de dados, que retorna uma pessoa tendo como critério o valor do seu id.
+
+* agora adicionar os endpoints no arquivo "peopleRoute.js" para fazer a requisição.
+
+EX:
+
+// src/routes/peopleRoutes.js
+
+// const express = require('express');
+// const peopleDB = require('../db/peopleDB');
+
+// ...
+
+router.get('/', async (_req, res) => {
+  try {
+    const [result] = await peopleDB.findAll();
+    res.status(200).json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.sqlMessage });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [[result]] = await peopleDB.findById(id);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: 'Pessoa não encontrada' });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.sqlMessage });
+  }
+});
+
+// module.exports = router;
+
+O código acima adiciona dois novos endpoints GET / e GET /:id. O novo endpoint GET / contém um bloco try/catch, que é responsável por responder a requisição. Dentro do bloco try temos uma chamada para a função findAll (ainda não foi implementada no arquivo src/db/peopleDB.js, mas o faremos em breve), que retorna uma Promise (por isso temos um await aqui) e realiza a desconstrução da resposta, armazenando na constante result.
+
+A constante result contém a lista de pessoas e a mesma é retornada como resposta. Caso ocorra algum erro durante a requisição, o bloco catch responderá com um código de estado 500 e a mensagem de erro do mysql2.
+
+Já o endpoint GET /:id também contém um bloco try/catch, que é responsável por responder a requisição também! Dentro do bloco try temos uma chamada para a função findById (ainda não foi implementada no arquivo src/db/peopleDB.js, mas o faremos em breve), que recebe o parâmetro de requisição id (obtido da desestruturação de req.params) e retorna uma Promise (por isso temos também um await aqui), realizando a desestruturação da resposta e armazenando na constante result.
+
+A constante result contém um array de pessoas. Porém, nesse endpoint essa lista pode ter nenhum objeto (situação na qual não existe uma pessoa no banco de dados com o id passado como parâmetro) ou um objeto. Por essa razão temos um bloco if/else para avaliar se o tamanho do array result é maior que zero.
+
+Se o tamanho do array result for maior que zero, uma pessoa foi encontrada no banco de dados e é retornada como resposta da requisição com código de estado 200. Caso contrário, será retornada como resposta da requisição uma mensagem com status 404 indicando que uma pessoa não foi encontrada.
+
+Se executarmos os nossos testes com o comando npm test novamente, eles irão falhar e apresentar uma mensagem de erro indicando que findAll e findById não são funções. O motivo desse erro é que realizamos a chamada dessas funções no arquivo src/routes/peopleRoutes.js, mas não as criamos no arquivo src/db/peopleDB.js (lembre-se do espírito do TDD 😎).
+
+
+
+
+
+
+
+
+
+
+
