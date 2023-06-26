@@ -23,6 +23,8 @@ services:
     # Informa ao docker, para que o container node seja iniciado após o container database
     depends_on:
       - "database"
+    env_file:
+      - .env  
 
   database:
     image: mysql:8.0.29
