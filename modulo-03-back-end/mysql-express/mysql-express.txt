@@ -603,8 +603,198 @@ Se o tamanho do array result for maior que zero, uma pessoa foi encontrada no ba
 
 Se executarmos os nossos testes com o comando npm test novamente, eles irão falhar e apresentar uma mensagem de erro indicando que findAll e findById não são funções. O motivo desse erro é que realizamos a chamada dessas funções no arquivo src/routes/peopleRoutes.js, mas não as criamos no arquivo src/db/peopleDB.js (lembre-se do espírito do TDD 😎).
 
+* agora adicionar aos testes a verificação da edição de algum pessoa no banco de dados e na retirada de alguém no banco de dados.
 
+EX:
 
+// src/tests/integration/people.test.js
+
+// ...
+
+// describe('Testando os endpoints de people', function () {
+// ...
+
+  it('Testando a alteração de uma pessoa com o id 1', async function () {
+    sinon.stub(connection, 'execute').resolves([{ affectedRows: 1 }]);
+    const response = await chai
+      .request(app)
+      .put('/people/1')
+      .send(
+        {
+          firstName: 'Lucão',
+          lastName: 'Andarilho dos céus',
+          email: 'lucao.andarilho@trybe.com',
+          phone: '851 678 4453',
+        },
+      );
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to
+      .deep.equal({ message: 'Pessoa de id 1 atualizada com sucesso' });
+  });
+
+  it('Testando a exclusão da pessoa com id 1', async function () {
+    sinon.stub(connection, 'execute').resolves([{ affectedRows: 1 }]);
+    const response = await chai
+      .request(app)
+      .delete('/people/1');
+
+    expect(response.status).to.equal(200);
+    expect(response.body).to
+      .deep.equal({ message: 'Pessoa de id 1 excluída com sucesso' });
+  });
+
+  // afterEach(sinon.restore);
+// });
+
+Com isso, foram adicionados dois casos de teste:
+
+Um caso de teste responsável por atualizar os dados de uma pessoa no banco de dados a partir do endpoint PUT /people/:id: esse teste espera o retorno de um objeto com uma mensagem de sucesso da operação com código de estado 200. Além disso, possui um stub para a função connection.execute(), que retornará um array contendo um objeto com a chave affectedRows com o valor 1;
+
+Um caso de teste responsável por excluir uma pessoa do banco de dados a partir do endpoint DELETE /people/:id: esse teste espera o retorno de um objeto com uma mensagem de sucesso da operação com código de estado 200. Além disso, também possui um stub para a função connection.execute(), que retornará um array contendo também um objeto com a chave affectedRows com o valor 1.
+
+* no arquivo "peopleRoutes.js" adicionamos os dois endpoints de editar e excluir.
+
+EX:
+
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const person = req.body;
+    const [result] = await peopleDB.update(person, id);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: `Pessoa de id ${id} atualizada com sucesso` });
+    } else {
+      res.status(404).json({ message: 'Pessoa não encontrada' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.sqlMessage });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await peopleDB.remove(id);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: `Pessoa de id ${id} excluída com sucesso` });
+    } else {
+      res.status(404).json({ message: 'Pessoa não encontrada' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.sqlMessage });
+  }
+});
+
+Nesse código adicionamos dois novos endpoints que mapeiam PUT /:id e DELETE /:id. O endpoint mapeado com o método HTTP PUT, recebe o id da pessoa como parâmetro de rota e também um objeto com os dados da pessoa (com o mesmo formato do objeto utilizado anteriormente no cadastro de pessoa). Em seguida é executada a função peopleDB.update(), a qual recebe os dados da pessoa e o id da pessoa a ser alterada. Essa operação retornará uma Promise, que será esperada e desconstruída para obter o result.
+
+É realizada uma verificação na qual é avaliado se a quantidade de linhas afetadas com a operação update é maior do que zero por meio da propriedade affectedRows do objeto result:
+
+Caso a condição seja verdadeira, será enviada uma resposta com o status 200 e uma mensagem de sucesso.
+Se a condição for falsa, será enviada uma resposta com o status 404 e uma mensagem de erro. Em caso de erro durante a requisição, será enviada uma resposta com o status 500 e uma mensagem de erro.
+O endpoint mapeado com o método HTTP DELETE possui a mesma estrutura do endpoint mapeado com o método HTTP PUT, exceto pelo fato de que não recebe nenhum JSON no corpo da requisição, apenas recebe o id da pessoa como parâmetro de rota.
+
+* para completar vamos adicionar as funções de ligação com o banco de dados no arquivo "peopleDB.js".
+
+EX:
+
+// src/db/peopleDB.js
+
+// const conn = require('./connection');
+// ...
+
+const update = (person, id) => conn.execute(
+    `UPDATE people 
+      SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?`,
+    [person.firstName, person.lastName, person.email, person.phone, id],
+  );
+
+const remove = (id) => conn.execute('DELETE FROM people WHERE id = ?', [id]);
+
+// module.exports = {
+// ...
+  update,
+  remove,
+// };
+
+* agora os testes vão rodar e passar, assim como as requisições.
+
+# VARIÁVEIS DE AMBIENTE  = Uma variável de ambiente é um recurso disponível nos sistemas operacionais que permite criar uma variável no formato NOME_DA_VARIÁVEL=VALOR, onde NOME_DA_VARIÁVEL é o nome da variável de ambiente, e VALOR se refere a um valor que será vinculado à variável. Toda vez que solicitarmos ao sistema operacional o valor de uma variável de ambiente, fornecemos a ele uma NOME_DA_VARIÁVEL e ele retorna o VALOR associado a esta chave, se ela estiver definida. (OBS: LEMBRAR DE ESPECIFICAR NO README O ARQUIVO ".env.example" QUE PRECISA SER SUBSTITUIDO)
+
+* primeiro vamos criar dois arquivos no diretório raiz o ".env" e o ".env.example", no .env vamos colocar os dados que tinha no "connection.js" e colocar o arquivo no .gitignore para não ser enviado para o github, apenas o .git.example.
+
+EX: arquivo .env
+
+MYSQL_HOST=localhost
+MYSQL_PORT=33060
+MYSQL_USER=root
+MYSQL_PASSWORD=root
+MYSQL_DATABASE_NAME=trybecashdb
+MYSQL_WAIT_FOR_CONNECTIONS=true
+MYSQL_CONNECTION_LIMIT=10
+MYSQL_QUEUE_LIMIT=0
+
+EX: arquivo .env.example  (OBS: LEMBRAR DE ESPECIFICAR NO README O ARQUIVO ".env.example" QUE PRECISA SER SUBSTITUIDO)
+
+MYSQL_HOST=<ENDEREÇO DO BANCO>
+MYSQL_PORT=<PORTA DE CONEXÃO DO BANCO>
+MYSQL_USER=<NOME DE USUÁRIO DO BANCO>
+MYSQL_PASSWORD=<SENHA DE ACESSO DO BANCO>
+MYSQL_DATABASE_NAME=<NOME DO BANCO DE DADOS>
+MYSQL_WAIT_FOR_CONNECTIONS=true
+MYSQL_CONNECTION_LIMIT=10
+MYSQL_QUEUE_LIMIT=0
+
+* agora vamos ajustar o arquivo "connection.js" e retirar os dados visíveis de lá que já foi colocado no arquivo ".env".
+
+EX:
+
+// src/db/connection.js
+
+const mysql = require('mysql2/promise');
+
+const connection = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  port: process.env.MYSQL_PORT,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE_NAME,
+  waitForConnections: process.env.MYSQL_WAIT_FOR_CONNECTIONS,
+  connectionLimit: process.env.MYSQL_CONNECTION_LIMIT,
+  queueLimit: process.env.MYSQL_QUEUE_LIMIT,
+});
+
+module.exports = connection;
+
+* agora para iniciar e funcionar tudo direto vamos instalar um pacote node do env e pedir a requisição dele no arquivo "server.js".
+
+EX:
+
+npm i dotenv@16.0
+
+require('dotenv').config();  = colocar esse código no começo no arquivo "server.js"
+
+* agora sim está tudo completo e escondemos os dados do nosso banco de dados. lembrar de explicar o arquivo ".env.example" de como ele funciona no readme.
+
+* GLOSSÁRIO:
+
+Docker Compose
+É uma ferramenta para definir e executar aplicações Docker de vários containers. Utiliza-se um um arquivo yaml para definir as configurações dos serviços daquela aplicação, que serão iniciados com um único comando: docker compose up.
+
+Pool de conexões
+Um pool de conexões é um repositório com um conjunto de conexões estabelecidas previamente com o banco de dados. Essas conexões serão reutilizadas durante a execução da aplicação conforme a necessidade, ou seja, se uma API recebe duas ou mais requisições simultâneas, ela usará as conexões disponíveis para atender as requisições com melhor desempenho.
+
+Utilizando uma analogia, o pool de conexões é como um estojo com vários lápis do qual você pode retirar um sempre que precisar e, assim que aquele lápis não for mais necessário pra você, você pode devolver ao estojo para que ele esteja disponível da próxima vez que você precisar dele.
+
+Prepared statements
+São como um template ou um molde para consultas SQL que uma aplicação deseja executar, e que pode ser customizado utilizando variáveis de parâmetros (os placeholders ou marcadores).
+
+São caracterizados pela chamada da função conn.execute() com os dois parâmetros: uma string que contém uma query do MySQL construída utilizando placeholders (representados pelo sinal ?) e um array de valores que substituirão esses placeholders, seguindo a mesma ordem nos quais eles foram declarados.
+
+Variáveis de ambiente
+As variáveis de ambiente são cadeias de caracteres que contêm informações sobre o ambiente do sistema e sobre o usuário que está conectado no momento. Seu formato é definido por NOME_DA_VARIÁVEL=VALOR, onde NOME_DA_VARIÁVEL é o nome da variável de ambiente, e VALOR se refere a um valor que será vinculado à variável.
+
+São comumente usadas para guardar chaves e senhas, evitando sua exposição, ou outras configurações do sistema.
 
 
 

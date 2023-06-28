@@ -27,3 +27,181 @@ npm install chai-http@4.3.0 --save-dev --save-exact
 const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);  = precisa usar esse comando para ter acesso as requisições http.
+
+* criar a pasta "tests" fora de "src" e dentro da pasta tests criar a pasta "integration" para sinalizar que ali se encontra testes de integração.
+
+EX: DE UM TESTE COMPLETO
+
+// tests/integration/chocolates.test.js
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+
+const { expect } = chai;
+
+chai.use(chaiHttp);
+
+describe('Testando a API Cacau Trybe', function () {
+  describe('Usando o método GET em /chocolates', function () {
+    it('Retorna a lista completa de chocolates!', async function () {
+      const output = [
+        { id: 1, name: 'Mint Intense', brandId: 1 },
+        { id: 2, name: 'White Coconut', brandId: 1 },
+        { id: 3, name: 'Mon Chéri', brandId: 2 },
+        { id: 4, name: 'Mounds', brandId: 3 },
+      ];
+
+      const response = await chai
+        .request(app)
+        .get('/chocolates');
+      expect(response.status).to.be.equal(200);
+      expect(response.body.chocolates).to.deep.equal(output);
+    });
+  });
+});
+
+Voltando ao cenário de teste, nós ainda precisamos especificar a saída esperada para esse teste. Para isso, vamos recordar o contrato estabelecido para a rota /chocolates:
+
+👉 GET /chocolates
+
+Objetivo: Retornar uma lista com todos os chocolates cadastrados.
+Código HTTP: 200 - OK;
+Body (exemplo):
+Copiar
+  [
+    { "id": 1, "name": "Mint Intense", "brandId": 1 },
+    { "id": 2, "name": "White Coconut", "brandId": 1 },
+    { "id": 3, "name": "Mon Chéri", "brandId": 2 },
+    { "id": 4, "name": "Mounds", "brandId": 3 }
+  ]
+Nós iremos dividir a validação desse contrato em duas partes usando o expect.
+
+Na primeira parte, iremos verificar se o código HTTP retornado corresponde ao valor esperado:
+Copiar
+ expect(response.status).to.be.equals(200);
+Em seguida, validamos se o corpo da mensagem corresponde a lista com todos os chocolates cadastrados na API:
+
+Copiar
+const output = [
+  { id: 1, name: 'Mint Intense', brandId: 1 },
+  { id: 2, name: 'White Coconut', brandId: 1 },
+  { id: 3, name: 'Mon Chéri', brandId: 2 },
+  { id: 4, name: 'Mounds', brandId: 3 },
+];
+expect(response.body.chocolates).to.deep.equal(output);
+Você pode estar se perguntando: “Por que utilizamos o comando to.deep.equal ao invés do to.be.equals?” 🤔
+
+Resposta: Nesse caso, precisamos utilizar o deep para garantir que todas as informações dentro do objeto retornado são as mesmas do objeto esperado. Do outro modo, essa validação não seria possível, pois não seria realizada a comparação em profundidade.
+
+# SINON  = utilizado para mocks de api
+
+* primeiramente vamos instalar o sinon.
+
+npm install sinon@11.1.1 --save-dev --save-exact
+
+* agora é só importar o sinon no arquivo e fazer os testes usando o "stub" é ele que vai testar a função e retornar o mock (LEMBRANDO QUE É BOM USAR O AFTEREACH E BEFOREEACH).
+
+EX:
+
+// tests/integration/chocolates.test.js
+
+// const chai = require('chai');
+const sinon = require('sinon');
+// const fs = require('fs');
+// const chaiHttp = require('chai-http');
+// const app = require('../../src/app');
+
+// const { expect } = chai;
+
+// chai.use(chaiHttp);
+
+// const mockFile = JSON.stringify({
+//   ...
+
+describe('Testando a API Cacau Trybe', function () {
+  beforeEach(function () {
+    sinon.stub(fs.promises, 'readFile')
+      .resolves(mockFile);
+  });
+
+  afterEach(function () {
+    sinon.restore();
+  });
+
+  describe('Usando o método GET em /chocolates', function () {
+    it('Retorna a lista completa de chocolates!', async function () {
+      const output = [
+        { id: 1, name: 'Mint Intense', brandId: 1 },
+        { id: 2, name: 'White Coconut', brandId: 1 },
+        { id: 3, name: 'Mon Chéri', brandId: 2 },
+        { id: 4, name: 'Mounds', brandId: 3 },
+      ];
+
+      const response = await chai
+        .request(app)
+        .get('/chocolates');
+      expect(response.status).to.be.equal(200);
+      expect(response.body.chocolates).to.deep.equal(output);
+    });
+  });
+});
+
+EX:
+
+// tests/integration/chocolates.test.js
+
+//describe('Testando a API Cacau Trybe', function () {
+
+//...
+
+describe('Usando o método GET em /chocolates/:id para buscar o ID 4', function () {
+    it('Retorna o chocolate Mounds', async function () {
+      const response = await chai
+        .request(app)
+        .get('/chocolates/4');
+
+      expect(response.status).to.be.equal(200);
+      expect(response.body.chocolate).to.deep.equal(
+        {
+          id: 4,
+          name: 'Mounds',
+          brandId: 3,
+        });
+    });
+  });
+
+  describe('Usando o método GET em /chocolates/:id para buscar o ID 99', function () {
+    it('Retorna status 404 com a mensagem "Chocolate not found"', async function () {
+      const response = await chai
+        .request(app)
+        .get('/chocolates/99');
+
+      expect(response.status).to.be.equal(404);
+      expect(response.body).to.deep.equal({ message: 'Chocolate not found' })
+    });
+  });
+
+  describe('Usando o método GET em /chocolates/brand/:brandId para buscar brandId 1', function () {
+    it('Retorna os chocolates da marca Lindt & Sprungli', async function () {
+      const response = await chai
+        .request(app)
+        .get('/chocolates/brand/1');
+
+      expect(response.status).to.be.equal(200);
+      expect(response.body.chocolates).to.deep.equal([
+        {
+          id: 1,
+          name: 'Mint Intense',
+          brandId: 1,
+        },
+        {
+          id: 2,
+          name: 'White Coconut',
+          brandId: 1,
+        },
+      ]);
+    });
+  });
+//});
+
+
