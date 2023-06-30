@@ -1,2 +1,45 @@
 # ARQUITERURA DE SOFTWARE  = Precisamos, em suma, criar padrões de organização para nossa aplicação. Em Ciência da Computação, chamamos isso de Arquitetura de Software. É um campo de estudo rico em análises e experimentos com diferentes organizações de aplicação. Em Desenvolvimento Web, um modelo se destaca em popularidade e reconhecida eficácia, e iremos estudá-lo nesta seção.
 
+# Iremos nos aprofundar em cada camada no momento oportuno. Por enquanto, segue uma resumo das responsabilidades de cada uma das camadas:
+
+* Model: agrupa as funções que lidam com a leitura ou escrita de dados. Essa camada deve ser a única a ter acesso direto a ferramentas de armazenamento de dados, que podem ser desde um SGBD (MySQL, Postgres, etc.), sistema de arquivos (arquivos .csv, .json) ou mesmo outras APIs RESTful.
+
+* Service: agrupa as funções que definem as regras de negócio da aplicação. Para entender o que é uma regra de negócio, imagine uma aplicação que gerencia o almoxarifado de uma empresa. Cada vez que alguém solicita algum item do almoxarifado, é feito uma checagem para saber se a quantidade atual deste item está abaixo de uma quantidade mínima pré-determinada, e caso esteja, deve ser enviado um e-mail para o setor de compras solicitando uma reposição no estoque. A camada Service deve conter funções que são geradas ao transcrever fluxos como deste exemplo em forma de código.
+
+* Controller: agrupa as funções que determinam como uma aplicação interage com o mundo exterior, ou seja, com quem a usa - um cliente, que pode ser ruma requisição feita de aplicação Front-end ou uma outra API. No contexto de uma API RESTful, as funções presentes nessa camada lidam com requisições HTTP e devem devolver uma resposta. Para isso, essa camada valida o formato dos dados recebidos e interage com as demais camadas para aplicar alguma regra de negócio ou acessar dados.
+
+# CAMADA MODEL  = a camada de Model é a responsável por obter os dados da base e oferecê-los de forma simples para o restante da aplicação, responsável por leitura, escrita e modelagem de dados.
+
+* primeiro vamos criar dentro da pasta "src" a pasta "models" e dentro dessa pasta vai conter o arquivo "connection.js" que faz a ligação com o banco de dados e os arquivos que contém as funções que faz requisições ao banco de dados seguindo a nomeclatura "nomeDaTabela.model.js", cada tabela vai ter seu arquivo model.
+
+* camelize  = biblioteca que converte as palvras de snake case(actor_id) para camel case(actorId).
+
+EX:
+
+const camelize = require('camelize');
+
+const a = 'actor_id'
+camelize(a)  = 'actorId'
+
+* na hora que for exportar uma função de um arquivo model pega só o arquivo e coloca a função depois.
+
+EX:
+
+const express = require('express');
+const passengerModel = require('../models/passenger.model');
+
+const router = express.Router();
+router.use(express.json());
+
+router.get('/', async (req, res) => {
+  const passengers = await passengerModel.findAll();  = aqui deixa o nome para ter uma referência.
+  if (!passengers) return res.status(404).json({ message: 'Passengers not found' });
+  res.status(200).json(passengers);
+});
+
+
+
+
+
+
+
