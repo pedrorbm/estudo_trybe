@@ -12,6 +12,67 @@
 
 * primeiro vamos criar dentro da pasta "src" a pasta "models" e dentro dessa pasta vai conter o arquivo "connection.js" que faz a ligação com o banco de dados e os arquivos que contém as funções que faz requisições ao banco de dados seguindo a nomeclatura "nomeDaTabela.model.js", cada tabela vai ter seu arquivo model.
 
+* arquivo "connection.js" que fica dentro da pasta src/models.
+
+EX:
+
+const mysql = require('mysql2/promise');
+
+const connection = mysql.createPool({
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: process.env.MYSQL_PORT || 33060,
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || 'password',
+  database: 'trybecardb',
+});
+
+module.exports = connection;
+
+* arquivo "nomeDaTabela.model.js" que fica dentro da pasta src/models.
+
+EX:
+
+const camelize = require('camelize');
+const connection = require('./connection');
+
+const findAll = async () => {
+  const [passengers] = await connection.execute('SELECT * FROM passengers');
+  return camelize(passengers);
+};
+
+const findById = async (passengerId) => {
+  const [[passenger]] = await connection
+    .execute('SELECT * FROM passengers WHERE id = ?', [passengerId]);
+  return camelize(passenger);
+};
+
+module.exports = { findAll, findById };
+
+* arquivo de rota que fica na pasta "routes", como ele chama a função que está no arquivo "nomeDaTabela.model.js" para dar a resposta do express.
+
+EX:
+
+const express = require('express');
+const passengerModel = require('../models/passenger.model');
+
+const router = express.Router();
+router.use(express.json());
+
+router.get('/', async (req, res) => {
+  const passengers = await passengerModel.findAll();
+  if (!passengers) return res.status(404).json({ message: 'Passengers not found' });
+  res.status(200).json(passengers);
+});
+
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const passenger = await passengerModel.findById(Number(id));
+  if (!passenger) return res.status(404).json({ message: 'Passenger not found' });
+  res.status(200).json(passenger);
+});
+
+module.exports = router;
+
 * camelize  = biblioteca que converte as palvras de snake case(actor_id) para camel case(actorId).
 
 EX:
@@ -36,6 +97,222 @@ router.get('/', async (req, res) => {
   if (!passengers) return res.status(404).json({ message: 'Passengers not found' });
   res.status(200).json(passengers);
 });
+
+* arquivo "docker-compose.yml".
+
+EX:
+
+version: '3'
+
+services:
+  # Serviço que irá rodar o node
+  node:
+    image: node:16.14
+    container_name: trybecar
+    # Mesmo que `docker run -t`
+    tty: true
+    # Mesmo que `docker run -i`
+    stdin_open: true
+    command: bash
+    restart: always
+    working_dir: /home/node/app
+    volumes:
+      - ./:/home/node/app
+    depends_on:
+      - database
+    ports:
+      # Expõe a porta padrão da aplicação: altere aqui caso use outra porta
+      - 3001:3001
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_PORT: 3306
+      MYSQL_HOST: database # Nome do service que será utilizado para o banco de dados
+      PORT: 3001
+
+# node: [...]
+
+# Serviço que irá rodar o banco de dados
+  database:
+    image: mysql:8.0.29
+    container_name: trybecar_db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: trybecardb
+    ports:
+      - 33060:3306
+    volumes:
+      - ./:/docker-entrypoint-initdb.d
+      
+# REFATORAR UMA APLICAÇÃO PARA A CAMADA MODEL E TESTES.
+
+* Primeira etapa: Identificar queries SQL que fazem parte das rotas;
+* Segunda etapa: Criar nossa camada model, com diretórios, arquivos e suas respectivas funções;
+* Terceira etapa: Construir testes de unidade para verificar se o comportamento das funcionalidades criadas, se mantiveram!;
+* Quarta etapa: Atualizar o arquivo src/app.js, refletindo nossa modularização.
+
+* exemplos de funções que ajudam a tornar códigos SQL mais flexíveis sem ficar mudando direto caso adicione mais colunas.(fica na pasta "src/utils")
+
+EX:
+
+const snakeize = require('snakeize');
+
+const getFormattedColumnNames = (object) => Object.keys(snakeize(object)).join(',');  = faz com que pegue todas as chaves do objeto em formato de snakeize(pedro_roberto) e entre cada um deles adicionar uma vírgula.
+
+const getFormattedPlaceholders = (object) => Object.keys(object).map(() => '?').join(',');  = faz com que em cada chave que tenha coloque uma interrogação no lugar e depois uma vírgula.
+
+module.exports = {
+  getFormattedColumnNames,
+  getFormattedPlaceholders,
+};
+
+* criar um arquivo "index.js" dentro do "src/models" e nele colocar os models já com os nomes, pois quando for chamar a função já vem modificada.
+
+EX:
+
+const passengerModel = require('./passenger.model');
+const travelModel = require('./travel.model');
+
+module.exports = {
+  passengerModel,
+  travelModel,
+};
+
+* mocks. "tests/unit/mocks/nomeArquivo.mock.js"
+
+EX:
+
+const travelFromDB = {
+  id: 42,
+  driver_id: null,
+  starting_address: 'starting street',
+  ending_address: 'end street',
+  request_date: '2023-05-29T19:56:25.000Z',
+  travel_status_id: 1,
+  status: 'Aguardando Motorista',
+  address: null,
+  stop_order: null,
+};
+
+const travelFromModel = {
+  id: 42,
+  driverId: null,
+  startingAddress: 'starting street',
+  endingAddress: 'end street',
+  requestDate: '2023-05-29T19:56:25.000Z',
+  travelStatusId: 1,
+  status: 'Aguardando Motorista',
+  waypoints: [],
+};
+
+const travelWithWaypointsFromDB = [
+  {
+    id: 1,
+    driver_id: null,
+    starting_address: 'Rua dos caramelos',
+    ending_address: 'Rua Mariana Alvarez Dutra',
+    request_date: '2023-05-29T19:56:52.000Z',
+    travel_status_id: 1,
+    status: 'Aguardando Motorista',
+    address: 'Rua Quatro de Março',
+    stop_order: 1,
+  },
+  {
+    id: 1,
+    driver_id: null,
+    starting_address: 'Rua dos caramelos',
+    ending_address: 'Rua Mariana Alvarez Dutra',
+    request_date: '2023-05-29T19:56:52.000Z',
+    travel_status_id: 1,
+    status: 'Aguardando Motorista',
+    address: 'Rua Sete de Setembro',
+    stop_order: 2,
+  },
+];
+
+const travelWithWaypointsFromModel = {
+  id: 1,
+  driverId: null,
+  startingAddress: 'Rua dos caramelos',
+  endingAddress: 'Rua Mariana Alvarez Dutra',
+  requestDate: '2023-05-29T19:56:52.000Z',
+  travelStatusId: 1,
+  status: 'Aguardando Motorista',
+  waypoints: [
+    { address: 'Rua Quatro de Março', stopOrder: 1 },
+    { address: 'Rua Sete de Setembro', stopOrder: 2 },
+  ],
+};
+
+O travelFromDB, simula o retorno do banco de dados e o travelFromModel, simula o retorno do banco de dados depois de passar na função camelize(). Ambos são diferentes e nosso código refatorado trata tudo isso 👍 Abaixo vamos escrever o teste de unidade que utiliza esses mocks!
+
+* teste unitário. "tests/unit/models/nomeArquivo.model.test.js"
+
+EX:
+
+const { expect } = require('chai');
+const sinon = require('sinon');
+const connection = require('../../../src/models/connection');
+const { travelModel } = require('../../../src/models');
+const {
+  travelFromDB,
+  travelFromModel,
+  travelWithWaypointsFromDB,
+  travelWithWaypointsFromModel,
+} = require('../mocks/travel.mock');
+
+describe('Realizando testes - TRAVEL MODEL:', function () {
+  it('Recuperando travel por id sem waypoints com sucesso', async function () {
+    sinon.stub(connection, 'execute').resolves([[travelFromDB]]);
+
+    const inputData = 42;
+    const travel = await travelModel.findById(inputData);
+
+    expect(travel).to.be.an('object');
+    expect(travel).to.be.deep.equal(travelFromModel);
+  });
+
+  it('Recuperando travel por id com waypoints com sucesso', async function () {
+    sinon.stub(connection, 'execute').resolves([travelWithWaypointsFromDB]);
+
+    const inputData = 1;
+    const travel = await travelModel.findById(inputData);
+
+    expect(travel).to.be.an('object');
+    expect(travel).to.be.deep.equal(travelWithWaypointsFromModel);
+  });
+
+  afterEach(function () {
+    sinon.restore();
+  });
+});
+
+* cobertura de teste.
+
+EX:
+
+npm install -D -E nyc@15.1.0
+
+"scripts": {
+    "test:coverage": "nyc --all --include src/models --include src/services --include src/controllers mocha tests/unit/**/*.js --exit"
+  },
+  
+npm run test:coverage
+
+A tabela traz as porcentagem de código do programa que foi executado ao rodar os testes. para cada coluna temos:
+
+File: nome do arquivo do projeto.
+Stmts: instruções do código.
+Branch: estruturas de controle (por exemplo: ramificações de uma estrutura if/else).
+Funcs: funções, métodos ou sub-rotinas.
+Lines: linha do arquivo.
+As informações mais importantes que conseguimos tirar dessa tabela são:
+
+Na coluna % Stmts temos a informação da porcentagem de instruções, do respectivo arquivo, que foram cobertos pelo teste.
+De olho na dica 👀: este valor é utilizado pelo avaliador para definir se um requisito do projeto foi aprovado ou não.
+
+Na coluna % Lines (porcentagem de linhas de código) da linha All files(todos os arquivos) temos a informação do total de número de linhas da nossa aplicação que nossos testes estão cobrindo, nesse caso 76,19%
+Na coluna Uncovered Line #s (número das linhas de códigos que não estão cobertas) da linha passenger.model.js temos a informação de exatamente quais são as linhas de código do arquivo passenger.model.js que ainda não estão cobertas, nesse caso o intervalo começando na linha 21 e indo até a linha 32 representado por 21-32
 
 
 
