@@ -457,6 +457,150 @@ app.get('/cars', async (_req, res) => {
   return res.status(200).json(serviceResponse.data);
 });
 
+
+# CAMADA CONTROLLER  = vai se comunicar com a camada service.
+
+* primeiro passo criar a pasta "constrollers.js" dentro de src e dentro dele criar o arquivo "nomdeDoArquivo.controller.js" seguindo a mesma lógica da camada model e o arquivo "index.js" com o seguinte código.
+
+EX:
+
+const passengerController = require('./passenger.controller');
+
+module.exports = {
+  passengerController,
+};
+
+* depois criar um arquivo na pasta utils "src/utils/mapStatusHTTP.js" onde vai ficar armazenados todos os tipos de status.
+
+EX:
+
+const httpErrorMap = {
+  SUCCESSFUL: 200,
+  CREATED: 201,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  INVALID_VALUE: 422,
+};
+
+const mapStatusHTTP = (status) => httpErrorMap[status] || 500;
+
+module.exports = mapStatusHTTP;
+
+* dentro do "nomeDoArquivo.controller.js".
+
+EX:
+
+const { travelService } = require('../services');
+const mapStatusHTTP = require('../utils/mapStatusHTTP');
+
+const createTravel = async (req, res) => {
+  const { passengerId } = req.params;
+  const travelData = { passengerId, ...req.body };
+
+  const { status, data } = await travelService.requestTravel(travelData);
+  return res.status(mapStatusHTTP(status)).json(data);
+};
+
+module.exports = {
+  createTravel,
+};
+
+* fazendo testes.
+
+EX: NO ARQUIVO "tests/unit/mocks/nomeDoArquivo.mock.js"
+
+const travelFromServiceCreated = {
+  status: 'CREATED',
+  data: travelFromModel,
+};
+const travelFromServiceInvalidValue = {
+  status: 'INVALID_VALUE',
+  data: { message: 'message' },
+};
+const travelFromServiceNotFound = {
+  status: 'NOT_FOUND',
+  data: { message: 'message' },
+};
+const travelFromServiceConflict = {
+  status: 'CONFLICT',
+  data: { message: 'message' },
+};
+
+* arquivo router como fica.
+
+EX:
+
+const route = require('express').Router();
+const { passengerController } = require('../controllers');
+
+route.post('/:passengerId/request/travel', passengerController.createTravel);
+
+module.exports = route;
+
+
+AGORA ARQUIVO DE TESTE "tests/unit/controllers/nomeDoArquivo.controller.js"
+
+
+const chai = require('chai');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+
+const { expect } = chai;
+chai.use(sinonChai);
+
+const { travelService } = require('../../../src/services');
+const { passengerController } = require('../../../src/controllers');
+const {
+  travelFromServiceCreated,
+  travelFromModel,
+} = require('../mocks/travel.mock');
+
+describe('Realizando testes - PASSENGER CONTROLLER:', function () {
+  it('Inserindo travel com sucesso - status 201', async function () {
+    sinon.stub(travelService, 'requestTravel').resolves(travelFromServiceCreated);
+    const req = {
+      params: { passengerId: 1 },
+      body: { startingAddress: 'starting street', endingAddress: 'end street' },
+    };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await passengerController.createTravel(req, res);
+    expect(res.status).to.have.been.calledWith(201);
+    expect(res.json).to.have.been.calledWith(travelFromModel);
+  });
+
+
+  afterEach(function () {
+    sinon.restore();
+  });
+});
+
+
+OUTRO EX
+
+
+  /* ... */
+
+  it('Não insere travel com endereços iguais - status 422', async function () {
+    sinon.stub(travelService, 'requestTravel').resolves(travelFromServiceInvalidValue);
+    const req = {
+      params: { passengerId: 1 },
+      body: { startingAddress: 'starting', endingAddress: 'starting' },
+    };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await passengerController.createTravel(req, res);
+    expect(res.status).to.have.been.calledWith(422);
+    expect(res.json).to.have.been.calledWith(sinon.match.has('message'));
+  });
+
+  /* ... */
   
   
 
