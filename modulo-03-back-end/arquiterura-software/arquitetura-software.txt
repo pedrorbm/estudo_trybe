@@ -314,6 +314,153 @@ De olho na dica 👀: este valor é utilizado pelo avaliador para definir se um 
 Na coluna % Lines (porcentagem de linhas de código) da linha All files(todos os arquivos) temos a informação do total de número de linhas da nossa aplicação que nossos testes estão cobrindo, nesse caso 76,19%
 Na coluna Uncovered Line #s (número das linhas de códigos que não estão cobertas) da linha passenger.model.js temos a informação de exatamente quais são as linhas de código do arquivo passenger.model.js que ainda não estão cobertas, nesse caso o intervalo começando na linha 21 e indo até a linha 32 representado por 21-32
 
+# CAMADA SERVICE  = ela liga a camada model com a camada controller, nela fica as regras de negócios. Em resumo, a camada de serviço é essencial para o desenvolvimento de software robusto e confiável. Ela centraliza a lógica de negócios e as validações de dados, promovendo a modularidade, reutilização de código e facilidade de manutenção. Ao adotar uma abordagem em camadas e incluir a camada de serviço, estamos construindo uma base sólida para o sistema, garantindo sua eficiência, escalabilidade e capacidade de adaptação a mudanças futuras.
+
+Agora, o que uma boa camada de Service não deve fazer? 🤔
+
+Não deve ter nenhum tipo de informação sobre o acesso a camada de dados (Model);
+
+Exemplo: não ter nenhuma query SQL. 🙏
+Não deve receber nada relacionado ao HTTP, seja o request ou o response.
+
+A camada Controller, que será explorada mais adiante, deve mandar apenas o necessário para a camada de Service.
+
+* primeiro criar uma pasta chamada "services" dentro de "src" e nela criar um arquivo que faça sentido estilo a camada model que seria "nomeDoArquivo.service.js" e "index.js"
+
+EX: DENTRO DO ARQUIVO "nomeDoArquivo.service.js"
+
+const { carModel } = require('../models');
+
+const createCar = async ({ model, licensePlate, year, color, driverId }) => {
+  const carId = await carModel.insert({ model, licensePlate, year, color, driverId });
+  const newCar = { id: carId, model, licensePlate, year, color, driverId };
+  return { status: 'SUCCESSFUL', data: newCar };
+};
+
+
+DENTRO DO ARQUIVO "index.js"
+
+
+const carService = require('./car.service');
+
+module.exports = {
+  carService,
+};
+
+* dentro da pasta "services" criar também outra pasta chamada "validations" e dentro de validations criar dois arquivos "schemas.js" e "validationsInputValues.js"
+
+EX: DENTRO DO ARQUIVO "schemas.js"
+
+const Joi = require('joi');  = biblioteca que faz as validações.
+
+const addCarSchema = Joi.object({
+  model: Joi.string().min(3),  = o valor da chave model tem que ser do tipo string e no mínino 3 caracteres.
+  color: Joi.string().min(2),
+  licensePlate: Joi.string().length(7),
+  year: Joi.number().integer(),
+  driverId: Joi.number(),
+});
+
+module.exports = { addCarSchema };
+
+
+DENTRO DO ARQUIVO "validationsInputValues.js"
+
+
+const { addCarSchema } = require('./schemas');
+
+const validateNewCar = ({ model, licensePlate, year, color, driverId }) => {
+  const { error } = addCarSchema
+    .validate({ model, licensePlate, year, color, driverId });   = o ".validate" serve para fazer a validação que está no arquivo "scheme.js"
+  if (error) return { status: 'INVALID_VALUE', message: error.message };  = se tiver erro vai retornar esse erro.
+};
+
+module.exports = {
+  validateNewCar,
+};
+
+
+* agora completar o arquivo "nomeDoArquivo.service.js" para adicionar a validação.
+
+EX: TRECHO PARA ADICIONAR.
+
+const { validateNewCar } = require('./validations/validationsInputValues');
+
+  
+  const error = validateNewCar({ model, color, year, licensePlate, driverId });
+  if (error) return { status: error.status, data: { message: error.message } };
+  
+
+COMO FICA COMPLETO O ARQUIVO: ADICIONANDO MAIS UMA NOVA FUNÇÃO QUE É PARA VER SE O DRIVER EXISTE OU SEJA AO MOTORISTA.
+
+
+const { carModel, driverModel } = require('../models');
+const { validateNewCar } = require('./validations/validationsInputValues');
+
+const createCar = async ({ model, licensePlate, year, color, driverId }) => {
+  const error = validateNewCar({ model, color, year, licensePlate, driverId });
+  if (error) return { status: error.status, data: { message: error.message } };
+	
+  const driver = await driverExists(driverId);
+  if (!driver) return { status: 'NOT_FOUND', data: { message: 'Driver not found' } };
+  
+  const carId = await carModel.insert({ model, licensePlate, year, color, driverId });
+  const newCar = { id: carId, model, licensePlate, year, color, driverId };
+  return { status: 'SUCCESSFUL', data: newCar };
+};
+
+const driverExists = async (driverId) => {
+  const driver = await driverModel.findById(driverId);
+  return driver || false;
+};
+
+
+* implementando o arquivo service no endpoint.
+
+EX:
+
+app.post('/cars', async (req, res) => {
+  const { model, licensePlate, year, color, driverId } = req.body;
+  const serviceResponse = await carService.createCar({
+    model, 
+    licensePlate, 
+    year, 
+    color, 
+    driverId,
+  });
+
+  if (serviceResponse.status !== 'SUCCESSFUL') {
+    return res.status(400).json(serviceResponse.data);  = aqui acessa a chave data
+  }
+  return res.status(201).json(serviceResponse.data);  = aqui acessa a chave data
+});
+
+
+* agora com função de requisição GET.
+
+EX: NO ARQUIVO "nomeDoArquivo.service.js"
+
+const findAll = async () => {
+  const cars = await carModel.findAll();
+  return { status: 'SUCCESSFUL', data: cars };
+};
+
+
+NO ARQUIVO DO ENDPOINT
+
+
+app.get('/cars', async (_req, res) => {
+  const serviceResponse = await carService.findAll();
+  if (serviceResponse.status !== 'SUCCESSFUL') {
+    return res.status(400).json(serviceResponse.data);
+  }
+  return res.status(200).json(serviceResponse.data);
+});
+
+  
+  
+
+
 
 
 
