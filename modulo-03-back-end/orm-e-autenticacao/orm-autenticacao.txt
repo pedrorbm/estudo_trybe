@@ -571,6 +571,32 @@ module.exports = {
   }
 };
 
+*  Em seguida rodamos o comando abaixo para executar a nossa nova migration:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate
+
+* Também devemos alterar o model user.model.js para incluir a nova coluna phoneNum da seguinte forma:
+
+EX:
+
+// src/models/user.model.js
+
+// const User = (sequelize, DataTypes) => {
+//   const User = sequelize.define('User', {
+//     fullName: DataTypes.STRING,
+//     email: DataTypes.STRING,
+       // aqui inserimos o datatype da coluna criada
+       phoneNum: DataTypes.STRING,
+//   });
+// 
+//   return User;
+// };
+
+// module.exports = User;
+
+➡️ Pronto! Conseguimos criar uma migration para adição da coluna phoneNum na tabela Users. Desta maneira, se outra pessoa for alterar este projeto em outra máquina, ela pode executar as migrations e atualizar o banco de dados local com as modificações feitas por você!
 
 
 
