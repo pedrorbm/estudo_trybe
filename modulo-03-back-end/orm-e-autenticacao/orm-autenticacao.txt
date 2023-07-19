@@ -1,0 +1,613 @@
+# ORM  = Mapeamento objeto-relacional ou ORM (Object-Relational Mapping) é uma técnica que permite fazer um mapeamento estrutural entre as entidades do banco de dados e os objetos que as representam no código JavaScript. O mapeamento objeto-relacional abstrai as diferenças entre os dois paradigmas, da aplicação e do banco de dados, como podemos ver na imagem a seguir (imagem armazenada na pasta orm-exemplo.png)
+
+Com ORM não precisamos mais escrever uma query SQL “crua” para cada vez que formos inserir um registro na tabela. A própria biblioteca fica responsável por isso. Você apenas passa o objeto JavaScript para ela e ela insere os dados no banco de dados.
+
+No Node.js, temos o Sequelize, uma biblioteca de ORM bem conhecida e com suporte aos bancos de dados PostgreSQL, MariaDB, MySQL, SQLite e Microsoft SQL Server. É justamente nessa biblioteca de ORM que vamos nos aprofundar no conteúdo.
+
+* sequelize  = (imagem na pasta estapas-para-implementacao-do-sequelize.png)
+Esse processo pode parecer complexo, mas o Sequelize possui muitas vantagens sobre a utilização de uma interface direta com o MySQL. Quando tentamos fazer a interação direta com o banco de dados, enfrentamos problemas como:
+
+O JavaScript sozinho não possui um suporte eficiente para o SQL, você precisaria de um script SQL separado para criar seu database e tabelas.
+As queries SQL precisam ser incorporadas (“embedadas”) no código do JavaScript para serem utilizadas.
+Por causa dessas limitações, acabamos apenas incluindo boilerplates de SQL em vez de utilizar a Lógica de Negócio na nossa aplicação.
+✏️Anote aí: boilerplates são trechos de código que podem ser reutilizados em muitos lugares com pouca ou nenhuma alteração.
+
+Esses são alguns problemas que o Sequelize ajuda a resolver! Com ele, você pode evitar a criação de queries SQL para produzir as tabelas. Com o uso das models e migrations no Sequelize, o seu código se torna mais legível, extensível e de fácil manutenção.
+
+Além disso, por meio do mapeamento por objetos relacionais, é possível criar as relações e associações entre as tabelas com o próprio JavaScript. E ainda, é possível migrar seu database para outro banco de dados sem precisar reescrever todo o código (por exemplo: mudar de MySQL para o SQL server).
+
+* instalaçao do sequelize
+
+EX:
+
+npm install -E sequelize@6.3.4
+
+* O próximo passo para utilizar o Sequelize é instalar um CLI, que é responsável por gerar e executar as operações. Além de instalar o CLI, também precisamos instalar o mysql2, uma dependência necessária para usarmos o MySQL com o Sequelize. Na pasta raiz da aplicação, rode os comandos: (OBS: FORA DA PASTA "./SRC")
+
+EX:
+
+npm install -D -E sequelize-cli@6.2.0
+
+npm install -E mysql2@2.1.0
+
+mkdir src
+
+* Depois que instalamos o CLI, precisamos iniciar um projeto com o Sequelize. Para isso, vamos executar o seguinte comando dentro da pasta src:
+
+EX:
+
+cd src
+
+npx sequelize-cli init
+
+Esse comando vai criar as seguintes pastas:
+
+config: contém um arquivo de configuração, com orientações para o CLI se conectar com o nosso banco de dados;
+
+models: contém todos os modelos da nossa aplicação;
+
+migrations: contém todos os arquivos de migração da nossa aplicação;
+
+seeders: contém todos os arquivos de “seeds” (sementes que são usadas para popular o banco).
+
+➡️ O arquivo .sequelizerc
+
+O arquivo .sequelizerc é um arquivo de configuração do Sequelize. Esse arquivo é responsável por configurar o caminho das pastas migrations, models, seeders e config que o Sequelize irá procurar ao executar um comando.
+
+Por padrão, ao rodar um comando Sequelize os arquivos dentro das pastas de migrations, models, seeders e config seriam procurados somente na camada em que estivéssemos executando o comando. No nosso caso, como estamos utilizando a pasta src para abrigar os arquivos do Sequelize, caso executássemos um comando diretamente na raiz da aplicação, iríamos nos deparar com um erro.
+
+Podemos entrar na pasta src e executar estes comandos, como fizemos anteriormente, pois assim teremos êxito. Mas caso fosse uma aplicação maior, com mais camadas, aumentaríamos a complexidade de subir e configurar a aplicação.
+
+É neste momento que entra em cena o arquivo .sequelizerc. Dessa forma, podemos construir um código com uma arquitetura mais organizada. ⭐
+
+* Antes de configurar esse arquivo, volte para a pasta raiz da aplicação com o seguinte comando:
+
+EX:
+
+cd ..
+
+* Agora crie um arquivo com o nome .sequelizerc com o seguinte conteúdo: (O arquivo .sequelizerc é um arquivo de configuração do Sequelize e deve ser criado na pasta raiz. Nesse caso, a pasta app-with-sequelize.)
+
+EX:
+
+// app-with-sequelize/.sequelizerc
+
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('src', 'config', 'config.js'),
+  'models-path': path.resolve('src', 'models'),
+  'seeders-path': path.resolve('src', 'seeders'),
+  'migrations-path': path.resolve('src', 'migrations'),
+};
+
+Vamos entender melhor as informações deste arquivo:
+
+path: é um módulo interno do Node que nos fornece alguns utilitários para trabalharmos com caminhos de arquivos e diretórios;
+
+config: é um caminho para o arquivo de configuração;
+
+models-path: é um caminho para o diretório de models;
+
+seeders-path: é um caminho para o diretório de seeders;
+
+migrations-path: é um caminho para o diretório de migrations.
+
+* Agora precisamos configurar o arquivo config.json gerado pelo init do CLI. Ao alterar esse arquivo, estamos configurando o acesso da aplicação ao nosso banco de dados.
+
+➡️ Note que o arquivo config.json, localizado no diretório ./src/config, contém informações sensíveis, como credenciais de acesso ao banco de dados, expostas no nosso código. Uma boa prática é substituir os valores por variáveis de ambiente, não expondo assim, informações sensíveis relacionados à configuração geral da aplicação. Então, vamos fazer isso do jeito certo!
+
+➡️ Mudaremos o nome do nosso arquivo config.json para config.js
+
+➡️ Retiraremos todo o conteúdo de config.js e substituiremos pelo código abaixo:
+
+EX:
+
+// src/config/config.js
+
+const config = {
+  username: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  host: process.env.MYSQL_HOST,
+  dialect: 'mysql',
+};
+
+module.exports = {
+  development: config,
+  test: config,
+  production: config,
+};
+
+Vamos entender melhor as informações que estamos passando:
+
+username: usuário de acesso ao banco de dados;
+
+password: senha de acesso ao banco de dados;
+
+database: nome do banco de dados no qual queremos conectar;
+
+host: servidor no qual estamos conectando - por ser local, utilizamos o endereço IP 127.0.0.1, ou seu alias localhost;
+
+dialect: informa qual a biblioteca que o sequelize utiliza para se conectar ao banco de dados estamos utilizando. Nesse caso, mysql.
+
+* Modifique o arquivo src/models/index.js para apontar para o arquivo config.js:
+
+EX:
+
+Para fazer isso, busque neste arquivo, a seguinte linha de código:
+
+const config = require(__dirname + '/../config/config.json')[env]; // configuração antiga
+
+Altere esta linha para ficar assim:
+
+/ Praticamente é só mudar a extensão de .json para .js! /
+const config = require(__dirname + '/../config/config.js')[env]; // configuração nova
+
+* Antes de rodar os comandos Sequelize, precisamos garantir que temos uma instância do MySQL rodando.
+
+Caso você já tenha um container com uma imagem do MySQL, pode utilizá-lo ou usar o comando abaixo no terminal para criar e rodar um:
+
+⚠️ Garanta que a senha do banco esteja de acordo com a presente no .env. 😉
+
+EX:
+
+docker container run --name teste-sequelize -e MYSQL_ROOT_PASSWORD=root -d -p 3306:3306 mysql:8.0.29
+
+*  Criação do banco de dados usando o CLI do Sequelize
+
+➡️Agora que iniciamos uma aplicação do Sequelize e a nossa instância do MySQL está rodando, podemos criar o banco de dados orm_example (que nomeamos no .env) na raiz do projeto:
+
+EX:
+
+env $(cat .env) npx sequelize db:create
+
+NOTA: o comando env $(cat .env) irá realizar a leitura das variáveis do arquivo .env e repassá-las para o próximo comando, disponibilizando assim os valores das variáveis de ambiente para o seu código através do process.env.NOME_DA_VARIAVEL.
+
+De olho na dica 👀: O .sequelizerc procura os arquivos de configuração do Sequelize no diretório src. Por isso, é importante que você esteja na raiz do projeto quando for rodar os comandos do Sequelize.
+
+* No seu terminal, o Sequelize vai avisar que o database foi criado. Você pode verificar isso no próprio MySQL utilizando os comandos abaixo:
+
+➡️ Execute o container criado anteriormente com o comando:
+
+EX:
+
+docker exec -it container-mysql bash
+
+➡️ Entre no terminal do mysql com o comando:
+
+mysql -u root -p
+
+➡️ Digite a sua senha de acesso ao mysql e em seguida rode o comando abaixo:
+
+show databases;
+
+➡️ Perceba que, a partir desses passos, o banco orm_example foi criado e você não precisou escrever nenhuma linha de SQL para isso. Essa é uma das primeiras vantagens que o Sequelize nos oferece.
+
+# MODEL  = Os models são a essência do Sequelize. Um model é uma abstração que representa uma linha na tabela em seu banco de dados e passa várias informações ao Sequelize sobre essa entidade, como o nome e quais atributos (colunas) ela possui (e seus tipos de dados).
+
+* Vamos dar um exemplo para ficar mais evidente! Queremos criar uma tabela users, que contém dados de várias pessoas usuárias.
+
+O que fazemos primeiro é criar um model que vai representar uma pessoa em nossa aplicação, ou uma linha na tabela users no nosso banco (vamos ver a tabela sendo criada no próximo tópico).
+Crie um arquivo user.model.js na pasta model com o seguinte conteúdo:
+
+EX:
+
+// src/models/user.model.js
+
+const UserModel = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    fullName: DataTypes.STRING,
+    email: DataTypes.STRING,
+  });
+
+  return User;
+};
+
+module.exports = UserModel;
+
+Perceba que adicionamos as colunas fullName e email no nosso model, ambas do tipo string.
+
+Note também que o nome do arquivo model é user.model.js e que o nome da função definida nele também está no singular (User). Isso é uma convenção. Geralmente os models são nomeados no singular, já que representam um registro (o equivalente a uma linha) da tabela, enquanto as tabelas são nomeadas no plural. Como não explicitamos o nome da tabela no model, por padrão, o Sequelize coloca no plural o nome do model e o usa como nome da tabela. No nosso caso, o model se chama user e nossa tabela Users, portanto, funciona perfeitamente.
+
+* Utilizando o build
+Antes de usarmos as funções, vamos adicionar uma nova linha no nosso arquivo user.model.js. Ela vai ser responsável por sincronizar a model com os métodos do Sequelize:
+
+EX:
+
+// src/models/user.model.js
+// const UserModel = (sequelize, DataTypes) => {
+//  const User = sequelize.define('User', {
+//    fullName: DataTypes.STRING,
+//    email: DataTypes.STRING,
+//  });
+  (async () => {
+    await sequelize.sync({ force: true });
+    // As funções vão aqui
+})();
+//  return User;
+// };
+// module.exports = UserModel;
+
+Note que o método sync está sendo chamado com o parâmetro force: true. Isso significa que, toda vez que o servidor for iniciado, a tabela será recriada. Isso é útil para testes, mas não deve ser usado em produção.
+
+* Vamos então criar a nossa Model com o método build. O método build é útil para criar uma instância de um model, mas sem salvá-la no banco de dados. Podemos usar essa função quando queremos criar um objeto que vai armazenar dados temporários, por exemplo:
+
+EX:
+
+const sara = User.build({
+  fullName: 'Sara Silva Santos',
+  email: 'sara.ss@trybe.com',
+});
+
+console.log(sara instanceof User); // true
+console.log(sara.fullName); // "Sara Silva Santos"
+
+Note que o código acima não é assíncrono, o que significa que o método build não se comunica com o banco de dados. Isso acontece por que essa função cria uma instância de um model, que representa os dados que irão ser salvos no banco de dados, mas não os salva. 
+
+* Para salvar os dados no banco de dados, o método save deve ser utilizado:
+
+EX:
+
+await sara.save();
+console.log('Pessoa salva no banco de dados!');
+
+O método save é assíncrono, por isso ele deve ser utilizado com await.
+
+* Criando com create
+Uma forma mais simples de criar uma instância de um model e salvá-la no banco de dados é usando o método create, que combina o build e o save em uma única função:
+
+EX:
+
+const sara = await User.create({
+  fullName: 'Sara Silva Santos',
+  email: 'sara.ss@trybe.com',
+});
+
+console.log(sara instanceof User); // true
+console.log(sara.name); // "Sara Silva Santos"
+
+Note que o método create é assíncrono, pois ele se comunica com o banco de dados para criar a instância do model.
+
+* Modificando informações no banco de dados
+Quando trocamos informações de um model, precisamos salvar essas alterações no banco de dados. Para isso, podemos usar o método save:
+
+EX:
+
+const sara = await User.create({
+  fullName: 'Sara Silva Santos',
+  email: 'sara.ss@trybe.com',
+});
+
+console.log(sara.fullName); // "Sara Silva Santos"
+
+sara.fullName = "Jane Doe";
+
+// O nome ainda está "Sara Silva Santos" no banco de dados!
+
+await sara.save();
+
+// Agora o nome foi atualizado para "Jane Doe" no banco de dados!
+
+* Também é possível atualizar diversos campos de uma vez usando o método set:
+
+EX:
+
+const lucas = await User.create({
+  fullName: 'Lucas Silva Santos',
+  email: 'lucas.ss@trybe.com',
+});
+
+lucas.set({
+  fullName: "Pedro Silva Santos",
+  email: "pedro.ss@trybe.com"
+});
+
+// O nome ainda está "Lucas Silva Santos" no banco de dados!
+
+await lucas.save();
+
+// Agora o nome foi atualizado para "Pedro Silva Santos", e o email para pedro.ss@trybe.com no banco de dados!
+
+Note que chamar a função save no arquivo, vai atualizar todos os campos que foram alterados, não apenas os que foram modificados através do método set. 
+
+* Para atualizar apenas os campos específicos que foram modificados, podemos usar o método update:
+
+EX:
+
+const jane = await User.create({
+fullName: "Jane Doe",
+email: "jane.doe@trybe.com",
+});
+
+jane.email = "ada.doe@trybe.com";
+await jane.update({ fullName: "Ada Joe" });
+
+// O banco de dados agora tem "Ada Joe" para o nome, mas o email ainda é "jane.doe@trybe.com".
+
+await jane.save();
+// O banco de dados agora tem "ada.doe@trybe.com" para o email.
+
+* Excluindo informações do banco de dados
+Quando precisamos excluir um model do banco de dados, podemos usar o método destroy:
+
+EX:
+
+const mario = await User.create({ fullName: "Mario Bors" });
+
+console.log(mario.fullName); // "Mario Bors"
+
+await mario.destroy();
+
+// Agora essa entrada não existe mais no banco de dados!
+
+# MIGRATIONS  = Uma migration é uma forma de versionar o schema do banco de dados. Ou seja, cada migration conterá um pedaço de código que representa o histórico das alterações feitas no nosso banco de dados.
+
+💪 Vamos trazer isso pra prática!
+
+Imagine o seguinte: você escreve um código definindo como um banco de dados deve ser criado e esse código fica salvo em um arquivo na pasta migrations. Após um tempo, uma atualização é feita e uma coluna é acrescentada em uma tabela. O que você faz?
+
+Você vai escrever o código em outro arquivo para acrescentar essa coluna, certo? Pense que, cada arquivo será marcado com uma estampa datetime, então ao longo do tempo esse código vai empilhando dezenas, às vezes centenas, de arquivos. Cada um desses arquivos marca uma versão do banco de dados e o seu histórico de mudanças e evoluções.
+
+Quem clona um projeto pela primeira vez, roda suas migrations para configurar o banco de dados no formato mais recente enviado para a main (ou branch principal), sem ter que fazer mais nada. Aí sim é possível trabalhar localmente no banco de dados da aplicação sem medo de ele ser diferente da versão mais nova que encontramos na main.
+
+Usando migrations, o mapeador objeto-relacional sabe exatamente quais alterações executar no banco de dados, tanto para criar algo novo quanto para restaurar o banco para uma versão mais antiga. Além disso, uma migration tem dois códigos conhecidos como Up e Down. Ou seja: toda migration, além de saber o que fazer para executar as mudanças no banco de dados (Up), também deve saber como reverter essas mudanças (Down). Isso significa que as migrations têm o poder de avançar ou reverter o seu banco de dados para qualquer um dos estados que ele já teve.
+
+EX:
+
+(imagem salva na pasta "exemplo-migrations.png")
+
+*  Agora vamos gerar um novo arquivo, com apenas o “esqueleto” de uma migration, usando o seguinte comando no terminal:
+
+EX:
+
+npx sequelize migration:generate --name create-user
+
+* Com isso, um novo arquivo [timestamp]-create-user.js será criado na pasta migrations contendo o seguinte código:
+
+EX:
+
+// src/migrations/[timestamp]-create-user.js
+
+'use strict';
+
+module.exports = {
+  async up (queryInterface, Sequelize) {
+    /**
+     * Add altering commands here.
+     *
+     * Example:
+     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     */
+  },
+
+  async down (queryInterface, Sequelize) {
+    /**
+     * Add reverting commands here.
+     *
+     * Example:
+     * await queryInterface.dropTable('users');
+     */
+  }
+};
+
+Ao serem criadas pelo Sequelize, os arquivos de migrations e seeds têm seus nomes iniciados por um timestamp, que é seguido pelo nome que nós definimos no comando, gerando ao final um arquivo de nome similar a 20220827010852-create-user.js.
+
+* Agora vamos mexer apenas dentro das funções up e down. Repare que ambas as funções recebem dois parâmetros: um é o queryInterface, e o outro é o Sequelize. Ambos os parâmetros são objetos que armazenam dados e operações. O queryInterface é usado pela biblioteca para modificar o banco de dados, seguindo o “dialeto” do banco que estamos utilizando. O objeto Sequelize armazena os tipos de dados disponíveis no contexto do banco, por exemplo varchar, string, integer, date etc.
+
+➡️ O objetivo da nossa migration é criar a tabela users com os seguintes campos e condições:
+
+id: Identificador do item.
+
+É uma chave primária;
+Valor não pode ser nulo;
+Possui incremento automático;
+É do tipo Integer.
+fullName: Nome completo da pessoa usuária da aplicação.
+
+É do tipo String.
+email: E-mail da pessoa usuária da aplicação.
+
+É do tipo String.
+createdAt: Data da criação do item.
+
+Valor não pode ser nulo;
+É do tipo Date.
+updatedAt: Data da atualização do item.
+
+Valor não pode ser nulo;
+É do tipo Date.
+Podemos criar a tabela Users através da função createTable do queryInterface. A função createTable recebe dois parâmetros:
+
+O primeiro recebe uma string com o nome da tabela;
+O segundo recebe um objeto com os campos, e suas condições, da tabela.
+Lembra da convenção que mencionamos anteriormente, na qual o nome do model é no singular e o nome da tabela é no plural? É por esta razão que na função createTable o nome especificado será "Users". 😉
+
+* Para começar, chamamos a função createTable passando o nome da tabela dentro do bloco de execução (up):
+
+⚠️ Usamos o await porque a função createTable é assíncrona!
+
+EX:
+
+// src/migrations/[timestamp]-create-user.js
+
+// 'use strict';
+
+// module.exports = {
+//   up: async (queryInterface, Sequelize) => {
+       await queryInterface.createTable('Users', {});
+//   },
+
+//   down: async (queryInterface, Sequelize) => {
+      /**
+       * Add reverting commands here.
+       *
+       * Example:
+       * await queryInterface.dropTable('users');
+       */
+//   }
+// };
+
+* Agora vamos adicionar todos os campos da nossa tabela e suas determinadas condições:
+
+EX:
+
+// src/migrations/[timestamp]-create-user.js
+
+// 'use strict';
+
+// module.exports = {
+//   up: async (queryInterface, Sequelize) => {
+       await queryInterface.createTable('Users', {
+         id: {
+           allowNull: false,
+           autoIncrement: true,
+           primaryKey: true,
+           type: Sequelize.INTEGER
+         },
+         fullName: {
+           type: Sequelize.STRING
+         },
+         email: {
+           type: Sequelize.STRING
+         },
+         createdAt: {
+           allowNull: false,
+           type: Sequelize.DATE
+         },
+         updatedAt: {
+           allowNull: false,
+           type: Sequelize.DATE
+         }
+       });
+//   },
+
+//   down: async (queryInterface, Sequelize) => {
+      /**
+       * Add reverting commands here.
+       *
+       * Example:
+       * await queryInterface.dropTable('users');
+       */
+//   }
+// };
+
+➡️ Percebeu que cada campo possui um objeto representando as propriedades daquele campo em específico? Veja o que são cada uma dessas propriedades:
+
+allowNull: Define se o campo pode ou não receber um valor null;
+autoIncrement: Define se o campo vai ter incremento automático;
+primaryKey: Define se o campo é uma chave primária;
+type: Define o tipo do campo, por exemplo STRING, INTEGER, DATE, etc.
+
+* Agora vamos implementar o bloco de reversão (down) com um código que vai apenas apagar a tabela caso seja necessário desfazer a operação de execução (up). Assim escreveremos uma migration perfeitamente reversível!
+
+EX:
+
+// src/migrations/[timestamp]-create-user.js
+
+//  'use strict';
+
+//  module.exports = {
+//    up: async (queryInterface, Sequelize) => {
+//      ...
+//    },
+//    down: async (queryInterface, Sequelize) => {
+        await queryInterface.dropTable('Users');
+//    }
+//  };
+
+⚠️Importante: se o código da migration tiver erros, as suas migrations podem não executar corretamente os processos de criar ou desfazer uma nova versão do banco. É preciso ter bastante cuidado na hora de mexer no código de uma migration.
+
+⚠️Importante: A execução de uma migration requer o uso das variáveis de ambiente, uma vez que será realizado um acesso ao banco de dados.
+
+* Com a migration criada, basta executarmos o seguinte comando pelo CLI:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate
+
+* Caso queira reverter uma migration use o seguinte comando:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate:undo
+
+* Criando uma nova migration para alterar uma tabela já existente
+Imagine agora, com base no modelo User, se for preciso salvar o telefone do usuário. O que pode vir à mente é que basta adicionar o novo atributo no modelo e na migration, como fizemos com o atributo email anteriormente, correto?
+
+❌ Errado, essa é uma prática que não é escalável! Imagine que foi feito um deploy do seu código e a migration foi usada para criar o banco em ambiente de produção. Nesse caso, você teria que rodar o comando db:migrate:undo e recriar o banco para executar o comando db:migrate, para então recriar uma tabela. O problema disso é que ao rodar o undo você perde todos os dados salvos anteriormente na tabela, e isso é uma coisa que jamais deve ser feita. Anotou aí?
+
+Então qual seria a forma correta de adicionar uma nova coluna em uma tabela já existente?
+
+✔️ A resposta certa é: criar uma nova migration que permita alterar a tabela. Para isso, o objeto queryInterface possui funções específicas, que permitem criar uma nova coluna, remover uma coluna ou mesmo mudar o tipo de uma coluna que já existe. Nesse caso, o queryInterface abstrai o que a função ALTER TABLE faz no SQL. Deseja saber mais sobre ALTER TABLE e está com sua gestão de tempo em dia? Consulte o conteúdo adicional sobre o assunto.
+
+Lembre-se que a tabela Users tem que estar criada para que os passos a seguir sejam executados com sucesso, portanto, se você reverteu a migration que a criava, refaça-a com o comando npx sequelize db:migrate.
+
+* Para criar uma outra migration para adicionar a coluna phoneNum na sua tabela Users, você deve criar um novo arquivo com o seguinte comando:
+
+EX:
+
+npx sequelize migration:generate --name add-column-phone-table-users
+
+Com isso, um novo arquivo [timestamp]-add-column-phone-table-users.js será criado.
+
+* Agora podemos inserir a função queryInterface.addColumn() no escopo Up para adicionar uma nova coluna à nossa tabela Users, e adicionar a função queryInterface.removeColumn() no escopo Down para remover a nova coluna da tabela. Veja como fazer isso a partir do código abaixo:
+
+EX:
+
+// src/migrations/[timestamp]-add-column-phone-table-users.js
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+   await queryInterface.addColumn('Users', 'phoneNum', {
+     type: Sequelize.STRING,
+   });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('Users', 'phoneNum');
+  }
+};
+
+*  Em seguida rodamos o comando abaixo para executar a nossa nova migration:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate
+
+* Também devemos alterar o model user.model.js para incluir a nova coluna phoneNum da seguinte forma:
+
+EX:
+
+// src/models/user.model.js
+
+// const User = (sequelize, DataTypes) => {
+//   const User = sequelize.define('User', {
+//     fullName: DataTypes.STRING,
+//     email: DataTypes.STRING,
+       // aqui inserimos o datatype da coluna criada
+       phoneNum: DataTypes.STRING,
+//   });
+// 
+//   return User;
+// };
+
+// module.exports = User;
+
+➡️ Pronto! Conseguimos criar uma migration para adição da coluna phoneNum na tabela Users. Desta maneira, se outra pessoa for alterar este projeto em outra máquina, ela pode executar as migrations e atualizar o banco de dados local com as modificações feitas por você!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
