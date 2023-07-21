@@ -598,6 +598,428 @@ EX:
 
 ➡️ Pronto! Conseguimos criar uma migration para adição da coluna phoneNum na tabela Users. Desta maneira, se outra pessoa for alterar este projeto em outra máquina, ela pode executar as migrations e atualizar o banco de dados local com as modificações feitas por você!
 
+# SEEDERS  = agora chegou o momento de aprender a popular nosso banco de dados utilizando o Seeders. Podemos configurar nosso banco para ser automaticamente criado e povoado.
+
+* As seeds seguem a mesma linha das migrations, portanto primeiramente vamos precisar executar a criação de uma nova seed pelo CLI:
+
+EX:
+
+npx sequelize seed:generate --name users
+
+Reparem que o arquivo foi criado dentro da pasta seeders com o mesmo formato do arquivo de uma migration. 
+
+* Agora, devemos adicionar ao arquivo criado quais informações aquele seed vai gerar. O código abaixo vai adicionar dois usuários ao banco de dados:
+
+EX:
+
+// src/seeders/[timestamp]-users.js
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => queryInterface.bulkInsert('Users',
+    [
+      {
+        fullName: 'Leonardo',
+        email: 'leo@test.com',
+        // usamos a função CURRENT_TIMESTAMP do SQL para salvar a data e hora atual nos campos `createdAt` e `updatedAt`
+        createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+        updatedAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      {
+        fullName: 'JEduardo',
+        email: 'edu@test.com',
+        createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+        updatedAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+    ], {}),
+
+  down: async (queryInterface) => queryInterface.bulkDelete('Users', null, {}),
+};
+
+Na função acima, estamos utilizando o parâmetro recebido pela função queryInterface para conversar com o banco de dados. Dessa forma, conseguimos inserir os dados que queremos. Também estamos adicionando os dados, que estão na estrutura de uma array de objetos, na tabela users. O queryInterface tem a função bulkInsert, a qual estamos utilizando, que insere múltiplos dados na tabela.
+
+Note que a seed segue o mesmo princípio de up e down, ou seja, devemos colocar também o que a seed deve fazer caso precise reverter a operação. Aqui, um código ruim pode quebrar o fluxo de uso/reversão dos seeds, então escreva com atenção!
+
+* Para executar a seed, basta rodarmos o comando abaixo:
+
+EX:
+
+env $(cat .env) npx sequelize db:seed:all
+
+* Para reverter o seed, use o seguinte comando:
+
+EX:
+
+env $(cat .env) npx sequelize db:seed:undo:all
+
+# Implementando a listagem de pessoas usuárias
+
+Caso precisemos buscar todas as pessoas usuárias, por exemplo, basta criarmos os diretórios e arquivos para nossos services e controllers e preenchê-los como no código abaixo:
+
+EX: SERVICE
+
+// src/services/user.service.js
+
+const { User } = require('../models');
+
+/* Esta função usa o método findAll do Sequelize para buscar todas as linhas da tabela Users
+Equivale a fazer a query: SELECT * FROM Users */
+const getAll = async () => {
+  const users = await User.findAll();
+
+  return users;
+};
+
+module.exports = {
+  getAll,
+};
+
+EX: CONTROLLER
+
+// src/controllers/user.controller.js
+
+const UserService = require('../services/user.service');
+
+const getAll = async (_req, res) => {
+  try {
+    const users = await UserService.getAll();
+    return res.status(200).json(users);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: 'Ocorreu um erro' });
+  }
+};
+
+module.exports = {
+  getAll,
+};
+
+Note que não precisamos escrever uma query SQL para buscar os dados, pois o Sequelize abstrai isso para nós. Ele oculta essa complexidade e nos provê uma forma menos trabalhosa de escrever esse código.
+
+Repare que estamos importando o modelo que criamos do arquivo index.js da pasta models, e não diretamente do arquivo user.models.js. Quando executamos o comando npx sequelize init, o arquivo index.js é gerado dentro da pasta models.
+
+O código desse arquivo index.js é responsável por:
+
+Realizar a conexão com o banco de dados, por meio do arquivo config.json ou config.js;
+Coletar todos os modelos definidos dentro da pasta models e;
+Caso necessário, associar um modelo a algum outro.
+
+* Agora precisamos criar nossos arquivos app.js e server.js com os código logo abaixo dentro da pasta src. Teste e veja o comportamento de uma aplicação utilizando o Sequelize.
+
+EX:
+
+// src/app.js
+
+const express = require('express');
+
+const User = require('./controllers/user.controller');
+
+const app = express();
+
+app.use(express.json());
+
+app.get('/user', User.getAll);
+
+module.exports = app;
+
+EX:
+
+// src/server.js
+
+const app = require('./app');
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Escutando na porta ${PORT}`);
+});
+
+* Antes de executar a aplicação, precisamos adicionar o Express e o nodemon como dependências da nossa aplicação:
+
+EX:
+
+npm install -E express@4.17
+npm install -D -E nodemon@2.0.15
+
+* Agora, altere a chave no package.json a chave main para que aponte para o arquivo server.js: e adicione o script dev para rodar sua aplicação.
+
+EX:
+
+//  {
+//  ...
+  "main": "src/server.js",
+//  ...
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+//  ...
+//  }
+
+Agora você pode executar o comando "env $(cat .env) npm run dev" e testar fazer uma requisição para URL http://localhost:3001/user. Como acabamos de criar o banco de dados e a tabela Users nas lições anteriores, a resposta da requisição será um array com duas pessoas usuárias, essas pessoas são as que foram inseridas graças ao Seeder que foi criado e executado anteriormente.
+
+* Implementando os demais endpoints do CRUD de pessoas usuárias
+O caso que mostramos acima foi para buscar todas as pessoas usuárias, mas conseguimos realizar todas as outras operações de consulta, inserção e deleção também:
+
+EX: SERVICE
+
+// src/services/user.service.js
+
+// const { User } = require('../models/');
+
+// const getAll = async () => {
+//   const users = await User.findAll();
+
+//   return users;
+// };
+
+/* Esta função usa o método findByPk do Sequelize para buscar um usuário pelo id.
+Equivale a fazer a query: SELECT * FROM Users WHERE id=? */
+const getById = async (id) => {
+  const user = await User.findByPk(id);
+
+  return user;
+};
+
+/* Esta função usa o método findOne do Sequelize combinado 
+com a chave where para buscar por id e email. 
+Equivale a fazer a query: SELECT * FROM Users WHERE id=? AND email=? */
+const getByIdAndEmail = async (id, email) => {
+  const user = await User.findOne({ where: { id, email } });
+
+  return user;
+};
+
+/* Esta função usa o método create do Sequelize para inserir um objeto na tabela Users
+Equivale a fazer a query: INSERT INTO Users (full_name, email) VALUES (?, ?) */
+const createUser = async (fullName, email) => {
+  const newUser = await User.create({ fullName, email });
+
+  return newUser;
+};
+
+/* Esta função usa o método update do Sequelize para atualizar um objeto na tabela Users
+Equivale a fazer a query: UPDATE Users SET full_name=?, email=? WHERE id=?*/
+const updateUser = async (id, fullName, email) => {
+  const [updatedUser] = await User.update(
+    { fullName, email },
+    { where: { id } },
+  );
+
+  console.log(updatedUser); // confira o que é retornado quando o user com o id é ou não encontrado;
+  return updatedUser;
+};
+
+/* Esta função usa o método destroy do Sequelize para remover um objeto na tabela Users
+Equivale a fazer a query: DELETE FROM Users WHERE id=?*/
+const deleteUser = async (id) => {
+  const user = await User.destroy(
+    { where: { id } },
+  );
+
+  console.log(user); // confira o que é retornado quando o user com o id é ou não encontrado;
+  return user;
+};
+
+module.exports = {
+  getAll,
+  getById,
+  getByIdAndEmail,
+  createUser,
+  updateUser,
+  deleteUser,
+};
+
+EX: CONTROLLER
+
+// src/controllers/user.controller.js
+
+// const UserService = require('../services/user.service');
+
+const error500Message = 'Algo deu errado';
+
+// const getAll = async (_req, res) => {
+//   try {
+//     const users = await UserService.getAll();
+//     return res.status(200).json(users);
+//   } catch (e) {
+//     console.log(e.message);
+//     res.status(500).json({ message: 'Ocorreu um erro' });
+//   }
+// };
+
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserService.getById(id);
+
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+    return res.status(200).json(user);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: error500Message });
+  }
+};
+
+const getByIdAndEmail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.query;
+    const user = await UserService.getByIdAndEmail(id, email);
+
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+    return res.status(200).json(user);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: error500Message });
+  }
+};
+
+const createUser = async (req, res) => {
+  try {
+    const { fullName, email } = req.body;
+    const newUser = await UserService.createUser(fullName, email);
+
+    return res.status(201).json(newUser);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: error500Message });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { fullName, email } = req.body;
+    const { id } = req.params;
+    const updatedUser = await UserService.updateUser(id, fullName, email);
+
+    if (!updatedUser) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+    return res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: error500Message });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await UserService.deleteUser(id);
+
+    return res.status(200).json({ message: 'Usuário excluído com sucesso!' });
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: error500Message });
+  }
+};
+
+module.exports = {
+  getAll,
+  getById,
+  getByIdAndEmail,
+  createUser,
+  updateUser,
+  deleteUser,
+};
+
+EX: APP
+
+// src/app.js
+
+// const express = require('express');
+
+// const User = require('./controllers/user.controller');
+
+// const app = express();
+
+// app.use(express.json());
+
+// app.get('/user', User.getAll);
+
+// Este endpoint usa o método findByPk do Sequelize para buscar um usuário pelo id.
+app.get('/user/:id', User.getById);
+
+// Este endpoint usa o método findOne do Sequelize para buscar um usuário pelo id e email.
+// URL a ser utilizada para o exemplo "http://localhost:3001/user/search/1?email=leo@test.com"
+app.get('/user/search/:id', User.getByIdAndEmail);
+
+// Este endpoint usa o método create do Sequelize para salvar um usuário no banco.
+app.post('/user', User.createUser);
+
+// Este endpoint usa o método update do Sequelize para alterar um usuário no banco.
+app.put('/user/:id', User.updateUser);
+
+// Este endpoint usa o método destroy do Sequelize para remover um usuário no banco.
+app.delete('/user/:id', User.deleteUser);
+
+// module.exports = app;
+
+* Testes
+Para testarmos os models criados com o Sequelize, seguiremos os mesmos conceitos vistos anteriormente: vamos isolar as operações de IO e utilizaremos bibliotecas específicas para nos ajudar com os stubs e asserções.
+
+* Antes de começar a realizar os testes, vamos instalar nossas dependências de desenvolvimento como nas aulas anteriores:
+
+EX:
+
+npm i mocha@10.0.0 chai@4.3.4 sinon@14.0.0 chai-http@4.3.0 -D -E
+
+* Agora vamos alterar a linha abaixo em nosso package.json para executar nossos testes com o comando npm test, como nas aulas anteriores:
+
+EX:
+
+// package.json
+
+"scripts": {
+  ...
+  "test": "mocha tests/**/*$NAME*.test.js --exit"
+},
+
+* Para testar um model com Sequelize, podemos utilizar bibliotecas específicas para nos ajudar nessa tarefa. Uma bastante utilizada é a Sequelize Test Helpers. Vamos ver um exemplo de como podemos utilizá-la:
+
+Use o comando abaixo para instalar a biblioteca Sequelize Test Helpers:
+
+EX:
+
+npm i sequelize-test-helpers@1.4.3 -D -E
+
+* Crie o arquivo abaixo na raiz do projeto e depois rode npm test:
+
+EX:
+
+// tests/unit/models/user.test.js
+
+const {
+  sequelize,
+  dataTypes,
+  checkModelName,
+  checkPropertyExists,
+} = require('sequelize-test-helpers');
+
+const UserModel = require('../../../src/models/user.model');
+
+describe('O model de User', () => {
+  const User = UserModel(sequelize, dataTypes);
+  const user = new User();
+
+  describe('possui o nome "User"', () => {
+    checkModelName(User)('User');
+  });
+
+  describe('possui as propriedades "fullName" e "email"', () => {
+    ['fullName', 'email'].forEach(checkPropertyExists(user));
+  });
+});
+
+É possível fazer essas asserções diretamente, porém esse módulo já possui diversas funções prontas para facilitar a escrita dos testes.
+
+
+
+
+
 
 
 
