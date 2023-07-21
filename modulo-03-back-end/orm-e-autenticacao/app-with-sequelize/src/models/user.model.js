@@ -9,18 +9,16 @@ const UserModel = (sequelize, DataTypes) => {
 
   (async () => {
     await sequelize.sync({ force: true });
-    // As funções vão aqui
+    const sara = await User.create({
+      fullName: 'Sara Silva Santos',
+      email: 'sara.ss@trybe.com',
+      phoneNum: '944444',
+    });
+    console.log(sara instanceof User); // true
+    console.log(sara.name); // "Sara Silva Santos"
   })();
 
   return User;
 };
-
-const sara = await User.create({
-  fullName: 'Sara Silva Santos',
-  email: 'sara.ss@trybe.com',
-});
-
-console.log(sara instanceof User); // true
-console.log(sara.name); // "Sara Silva Santos"
 
 module.exports = UserModel;
