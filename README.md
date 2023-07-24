@@ -1,2 +1,2 @@
-Todas as anotações feitas durante o curso da Trybe estão aqui!
-Divididos em módulos, blocos e dias.
+Anotações de estudos feitos durante o curso da Trybe.
+Divididos em módulos e seções.
