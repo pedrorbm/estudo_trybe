@@ -1017,6 +1017,730 @@ describe('O model de User', () => {
 É possível fazer essas asserções diretamente, porém esse módulo já possui diversas funções prontas para facilitar a escrita dos testes.
 
 
+# PRIMARY KEY, FOREIGN KEY E JOINS NO SEQUELIZE:(MODIFICANDO NO TESTE PROJETO "APP-WITH" DA PASTA COM A TABELA "employees").
+
+# RELACIONAMENTO 1:1
+
+* Agora vamos criar as migrations e para criar a migration que será responsável pela tabela Employees, basta utilizar o comando:
+
+EX:
+
+npx sequelize migration:generate --name create-employees
+
+Lembre-se que todas as migrations e seeds, quando criadas pelos comandos do Sequelize, têm um timestamp antes do nome do arquivo, lembre-se disso ao procurá-las!
+
+* Abra a migration e substitua o código existente pelo seguinte código:
+
+EX:
+
+// src/migrations/[timestamp]-create-employee.js
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    return queryInterface.createTable('employees', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      firstName: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        field: 'first_name',
+      },
+      lastName: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        field: 'last_name',
+      },
+      age: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+    });
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.dropTable('employees');
+  },
+};
+
+* Agora vamos criar a migration responsável pela tabela Addresses utilizando o comando:
+
+EX:
+
+npx sequelize migration:generate --name create-addresses
+
+* Abra a migration e substitua seu conteúdo presente pelo seguinte código:
+
+EX:
+
+// src/migrations/[timestamp]-create-addresses.js
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    return queryInterface.createTable('addresses', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      city: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      street: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      number: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      employeeId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        // Configuram o que deve acontecer ao atualizar ou excluir um usuário
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        field: 'employee_id',
+        // Informa que o campo é uma Foreign Key (Chave estrangeira)
+        references: {
+          // Informa a tabela da referência da associação
+          model: 'employees',
+          // Informa a coluna da referência que é a chave correspondente
+          key: 'id',
+        },
+      },
+    });
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.dropTable('addresses');
+  },
+};
+
+Repare que, agora, temos algumas informações novas sendo passadas para o Sequelize no momento de adicionar a coluna employeeId. Esses dados informam ao Sequelize que aquele campo deve ser uma _foreign key_. Vamos passar por cada um deles:
+
+references.model: indica qual tabela nossa foreign key está referenciando.
+references.key: indica qual coluna da tabela estrangeira deve ser utilizada para nossa foreign key.
+onUpdate e onDelete: configura o que deve acontecer ao atualizar ou excluir um usuário. Nesse caso, todos os endereços daquele usuário serão alterados ou excluídos.
+Essa migration cria uma foreign key na tabela addresses, que relaciona o campo employee_id dessa tabela ao campo id da tabela employees.
+
+* Vamos executar o seguinte comando para gerar as migrations:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate
+
+Ok, mas como criamos essa associação no sequelize? 🤔
+
+Com as migrations criadas, vamos para os models criar essas associações!
+
+* Dentro da pasta models, crie o arquivo employee.model.js, que conterá a seguinte estrutura:
+
+EX:
+
+// src/models/employee.model.js
+
+module.exports = (sequelize, DataTypes) => {
+  const Employee = sequelize.define('Employee', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    age: DataTypes.INTEGER,
+  },
+  {
+    timestamps: false, // remove a obrigatoriedade de utilizar os campos `createdAt` e `updatedAt`
+    tableName: 'employees',
+    underscored: true,
+  });
+
+  Employee.associate = (models) => {
+    Employee.hasOne(models.Address,
+      { foreignKey: 'employeeId', as: 'addresses' });
+  };
+
+  return Employee;
+};
+
+A função Employee.associate = (models) => {} que criamos é onde declararemos as associações daquele model. No nosso caso, estamos dizendo que a tabela Employees possui um Address, referenciado pela foreign key employee_id, o model Employee deve chamá-la de addresses (note a letra minúscula), como definido na propriedade as.
+
+Essa função é chamada pelo arquivo src/models/index.js, criado pelo comando npx sequelize-cli init que você executou ao começar o exemplo.
+
+Os métodos de criação de associações que o Sequelize disponibiliza são:
+
+hasOne
+belongsTo
+hasMany
+belongsToMany
+No caso de relacionamentos 1:1, utilizamos os métodos hasOne e belongsTo. A tradução literal desses métodos facilita o seu entendimento.
+
+hasOne = tem um belongsTo = pertencente a
+
+* No model Address, por sua vez, temos que fazer o caminho inverso, declarando que o address pertence a Employee. Fazemos isso da seguinte forma:
+
+EX:
+
+// src/models/address.model.js
+
+module.exports = (sequelize, DataTypes) => {
+  const Address = sequelize.define('Address', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    city: DataTypes.STRING,
+    street: DataTypes.STRING,
+    number: DataTypes.INTEGER,
+    employeeId: { type: DataTypes.INTEGER, foreignKey: true },
+    // A declaração da Foreign Key é opcional no model
+  },
+  {
+    timestamps: false,
+    tableName: 'addresses',
+    underscored: true,
+  });
+
+  Address.associate = (models) => {
+// define o tipo de relacionamento
+    Address.belongsTo(models.Employee,
+    // define qual a foreign key a ser criada
+      { foreignKey: 'employeeId', as: 'employees' });
+  };
+
+  return Address;
+};
+
+👀 De olho na dica: 👀
+
+Note que apesar do uso da Foreign Key ser opcional no model, é importante deixar explícito dentro da função associate qual o relacionamento será feito, e qual Foreign Key vai ser criada quando queremos criar uma Foreign Key.
+
+* Validando relacionamentos 1:1
+Agora, vamos validar o relacionamento. Para isso, precisaremos criar seeders para inserirmos dados nas tabelas e um servidor para responder as requisições.
+
+Para criar os dois seeders, utilize os comandos abaixo:
+
+EX:
+
+npx sequelize seed:generate --name employees
+npx sequelize seed:generate --name addresses
+
+* Depois, abra o arquivo employees dentro da pasta seeders e copie o código a seguir:
+
+EX:
+
+// src/seeders/[timestamp]-employees.js
+
+module.exports = {
+  up: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkInsert('employees',
+      [
+        {
+          first_name: 'Marcos',
+          last_name: 'Zuck',
+          age: 49,
+        },
+        {
+          first_name: 'Fred',
+          last_name: 'Mercúrio',
+          age: 19,
+        },
+        {
+          first_name: 'Ayrton',
+          last_name: 'Keno',
+          age: 51,
+        },
+        {
+          first_name: 'Robin',
+          last_name: 'Mathias',
+          age: 63,
+        },
+      ],
+      {},
+    );
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkDelete('employees', null, {});
+  },
+};
+
+* O arquivo addresses da pasta seeds deve conter o seguinte código:
+
+EX:
+
+// src/seeders/[timestamp]-addresses.js
+
+module.exports = {
+  up: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkInsert('addresses',
+      [
+        {
+          city: 'Belo Horizonte',
+          street: 'Rua Flórida',
+          number: 1080,
+          employee_id: 1,
+        },
+        {
+          city: 'São Paulo',
+          street: 'Avenida Paulista',
+          number: 1980,
+          employee_id: 2,
+        },
+        {
+          city: 'Fortaleza',
+          street: 'Rua das Enseadas',
+          number: 95,
+          employee_id: 3,
+        },
+        {
+          city: 'Belo Horizonte',
+          street: 'Rua Andaluzita',
+          number: 131,
+          employee_id: 4,
+        },
+        {
+          city: 'Curitiba',
+          street: 'Rua Fria',
+          number: 101,
+          employee_id: 4,
+        },
+      ],
+      {},
+    );
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkDelete('addresses', null, {});
+  },
+};
+
+* Depois, utilize o comando abaixo para executar os seeders:
+
+EX:
+
+env $(cat .env) npx sequelize db:seed:all
+
+Existe uma possibilidade de você se deparar com o erro “Cannot add or update a child row: a foreign key constraint fails”. Isso acontece porque precisamos que a seed de employees rode primeiro que a de addresses, de forma de que a segunda possa pegar a chave que usa como foreign key da primeira.
+
+Contudo, como criamos as seeds juntas, as timestamps de ambas são iguais e elas acabam sendo executadas na ordem alfabética: primeiro addresses, depois employees, causando o erro. Para resolver isso de forma simples, basta renomear a seed de employees, tornando o número da timestamp menor que o de address e rodar o comando acima novamente.
+
+* Por último, vamos criar o servidor para testarmos nossas associations. A grande diferença quando vamos fazer uma requisição que necessite da utilização de uma association com o Sequelize, é o campo include. Esse campo diz ao Sequelize quais serão as configurações da requisição. A propriedade model se refere a qual tabela será utilizada. Já a propriedade as deve ser igual à que declaramos no momento da criação da associação no respectivo model.
+
+Para finalmente podermos rodar nossa aplicação precisamos de mais alguns arquivos. Por isso, dentro de src criaremos os diretórios Services e Controllers e os preencheremos da seguinte forma:
+
+EX:
+
+// src/services/employee.service.js
+
+const { Address, Employee } = require('../models/');
+
+const getAll = async () => {
+  const users = await Employee.findAll({
+    include: { model: Address, as: 'addresses' },
+  });
+
+  return users;
+};
+
+module.exports = { getAll };
+
+EX:
+
+// src/controllers/employee.controller.js
+
+const EmployeeService = require('../services/employee.service');
+
+const getAll = async (_req, res) => {
+  try {
+    const employees = await EmployeeService.getAll();
+    return res.status(200).json(employees);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: 'Ocorreu um erro' });
+  }
+};
+
+module.exports = {
+  getAll,
+};
+
+* Agora, precisamos criar mais dois arquivos, dentro da pasta src, o app.js e o server.js. Seu preenchimento deve ficar assim:
+
+EX:
+
+// src/app.js
+
+const express = require('express');
+
+const employee = require('./controllers/employee.controller');
+
+const app = express();
+
+app.use(express.json());
+
+app.get('/employees', employee.getAll);
+
+module.exports = app;
+
+EX:
+
+// src/server.js
+
+const app = require('./app');
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Escutando na porta ${PORT}`);
+});
+Por fim, vamos fazer algumas pequenas alterações no package.json: definir nosso arquivo principal e criar um script para rodar a aplicação com o nodemon.
+
+EX:
+
+// package.json
+{
+  // ...
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  // ...
+}
+
+Agora, inicie o servidor com "env $(cat .env) npm run dev", faça uma requisição do tipo GET para o endpoint localhost:3001/employees e verifique a resposta, na qual em cada um dos empregados (employees), aparecerá o respectivo endereço (address).
+
+esse é o relacionamento 1:1, agora vamos para o 1:N.
+
+# RELACIONAMENTO 1:N, OU SEJ A 1 PARA MUITOS.
+
+* No caso dos relacionamentos 1:N, não há grande diferença na maneira como criamos as associações. Caso cada employee possuísse vários address, bastaria declarar seu model da seguinte forma:
+
+EX:
+
+// src/models/employee.model.js
+
+//  module.exports = (sequelize, DataTypes) => {
+//  const Employee = sequelize.define('Employee', {
+//  ...
+//  });
+
+//  Employee.associate = (models) => {
+    Employee.hasMany(models.Address,
+//      { foreignKey: 'employeeId', as: 'addresses' });
+//  };
+
+//  return Employee;
+//  };
+
+hasMany: tem muitos
+
+Mudamos apenas o método de declaração da associação para hasMany, indicando que cada employee pode possuir muitos addresses. Faça uma nova requisição para o endpoint localhost:3000/employees e observe o id 4 no resultado e veja a diferença que ocorre quando é usado hasOne e/ou hasMany.
+
+No model addresses, por sua vez, não há necessidade de alterarmos nada, pois cada address continua pertencendo a apenas um employee, o que justifica o uso do método belongsTo.
+
+* para funcionar primeiro tem que dropar a tabela (cuidado com os dados, se tiver tudo nos seed pode ir tranquilo como é o caso desse exemplo), criar ela novamente, depois coloca as migrations e depois as seeds.
+
+EX:
+
+env $(cat .env) npx sequelize db:drop
+
+env $(cat .env) npx sequelize db:create
+
+env $(cat .env) npx sequelize db:migrate
+
+env $(cat .env) npx sequelize db:seed:all
+
+* Agora, veremos os dois métodos de utilização dos relacionamentos:
+
+Eager loading, ou carregamento antecipado;
+Lazy loading, ou carregamento tardio.
+
+Nesse caso, vamos aprender a utilizar cada um desses dois modos e como eles acontecem no código, usando o relacionamento 1:N visto há pouco.
+
+* Eager loading
+
+* Esse método carrega todos os dados na mesma request. Logo, ao utilizar eager loading, todas as informações são trazidas, independente se vamos usá-las ou não. Este modo é útil para cenários em que sabemos, já de antemão, que sempre vamos precisar de todos os dados das entidades envolvidas.
+
+Antes de prosseguirmos, vamos alterar o schema do banco de dados para que as tabelas tenham uma relação 1:N. Para isso, utilizaremos os seeders já criados.
+
+* Abra o arquivo [timestamp]-employees.js dentro da pasta seeders, apague tudo que havíamos colocado antes e copie o código abaixo:
+
+EX:
+
+// src/seeders/[timestamp]-employees.js
+
+module.exports = {
+  up: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkInsert('employees',
+      [
+        { first_name: 'Marcos', last_name: 'Zuck', age: 49 },
+        { first_name: 'Fred', last_name: 'Mercurio', age: 19 },
+        { first_name: 'Ayrton', last_name: 'Keno', age: 51 },
+        { first_name: 'Robin', last_name: 'Mathias', age: 63 },
+        { first_name: 'Antonio', last_name: 'Augusto', age: 18 },
+      ],
+      {},
+    );
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkDelete('employees', null, {});
+  },
+};
+
+* Depois, abra o arquivo [timestamp]-addresses.js dentro da pasta seeders, limpe-o e copie o código abaixo:
+
+EX:
+
+// src/seeders/[timestamp]-addresses.js
+
+module.exports = {
+  up: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkInsert('addresses',
+      [
+        {
+          city: 'Belo Horizonte',
+          street: 'Rua Florida',
+          number: 1080,
+          employee_id: 1,
+        },
+        {
+          city: 'São Paulo',
+          street: 'Avenida Paulista',
+          number: 1980,
+          employee_id: 2,
+        },
+        {
+          city: 'Fortaleza',
+          street: 'Rua das Enseadas',
+          number: 95,
+          employee_id: 3,
+        },
+        {
+          city: 'Belo Horizonte',
+          street: 'Rua Andaluzita',
+          number: 131,
+          employee_id: 4,
+        },
+        {
+          city: 'Belo Horizonte',
+          street: 'Rua Vicente Alvarenga',
+          number: 80,
+          employee_id: 1,
+        },
+        {
+          city: 'Curitiba',
+          street: 'Rua Fria',
+          number: 101,
+          employee_id: 5,
+        },
+      ],
+      {},
+    );
+  },
+
+  down: async (queryInterface, _Sequelize) => {
+    return queryInterface.bulkDelete('addresses', null, {});
+  },
+};
+
+* Finalmente, utilize o comando abaixo para remover as tabelas antigas, depois recriá-las e, por último, executar os seeders:
+
+EX:
+
+env $(cat .env) npx sequelize db:migrate:undo:all
+env $(cat .env) npx sequelize db:migrate
+env $(cat .env) npx sequelize db:seed:all
+
+* Agora, vamos ver como utilizar o Eager loading na prática. Vamos voltar ao arquivo src/app.js e criar mais uma rota:
+
+EX:
+
+// src/app.js
+
+// const express = require('express');
+// const employee = require('./controllers/employee.controller');
+
+// const app = express();
+
+// app.use(express.json());
+
+app.get('/employees/:id', employee.getById);
+// app.get('/employees', employee.getAll);
+
+// module.exports = app;
+
+* Com a nova rota já adicionada, vamos voltar ao arquivo src/controllers/employee.controller.js e adicionar o método getById:
+
+EX:
+
+// src/controllers/employee.controller.js
+
+// const EmployeeService = require('../services/employee.service');
+
+// const getAll = async (_req, res) => {
+//   ...
+// };
+
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const employee = await EmployeeService.getById(id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Pessoa colaboradora não encontrada' });
+    }
+
+    return res.status(200).json(employee);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Ocorreu um erro' });
+  };
+}
+
+// module.exports = {
+//   getAll,
+  getById
+// };
+
+* Por fim, criaremos o método getById, agora no arquivo src/services/employee.service.js
+
+EX:
+
+// src/services/employee.service.js
+
+// const { Address, Employee } = require('../models/');
+
+// const getAll = async () => {
+//   ...
+// };
+
+const getById = async (id) => {
+  const employee = await Employee.findOne({
+      where: { id },
+      include: [{ model: Address, as: 'addresses' }],
+    });
+  return employee;
+}
+
+// module.exports = {
+//   getAll,
+  getById
+// };
+
+Agora, faça uma requisição do tipo GET para o endpoint http://localhost:3001/employees/1 e veja como o resultado é retornado.
+
+* Além das propriedades que já citamos, o campo include pode manipular os dados que serão retornados. Por exemplo, se não quisermos o acesso ao número do endereço, bastaria alterar o código, adicionando a propriedade attributes e dentro dela o que queremos fazer:
+
+EX:
+
+// src/services/employee.service.js
+
+// ...
+
+// const getAll = async () => {
+//   ...
+// };
+
+// const getById = async (id) => {
+//   const employee = await Employee.findOne({
+//       where: { id },
+       include: [{
+         model: Address, as: 'addresses', attributes: { exclude: ['number'] },
+       }],
+//   });
+//   return employee;
+// }
+
+// ...
+
+Dessa maneira, o campo number será excluído do retorno da requisição.
+
+* lazy loading
+
+Agora vamos ver como funciona a outra forma de carregar dados de associações: o lazy loading. Esse método consiste, basicamente, em não especificar uma propriedade includes no momento de realizar a query no banco. Dessa forma, cria-se a possibilidade de termos dois usos para o mesmo endpoint.
+
+Para utilizarmos duas ações diferentes em um endpoint, usaremos a query string includeAddresses, na qual, caso o parâmetro dela seja true, os endereços daquele funcionário também serão retornados.
+
+* Antes, vamos voltar a função getById de employee como estava anteriormente:
+
+EX:
+
+// src/services/employee.service.js
+
+// ...
+
+const getById = async (id) => {
+  const employee = await Employee.findOne({
+    where: { id },
+  });
+  return employee;
+}
+
+// ...
+
+* Agora, vamos criar uma função getAllByEmployeeId para address que tem como responsabilidade buscar todos os endereços de acordo com o employee_id:
+
+Precisaremos criar o arquivo address.service.js, que terá o seguinte código:
+
+EX:
+
+// src/services/address.service.js
+
+const { Address } = require('../models/');
+
+const getAllByEmployeeId = async (employeeId) => {
+  const addresses = await Address.findAll({ where: { employeeId } });
+
+  return addresses;
+};
+
+module.exports = {
+  getAllByEmployeeId,
+}
+
+Por fim, importamos o service que acabamos de criar para que possamos usá-lo no Controller:
+
+EX:
+
+// src/controllers/employee.controller.js
+
+const AddressService = require('../services/address.service');
+
+//  ...
+
+const getById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const employee = await EmployeeService.getById(id);
+
+//     if (!employee) {
+//       return res.status(404).json({ message: 'Pessoa colaboradora não encontrada' });
+//     }
+
+    if (req.query.includeAddresses === 'true') {
+      const addresses = await AddressService.getAllByEmployeeId(id);
+      return res.status(200).json({ employee, addresses });
+    }
+
+//     return res.status(200).json(employee);
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({ message: 'Ocorreu um erro' });
+//   };
+// }
+
+// ...
+
+Reinicie a aplicação e realize uma requisição do tipo GET para o endpoint http://localhost:3001/employees/1?includeAddresses=true. Depois, altere para ?includeAddresses=false ou retire o ?includeAddresses=true e veja seu retorno.
+
+Como presenciamos, o lazy loading é muito útil em situações em que não sabemos se vamos, de fato, precisar buscar todas as informações de uma só vez. Aqui, se tivéssemos utilizado o eager loading, teríamos buscado os dados das pessoas colaboradoras mesmo quando includeAddresses não era informado, e precisaríamos excluir a chave addresses do resultado do banco. Com o lazy loading, podemos carregar apenas os dados do funcionário e dos endereços apenas quando necessário, economizando recursos do banco.
+
+
+
+
+
 
 
 
