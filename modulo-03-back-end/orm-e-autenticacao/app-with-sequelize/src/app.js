@@ -3,6 +3,7 @@
 const express = require('express');
 
 const User = require('./controllers/user.controller');
+const Employee = require('./controllers/employee.controller');
 
 const app = express();
 
@@ -25,5 +26,9 @@ app.put('/user/:id', User.updateUser);
 
 // Este endpoint usa o método destroy do Sequelize para remover um usuário no banco.
 app.delete('/user/:id', User.deleteUser);
+
+app.get('/employees', Employee.getAll)
+
+app.get('/employees/:id', Employee.getById);
 
 module.exports = app;
