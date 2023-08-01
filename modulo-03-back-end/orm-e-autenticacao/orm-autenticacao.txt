@@ -1737,6 +1737,116 @@ Reinicie a aplicação e realize uma requisição do tipo GET para o endpoint ht
 
 Como presenciamos, o lazy loading é muito útil em situações em que não sabemos se vamos, de fato, precisar buscar todas as informações de uma só vez. Aqui, se tivéssemos utilizado o eager loading, teríamos buscado os dados das pessoas colaboradoras mesmo quando includeAddresses não era informado, e precisaríamos excluir a chave addresses do resultado do banco. Com o lazy loading, podemos carregar apenas os dados do funcionário e dos endereços apenas quando necessário, economizando recursos do banco.
 
+# RELACIONAMENTO N:N E TRANSAÇÕES.
+
+* transações: é um bloco de códigos ocm vários comando, caso algum desses comando falhe a transação vai voltar para o estado anterior, faz o famoso rollback. Então funciona em conjunto e nada pode falhar.
+
+EX: ARQUIVO SERVICE
+
+// src/services/employee.service.js
+
+// const { Address, Employee } = require('../models');
+const Sequelize = require('sequelize');
+const config = require('../config/config');
+
+const env = process.env.NODE_ENV || 'development';
+// Ajustamos para usar a configuração correta para nosso ambiente
+const sequelize = new Sequelize(config[env]);
+
+// ...
+
+// const insert = async ({ firstName, lastName, age, city, street, number }) => {
+    const result = await sequelize.transaction(async (t) => {
+      const employee = await Employee.create({
+        firstName, lastName, age,
+      }, { transaction: t });
+
+      await Address.create({
+        city, street, number, employeeId: employee.id
+      }, { transaction: t });
+      return employee;
+    });
+
+    return result;
+    // Se chegou até aqui é porque as operações foram concluídas com sucesso,
+    // não sendo necessário finalizar a transação manualmente.
+    // `result` terá o resultado da transação, no caso um empregado e o endereço cadastrado
+// };
+
+// ...
+
+EX: ARQUIVO CONTROLLER
+
+const insert = async (req, res) => {
+  try {
+    const { firstName, lastName, age, city, street, number } = req.body;
+
+    const employee = await EmployeeService.insert(
+      { firstName, lastName, age, city, street, number },
+    );
+
+    return res.status(201).json({ id: employee.id, message: 'Cadastrado com sucesso' });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Ocorreu um erro' });
+  };
+};
+
+EX: ARQUIVO APP
+
+app.post('/employees', Employee.insert);
+
+* relação N:N
+
+* para começar vamos usar essa sequência de comandos para criar um projeto teste:
+
+EX:
+
+mkdir books-api-sequelize && cd books-api-sequelize
+
+npm init -y
+
+npm i -E express@4.17.1 nodemon@2.0.15 sequelize@6.3.4 mysql2@2.1.0
+
+npm i -D -E sequelize-cli@6.2.0
+
+touch .sequelizerc
+echo -e "const path = require('path');
+
+module.exports = {
+    'config': path.resolve('src', 'config', 'config.js'),
+    'models-path': path.resolve('src', 'models'),
+    'seeders-path': path.resolve('src', 'seeders'),
+    'migrations-path': path.resolve('src', 'migrations'),
+};
+" >> .sequelizerc
+
+mkdir src
+
+(cd src && npx sequelize-cli init)
+
+mkdir src/controllers src/services
+touch src/app.js
+echo -e "const express = require('express');
+
+const app = express();
+
+app.use(express.json());
+
+module.exports = app;
+" >> src/app.js
+touch src/server.js
+
+echo -e "const app = require('./app');
+const { PORT = 3001 } = process.env;
+
+app.listen(PORT, () => console.log(\`Ouvindo na porta \${PORT}\`));
+" >> src/server.js 
+
+touch src/services/userBook.service.js src/controllers/userBook.controller.js
+
+
+
 
 
 
