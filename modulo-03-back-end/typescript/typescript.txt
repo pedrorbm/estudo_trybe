@@ -1,0 +1,580 @@
+# TypeScript = serve para definir qual o tipo de ums variável, parâmetro de uma função, resultado de uma função, entre outros. Ela vai definir o tipo de cada um. Ele também analisa todos os tipos de dados para ver se está certo, antes de rodar o código.
+
+* Tipagem  = Tipar um dado é dizer explicitamente qual tipo de valor ele contém. Seja um número, uma string ou tantos outros. É possível usar a definição de tipos em:
+
+variáveis.
+parâmetros de funções.
+retorno de funções.
+
+EX:
+
+let firstName = 'Julia';
+console.log(typeof(firstName));  = 'String'
+
+* compilador e transpilador
+
+* Compilador é um programa que traduz um código escrito em uma linguagem de alto nível (mais próxima da humana) para um código equivalente escrito em uma linguagem de baixo nível (mais próxima da linguagem da máquina). Depois dessa tradução, o código pode ser executado.
+
+O TypeScript é compilado antes de ser executado. Já o JavaScript pula essa etapa e é executado direto. Por isso, somente rodando que o JavaScript consegue encontrar seus erros.
+
+* Transpilador, por outro lado, é um programa que traduz um código escrito em uma linguagem de alto nível para um código equivalente em outra linguagem de alto nível ou em uma versão diferente da mesma linguagem.
+
+É possível ver referências ao TypeScript como uma linguagem transpilada por ela ser “traduzida” para JS, ambas linguagens de alto nível. Contudo, além da documentação da linguagem tratar esse processo como compilação, o TS tem um compilador, o TSC (TypeScript Compiler), e é essa abordagem adotada aqui.
+
+# TSC - TypeScript Compiler
+
+Resumindo o que você estudou até aqui, o TypeScript é uma linguagem estaticamente tipada e tem o TSC como responsável por compilar o código TS em JS, fazendo as verificações de tipo no meio tempo.
+
+Agora, veja como isso funciona já em sua máquina! Primeiramente, em um diretório vazio, crie um arquivo hello.ts e adicione a ele apenas o seguinte código:
+
+EX:
+
+console.log('Hello, TypeScript!');
+
+Para executá-lo, é necessário instalar o Typescript, seja globalmente, seja no projeto atual. Para instalar no projeto, basta inicializar o package.json e instalar o Typescript:
+
+EX:
+
+npm init -y
+npm i typescript@4.4
+
+* Com o Typescript instalado, podemos rodar seu executável chamado tsc:
+
+EX:
+
+npx tsc hello.ts
+
+Ao rodar esse comando, o conteúdo do arquivo hello.ts será verificado e, caso nenhum problema seja encontrado, um arquivo será criado com o nome hello.js, contendo o código compilado para JS.
+
+Caso haja erro, como os problemas com tipo já mencionados, o compilador apontará uma mensagem de erro no terminal, e o arquivo .js não será gerado.
+
+Para rodar o arquivo gerado utilizando o Node, basta executar node hello.js no terminal.
+
+Também, é possível instalar o compilador TypeScript globalmente, mas é recomendável instalá-lo localmente em cada projeto, já com a versão adequada, para evitar possíveis conflitos de versão.
+
+* ts-node
+
+Uma opção para otimizar esse processo é usar o ts-node, que, em linhas gerais, vai compilar seu código TypeScript em JavaScript e executá-lo usando o Node com um único comando. Outra vantagem desse executável é que ele faz esse processo sem gerar um arquivo .js para cada arquivo .ts de sua aplicação.
+
+Instale o ts-node como uma dependência de desenvolvimento para que ele fique registrado em seu package.json. Para isso, basta entrar no diretório com seu arquivo hello.ts e executar o comando:
+
+EX:
+
+npm i --save-dev ts-node
+
+* Em seguida, você pode deletar o arquivo hello.js criado pelo tsc e utilizar o seguinte comando para executar seu código:
+
+EX:
+
+ts-node hello.ts
+
+* tsconfig
+
+O arquivo tsconfig.json é o arquivo de configuração de um projeto em TypeScript. Nele, estão especificadas as opções de configuração que definirão como seu código será compilado.
+
+Utilize o tsc para gerar o tsconfig.json. Para isso, a partir de um diretório vazio, execute o comando:
+
+EX:
+
+tsc --init
+Use o comando npx tsc --init caso queira utilizar o tsc como um executável npx.
+
+Um arquivo tsconfig.json será gerado no diretório com o seguinte conteúdo:
+
+EX:
+
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+    /* Projects */
+    [...]
+    /* Language and Environment */
+    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include
+    [...]
+
+    /* Modules */
+    "module": "commonjs",                                /* Specify what module code is generated. */
+    "rootDir": "./",                                     /* Specify the root folder within your source files. */
+    [...]
+
+    /* JavaScript Support */
+    [...]
+
+    /* Emit */
+    "outDir": "./",                                      /* Specify an output folder for all emitted files. */
+    [...]
+
+    /* Interop Constraints */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules.
+    [...]
+
+    /* Type Checking */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    [...]
+  }
+}
+
+Além de fornecer as principais configurações (com comentários sobre o que fazem e quais são os valores aceitos), o arquivo gerado tem uma URL explicando mais sobre o arquivo tsconfig.json.
+
+Vamos analisar o que já vem configurado no arquivo tsconfig.json e o que você precisa para criar o primeiro projeto em Typescript?
+
+module: especifica o “sistema de módulo” a ser utilizado no código JavaScript. Leia a documentação se quiser se aprofundar, mas aqui será requerido ‘CommonJS’ quase sempre.
+
+target: define a versão do JavaScript para qual o código será compilado. Exemplo: ES6.
+
+rootDir: define a raiz dos arquivos do projeto. É comum utilizar “./src” aqui, já que é onde os códigos-fonte costumam ficar.
+
+outDir: define a pasta de saída do código compilado. Pode-se agrupar os arquivos .js gerados durante a compilação em um diretório nomeado a seu critério, mas é comum usar “./dist” ou “./build”.
+
+esModuleInterop: permite a compilação de módulos ES6 para CommonJS. É isso que possibilita a você usar a sintaxe de importação padrão do TypeScript com módulos do ECMAScript, por exemplo.
+strict: ativa a verificação estrita (mais rigorosa) de tipo.
+
+include: inclui os arquivos ou diretórios mencionados na compilação, como “src/“.
+
+exclude: exclui os arquivos ou diretórios mencionados na compilação, por exemplo “build” ou “node_modules”.
+
+Falaremos de outras configurações à medida que você for usá-las, mas, caso queira saber mais a respeito disso, acesse o link que vem no arquivo recém-criado! 😉
+
+# Tipos primitivos
+Em JavaScript, um valor que não é um objeto nem uma função é de um tipo primitivo. Os mais comuns em JavaScript são:
+
+string: uma sequência de quaisquer caracteres que pertençam ao padrão UTF-16 Unicode.
+number: recebe valores numéricos, sejam eles inteiros ou frações.
+boolean: recebe verdadeiro (true) ou falso (false).
+null: representa a ausência intencional de um valor. É como dizer “aqui não há valor e isso é proposital”.
+undefined: representa a ausência de um valor cujo tipo não foi explicitado no código.
+
+Todos esses tipos primitivos têm um valor correspondente em TypeScript (com os mesmos nomes). Contudo, o TypeScript tem um tipo adicional chamado any.
+
+* any
+
+Esse tipo é um coringa. Ao utilizá-lo, você afirma “eu não sei qual é o tipo desse valor e não me importo com isso”. É uma forma de desabilitar as checagens de tipo e sinalizar para o TypeScript que você não quer que ele faça a verificação de tipagens para aquele valor.
+
+Como qualquer coringa, é preciso usá-lo com responsabilidade - a tipagem estática do TypeScript está aí por um motivo, então não a dispense sem ter muita convicção do que está fazendo.
+
+* No implict any
+
+Quando o TypeScript, por alguma razão, não consegue identificar o tipo de um valor, o tipo any é inferido e atribuído a ele por padrão. No geral, não queremos que isso aconteça, e sim queremos garantir que as checagens de tipo sejam feitas e que todos os tipos sejam identificados.
+
+Então, é comum que a regra noImplicitAny esteja habilitada nas configurações de projetos (arquivo tsconfig.json), pois isso faz com que o compilador sinalize qualquer any implícito como erro - quer dizer que ele não sabe qual é aquele tipo e precisa saber.
+
+* unknown
+
+Muitas vezes, ao consumir APIs externas, por exemplo, não se sabe qual tipo de valor será retornado. Nesses casos, usar o tipo any poderia parecer uma escolha natural, mas o TypeScript oferece uma alternativa mais segura: o unknown!
+
+Ao contrário do any, aqui você está dizendo “eu não sei qual é o tipo desse valor, mas me importo bastante com isso”! Desse modo, o compilador obrigará você a determinar o tipo de qualquer valor unknown antes de usá-lo, o que garante tipagem mais segura para sua aplicação.
+
+O próximo passo, então, é como dizer ao TypeScript qual o tipo de uma variável!
+
+* Variáveis
+Para fazer anotações de tipo em variáveis, você precisa apenas colocar : após o nome da variável e, em seguida, escrever seu tipo. Por exemplo:
+
+EX:
+
+const firstName: string = "Joel";
+const age: number = 38;
+const brazilian: boolean = false;
+
+* Funções
+Quando se tratam de funções, há valores de entrada (parâmetros) e saída (retorno) para tipar! É importante explicitar, sobretudo, o tipo dos valores de entrada, pois uma função pode ser chamada com qualquer valor e, por isso, o TypeScript não consegue inferir seu tipo durante a compilação.
+
+Exemplo de anotação de tipo em parâmetros:
+
+EX:
+
+function greet(name: string) {
+  console.log(`Olá, ${name.toUpperCase()}!`);
+}
+
+Se você executar a função acima no Typescript Playground usando uma string como argumento, verá que tudo funcionará perfeitamente. No entanto, se você tentar passar um número, por exemplo, receberá o erro “Argument of type ‘number’ is not assignable to parameter of type ‘string’.”.
+
+Exemplo de anotação de tipo em retornos:
+
+EX:
+
+function getFavoriteNumber(): number {
+  return 26;
+}
+
+* Agora, talvez você esteja se perguntando:
+
+“Certo, mas e quando a função não retorna nenhum valor?” 🤔
+
+Nesse caso, o tipo de retorno será void!
+
+A função greet, apresentada acima, é um exemplo de função que não tem um valor de retorno, pois apenas imprime algo no console. Vamos tipar seu retorno explicitamente:
+
+EX:
+
+function greet(name: string): void {
+  console.log(`Olá, ${name.toUpperCase()}!`);
+}
+
+Anota aí 📝: A anotação de tipo em retornos aparece após a lista de parâmetros da função.
+
+Como ocorre com as variáveis, a especificação de tipo do retorno não é sempre necessária, pois o TypeScript pode inferir o tipo do retorno com base nas declarações de retorno da própria função. No caso do exemplo acima, se você remover o tipo do retorno, o TS vai inferir que o retorno é void, uma vez que não há nenhum valor retornado.
+
+Algumas bases de código vão preferir explicitar sempre todos os tipos, sejam de retorno ou outros valores, para fins de documentação, a fim de prevenir alterações acidentais ou mesmo por preferências pessoais. O princípio “Explícito é melhor que implícito” é adotado por muitas organizações.
+
+* Que erros a tipagem previne?
+Conforme mencionado anteriormente, a tipagem estática pode prevenir alguns erros de forma mais eficiente do que documentação ou testes automatizados. Para ilustrar esse ponto, considere o seguinte código em JavaScript:
+
+EX:
+
+let sum = (a, b) => a + b
+sum(1, '2')
+
+A tipagem estática impede o erro de acontecer. No JavaScript, a função acima retorna '12', e cabe a você descobrir, depois de algo explodir em algum lugar lá na frente, que o problema era aqui.
+
+💭 Pare e reflita: você já viveu uma situação onde a tipagem estática de valores teria evitado horas de trabalho desperdiçadas?
+
+* Listas e objetos
+Comumente, arrays (listas) e objetos são utilizados em códigos JavaScript. Em TypeScript, não será diferente. Como você pode tipá-los?
+
+* object type
+Em TypeScript, o tipo objeto é basicamente qualquer valor que não seja um tipo primitivo (string, number, bigint, boolean, symbol, null, ou undefined) e que tenha propriedades. Para tipar um objeto, é necessário apenas listar suas propriedades e seus tipos, como no exemplo a seguir.
+
+EX:
+
+function printPersonalInfo(data: { name: string; birthYear: number }) {
+  console.log(`${data.name} was born in ${data.birthYear}.`);
+}
+printPersonalInfo({ name: 'Rogerinho', birthYear: 1978 });
+De olho na dica 👀: Você pode usar tanto vírgula quanto ponto e vírgula para separar propriedades escritas em uma só linha.
+
+Você não precisa tipar cada propriedade, mas, caso você não o faça, o TypeScript assumirá que elas são do tipo any.
+
+Você lembra qual problema isso pode causar? 🤔 Vai ferir uma configuração, que já comentamos, chamada noImplicitAny! Caso você cometa esse erro no futuro, lembre-se de que nós avisamos! 😜
+
+* Também, é possível especificar o tipo dos elementos de um array, o que é tipar o array em si. Para isso, basta inserir os colchetes depois do tipo dos elementos do array:
+
+EX:
+
+const evenNumbers: number[] = [2, 4, 6];
+const vowel: string[] = ['a', 'e', 'i', 'o', 'u'];
+const booleanValues: boolean[] = [true, false];
+
+* Portanto, não é possível adicionar novos elementos a um array se eles não corresponderem aos tipos previamente determinados.
+
+EX:
+
+evenNumbers.push(8) // Funciona
+evenNumbers.push('8') // Erro
+
+Outra sintaxe possível para fazer a mesma tipagem é Array<number>. Você estudará mais a respeito dessa sintaxe quando estiver no conteúdo sobre Generics! 😉
+
+* Combinação de tipos
+Até o momento, foi visto como tipar variáveis, parâmetros e retorno de funções com tipos. Contudo, no JavaScript, temos lógicas em que variáveis que precisam receber tipos de valores diferentes. Para esses casos, o TypeScript também tem solução.
+
+* Union Types
+Essa estrutura é formada por dois ou mais tipos que podem ser atribuídos àquele dado:
+
+EX:
+
+function printId(id: number | string) {
+  console.log(`Your ID is: ${id}`);
+}
+
+printId(101);
+printId("202");
+
+No Typescript Playground, chame a função acima com um número ou uma string como argumento. Note que tudo funcionará perfeitamente. Contudo, se tentássemos chamar a função com um argumento boolean, um erro seria disparado. Faça o teste!
+
+Atenção! Em casos assim, você não pode chamar na variável um método que não existe para todos os tipos que ela pode ter. Um exemplo é o toUpperCase(), que é um método do tipo string e não existe no tipo number. Para o id acima, chamar o toUpperCase() resultará em erro.
+
+EX:
+
+function printId(id: number | string) {
+  console.log(id.toUpperCase());
+}
+
+printId(101);
+
+Execute esse exemplo no TS Playground e veja o que acontece.
+
+* No entanto, se você ainda precisar chamar um método assim, basta verificar o tipo do valor antes da chamada. Desse modo, vai funcionar.
+
+EX:
+
+function printId(id: number | string) {
+  if (typeof id === "string") {
+    return console.log(id.toUpperCase());
+  }
+  return console.log(id);
+}
+
+printId(101);
+
+* Type Aliases
+Olha quanta coisa você já consegue fazer só com as anotações de tipo! Legal demais, né?! 🤩
+
+E no caso de haver vários elementos que você precisa tipar da mesma forma? Será necessário continuar especificando o tipo em cada um deles ou há modos melhores de fazer isso? 🤔
+
+Falaremos disso agora!
+
+* Type Alias é um modo de reunirmos alguns tipos específicos e chamá-los por um “apelido”. Para isso, utiliza-se a seguinte sintaxe:
+
+EX:
+
+type PersonalInfo = {
+  name: string;
+  birthYear: number;
+};
+
+* Agora, você pode utilizar o tipo criado para definir os parâmetros da função printPersonalInfo (criada anteriormente na lição sobre type annotations):
+
+EX:
+
+function printPersonalInfo(data: PersonalInfo) {
+  console.log(`${data.name} was born in ${data.birthYear}.`);
+}
+
+printPersonalInfo({ name: 'Rogerinho', birthYear: 1978});
+
+* Você pode usar type aliases para dar “apelidos” a quaisquer tipos que você queira, utilizando inclusive união de tipos para isso. Por exemplo:
+
+EX:
+
+type PersonalInfo = {
+  name: string;
+  birthYear: number | string;
+};
+
+Outro exemplo:
+
+EX:
+
+type ID = number | string;
+
+* Type Annotation vs Inferência de tipos
+Agora que você já sabe como fazer anotações de tipo e já viu que nem sempre é necessário explicitar essa informação, talvez tenha surgido a seguinte dúvida: “Afinal, quando usar type annotations e quando deixar o TypeScript inferir um tipo?”
+
+Em linhas gerais, é possível saber qual é o tipo simplesmente lendo a linha, sem precisar explicitá-lo. Isso só deixaria o código mais verboso e não melhoraria a legibilidade. Portanto, é desnecessário tipar variáveis e objetos simples, com valores inicializados como string, number ou boolean, por exemplo.
+
+Por outro lado, quando trabalhar com valores complexos, como objetos e funções, faça anotações de tipos. Como já mencionado, retornos de funções são valores importantes de serem tipados, a fim de certificar-se de que ele será o que você determinou. Além disso, na construção de APIs públicas, tipar os valores de entrada e de saída de funções pode ajudar outras pessoas a entender como utilizar sua API corretamente.
+
+* O objeto abaixo contém um exemplo de valores facilmente inferidos pelo TypeScript e, portanto, é desnecessário fazer anotações.
+
+EX:
+
+const person = {
+  fistName: 'Frodo',
+  lastName: 'Baggins',
+  age: 52,
+}
+
+console.log(typeof person.fistName); // "string"
+
+* Primeiro programa em TypeScript
+Finalmente chegou o momento de você escrever seu primeiro programa, do zero, utilizando o TypeScript e rodando em sua máquina!
+
+🎬 Caso você prefira consumir o conteúdo em vídeo, ele está disponível no final desta lição! 😉
+
+* Configuração inicial (setup)
+Crie um diretório chamado aprendendo-ts. Nele, você vai inicializar seu projeto TypeScript.
+
+EX:
+
+mkdir aprendendo-ts && cd aprendendo-ts
+
+* A seguir, você vai inicializar seu projeto Node e instalar o TypeScript, o ts-node e o módulo npm com a configuração base do tsconfig para o Node 16 (ou superior).
+
+EX:
+
+npm init -y
+Copiar
+npm install -D ts-node typescript@4.4
+
+* A próxima etapa é criar o arquivo tsconfig.json:
+
+EX:
+
+tsc --init
+
+* Garanta que seu arquivo tsconfig.json tenha as seguintes configurações:
+
+EX:
+
+{
+  "compilerOptions": {
+    "target": "es2016",                                 
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "preserveConstEnums": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+
+* Agora, instale o pacote npm com as definições de tipos para o Node.js.
+
+EX:
+
+npm install -D @types/node@16.11
+
+* Projeto GitHub Rockstars
+Você recebeu a missão de fazer uma pequena aplicação para ajudar no recrutamento de pessoas desenvolvedoras! Com base em uma lista estática de perfis do GitHub, deverão ser extraídas algumas informações:
+
+Listar todas as pessoas.
+Filtrar pessoas com base em determinada quantidade de repositórios.
+Descobrir se uma pessoa é a mais ativa da lista.
+
+* Para começar, crie sua estrutura de diretórios:
+
+EX:
+
+mkdir src && cd src
+mkdir types && touch types/User.ts
+touch data.ts myFunctions.ts index.ts 
+
+O diretório types concentrará todos os type aliases utilizados no projeto. A princípio, você terá apenas um para User. Os arquivos data.ts, myFunctions.ts e index.ts conterão, respectivamente, a lista estática de perfis, as funções que a aplicação deve fazer e as chamadas dessas funções.
+
+* Após a execução dos comandos acima, a estrutura de arquivos e diretórios do seu projeto será assim:
+
+EX:
+
+.
+└── aprendendo-ts/
+    ├── src/
+    │   └── index.ts
+    │   └── data.ts
+    │   └── myFunctions.ts
+    │   └── types/
+    │       └── User.ts
+    └── package-lock.json
+    └── package.json
+    └── tsconfig.json
+    └── node_modules
+    
+* Implementação
+Com tudo devidamente configurado, você vai iniciar a implementação de seu código, lembrando-se de que suas funções utilizam uma lista de perfis do GitHub para fazer as operações. Desse modo, o primeiro passo será definir um type alias para as propriedades que cada perfil da lista deve ter, que são nome, URL do perfil e quantidade de repositórios.
+
+Como este é o tipo principal utilizado em toda a sua aplicação, é essencial se lembrar de exportá-lo! 😉
+
+EX:
+
+// ./src/types/User.ts
+
+export type User = {
+  id: string | number;
+  name: string;
+  profileURL: string;
+  repositories: number;
+};
+
+* Agora, você pode criar sua lista definida com o tipo User.
+
+Note que já você precisará importar o type alias criado há pouco!
+
+EX:
+
+// ./src/data.ts
+
+import { User } from './types/User';
+
+const users: User[] = [
+  {
+    id: 1,
+    name: 'João Paulo Aramuni',
+    profileURL: 'https://github.com/joaopauloaramuni',
+    repositories: 19,
+  },
+  {
+    id: '2',
+    name: 'Rafaella Ballerini',
+    profileURL: 'https://github.com/rafaballerini',
+    repositories: 47,
+  },
+  {
+    id: 3,
+    name: 'Capi Etheriel',
+    profileURL: 'https://github.com/barraponto',
+    repositories: 340,
+  },
+];
+
+export default users;
+
+* Com esses dois arquivos de base feitos, inicie a escrita de suas funções! 😎
+
+Sua primeira função receberá uma lista de perfis do GitHub, como a definida no arquivo data.ts, e retornará uma lista contendo apenas os valores da propriedade name:
+
+Lembre-se de que, para usar o tipo User, é necessário importá-lo neste arquivo.
+
+O linter irá sugerir utilizar o export default, mas a partir do momento que adicionarmos as novas funções, esse aviso sumirá!
+
+EX:
+
+// ./src/myFunctions.ts
+
+import { User } from './types/User';
+
+export const getUserNames = (userList: User[]): string[] => userList.map((user: User) => user.name);
+
+* A segunda função receberá uma lista do tipo User e um número. Além disso, ela verificará quais perfis da lista recebida têm, no mínimo, o número de repositórios igual ao do passado como argumento, retornando uma lista com os perfis que satisfizerem a verificação.
+
+EX:
+
+// ./src/myFunctions.ts
+
+// ...
+
+export const getUsersByRepoQuantity = (users: User[], repos: number): string[] => users
+  .filter((user) => user.repositories >= repos).map((user) => user.name);
+  
+* Por fim, haverá uma função que será responsável por verificar se uma pessoa é a mais ativa da lista de usuárias do GitHub. Essa validação será feita com base na comparação da quantidade de repositórios que cada pessoa possui. Será considerada a pessoa mais ativa, neste exemplo, a que tiver o maior número de repositórios. Por isso, a função receberá o nome de uma pessoa do tipo User e uma lista, também do tipo User, em que a pessoa esteja incluída. O retorno da função deve ser um boolean (true ou false).
+
+EX:
+
+// ./src/myFunctions.ts
+
+// ...
+
+export const IsMostActiveUser = (name: string, users: User[]): boolean => {
+  const mostActiveUser = users.reduce(
+    (prev, curr) => 
+      (prev.repositories > curr.repositories ? prev : curr),
+  );
+  return mostActiveUser.name === name;
+};
+
+Utilizando as funções criadas
+
+* A primeira parte do trabalho está feita, mas agora você precisa fazer algumas chamadas para as funções criadas, a fim de testar se tudo está funcionando corretamente. Faça essas chamadas no arquivo index.ts.
+
+EX:
+
+// ./index.ts
+
+import * as Functions from './myFunctions';
+import users from './data';
+
+console.log(`Lista de pessoas usuárias do Github: ${Functions.getUserNames(users)}.`);
+
+console.log(
+  `Pessoas com pelo menos 20 repositórios: ${Functions.getUsersByRepoQuantity(users, 20)}.`,
+);
+
+console.log(
+  `Essa é a conta mais ativa da lista? ${Functions.IsMostActiveUser('João Paulo Aramuni', users)}.`,
+);
+
+* Em seguida, execute seu programa com o ts-node:
+
+EX:
+
+ts-node index.ts
+A saída esperada é:
+
+EX:
+
+Lista de pessoas usuárias do GitHub: João Paulo Aramuni, Rafaella Ballerini, Capi Etheriel.
+Pessoas com pelo menos 20 repositórios: Rafaella Ballerini, Capi Etheriel.
+Essa é a conta mais ativa da lista? false.
+
+
+
