@@ -1,0 +1,109 @@
+# GENERICS  = imagine uma função que lida de forma transparente, ou seja, sem você precisar mudá-la, que seja aplicável para qualquer tipo de pão ou produto e que tanto seus parâmetros quanto seu retorno sejam do tipo desejado. Nessa função, não é necessário mudar parâmetros, adicionar ifs ou mesmo escrever funções novas, só chamar com o novo tipo. Esse é o poder dos Generics no TypeScript!
+
+EX:
+
+// Aqui temos a nossa função com um tipo genérico. 
+// Repare que esse tipo, como qualquer outro, pode vir como um array nos parâmetros.
+function countBreads<Type>(breads: Type[]): number {
+  return breads.length;
+}
+
+Após você escrever a função genérica countBreads, você pode escolher chamá-la de duas maneiras.
+
+A primeira é deixando explícito qual é o tipo de Type, logo após o nome da função e antes dos ().
+
+EX:
+
+// Assim chamamos nossa função com o tipo string.
+// Ela tipará o parâmetro como um array de strings.
+
+const myBreadsAsStrings = ['Pão de sal', 'Pão doce'];
+console.log(countBreads<string>(myBreadsAsStrings));
+
+// Assim é como chamamos nossa função com dois objetos do tipo 'CommonBread'.
+
+// type CommonBread = { ... };
+// const paoDeSal: CommonBread = { ... };
+// const paoDoce: CommonBread = { ... };
+
+// Aqui, nossa função tipará o parâmetro como um array de CommonBread.
+const myBreads = [paoDeSal, paoDoce];
+console.log(countBreads<CommonBread>(myBreads));
+Acesse o exemplo acima aqui.
+
+Note que, para tipos genéricos, a inferência de tipos ainda funciona – se você não declara explicitamente o tipo de um valor, o TypeScript dá seu melhor palpite e o atribui àquele valor sempre que possível.
+
+Para o código ficar legível e os erros ficarem mais fáceis de rastrear, a tipagem deve ser sempre explícita, mas é importante saber que o TypeScript tem essa funcionalidade. Caso um valor fique sem tipagem e tudo siga funcionado, ainda assim pode ser por isso 😉.
+
+* E se você tem uma função com mais parâmetros e deseja que ela seja genérica? Você pode garantir a tipagem genérica de ambos os parâmetros também. 
+
+EX:
+
+function sendAlertAboutAllergens<BreadType, AllergensType>(
+  breads: BreadType[],
+  allergens: AllergensType[],
+): string {
+  return `Atenção! ${breads.join(' e ')} têm como alergênicos: ${allergens.join(', ')}`;
+}
+
+console.log(sendAlertAboutAllergens<string, string>(['Pão de sal', 'Pão doce'], ['Gluten']));
+
+const allergensIds = [123, 445, 221];
+console.log(sendAlertAboutAllergens<string, number>(['Pão de sal', 'Pão doce'], allergensIds));
+Note a sintaxe – é simples tiparmos a função com múltiplos tipos genéricos.
+
+* Como tipar, de forma genérica, funções que retornam Promises
+O exemplo abaixo é uma forma de ilustrar o uso de Generics com o módulo axios, mas é um código que não será necessário ser executado!
+
+Por fim, uma dica valiosa! Observe a requisição para uma API feita com uma biblioteca externa, a axios:
+
+EX:
+
+import axios from 'axios';
+
+async function fetchApi(endpoint: string) {
+  const { data } = await axios.get(`http://localhost:3001/${endpoint}`);
+  return data;
+}
+
+fetchApi('breads')
+
+Ao colocar o mouse sobre a chamada da função (última linha), no TypeScript Playground, você vai notar que o retorno da função será do tipo Promise<any>, como na imagem abaixo:
+
+Retorno da promise any
+Mensagem do VSCode com o retorno da função sendo Promise<any>
+Anota aí 📝: Promise<seu tipo aqui> é um tipo nativo do TypeScript que utiliza a estrutura dos Generics. É um código que só pode ser usado apropriadamente com Generics!
+
+Esse tipo de implementação não informa a estrutura de dados que você vai receber. Será que é a lista de pães? A de farinhas de trigo? Ou literalmente qualquer outra coisa? Nós perdemos nossa tipagem aí!
+
+* O Generics pode auxiliar nessas situações. Veja a implementação a seguir:
+
+O código a seguir não é funcional, apenas exemplificativo, portanto, não é necessário executá-lo.
+
+EX:
+
+// import axios from 'axios';
+
+type Bread = {
+  name: string,
+  ingredients: string[],
+  gluten: boolean,
+};
+
+type Flour = {
+  brand: string,
+  description: string,
+  gluten: boolean,
+};
+
+async function fetchApi<ResponseType>(endpoint: string): Promise<ResponseType> {
+  const { data } = await axios.get<ResponseType>(`http://localhost:3001/${endpoint}`);
+  return data;
+}
+
+fetchApi<Bread[]>('breads');
+fetchApi<Flour[]>('flours');
+
+Dessa forma, é possível utilizar uma biblioteca externa, como a axios, utilizando uma função genérica e cuidando da segurança em relação à tipagem.
+
+
