@@ -1,0 +1,93 @@
+# PROGRAMAÇÃO ORIENTADA A OBJETOS.
+
+* classe  = Classe é o primeiro dos conceitos. Ela é utilizada para determinar algo genérico. Na programação orientada a objetos, toda classe tem como finalidade modelar com precisão a representação de uma entidade do mundo real. Um exemplo de uma classe é o conceito Pessoa. Existem várias pessoas no mundo, sendo você e eu duas delas, e por mais que sejamos pessoas diferentes, pertencemos a mesma classe Pessoa. Agora repare que eu mencionei que somos pessoas diferentes. Isto quer dizer que somos objetos diferentes de uma mesma classe. Objeto (ou instância da classe) é algo específico. (OBS: IMAGEM DETALHANDO COMO EXEMPLO "classes-vs-objetos.png"). 
+
+Complementando as definições da mesma página citada anteriormente: Uma classe é uma estrutura que abstrai um conjunto de objetos com características similares, e um objeto é uma instância (ou seja, um exemplar) de uma classe. Uma classe define o comportamento de seus objetos - através de métodos - e os estados possíveis destes objetos - através de atributos.
+
+* atributos e métodos  = Dentro das classes e dos objetos existem atributos e métodos. Exemplos de atributos de uma Pessoa são: a altura e a massa da Pessoa. Observe que a definição dos atributos é feita na classe, mas os valores são do objeto. Todas as pessoas possuem uma altura e uma massa, portanto a definição fica na classe, mas minha altura é diferente da sua, e minha massa é diferente da sua, portanto os valores são de cada objeto.
+
+Se um atributo representa um valor, como a altura de alguém, um método (ou mensagem) retrata uma ação. Por exemplo, uma pessoa pode dormir ou acordar. Observe que, da mesma forma que o atributo, o método é algo que existe para a classe, mas cada objeto pode realizá-lo de forma diferente, única. Todas as pessoas dormem, mas eu posso dormir de lado e você de bruços, por exemplo.
+
+Trazendo para programação: um atributo é uma variável criada numa classe, e um método é uma função criada numa classe. Um método que merece destaque é o método construtor. Ele é rodado automaticamente na criação de um objeto, e serve para inicializar alguns atributos e chamar alguns métodos. Por exemplo, no nascimento de uma pessoa, os atributos altura e massa são definidos, e o método chorar é chamado.
+
+# pilares da programação orientada a objetos:
+
+* Abstração:
+
+O pilar abstração indica que você não necessariamente precisa saber os detalhes de como algo funciona. Pense por exemplo em uma câmera (como a do seu celular). Você provavelmente não sabe todos os detalhes de como ela funciona, mas para operar, você apenas precisa apontar, conferir no visor e apertar o botão. Uma atualização pode mudar detalhes do funcionamento da câmera, mas sua operação vai continuar essencialmente a mesma.
+
+* Encapsulamento:
+
+O pilar encapsulamento faz com que alguns atributos só possam ser acessados e/ou modificados dentro da classe. Pense, por exemplo, na sua massa. Você não pode, diretamente, mudar sua massa. Não é possível você pensar “vou ter x quilos” e instantaneamente passar a ter essa massa. Entretanto, algumas interfaces para alterar essa massa são expostas. Você pode comer para aumentar a massa, e dentro de você, sem que possa ditar como seu corpo irá se comportar, ele vai absorver as calorias do alimento. Ou seja, não é possível mudar diretamente a sua massa, pois ela é um atributo privado da classe Pessoa, mas existem métodos na classe Pessoa que permitem que a massa seja alterada de forma interna, como o método comer.
+
+* Herança:
+
+O pilar herança permite que classes filhas, que herdam métodos e atributos de outra classe (super classe), sejam criadas. Pense em uma classe Pessoa, com os atributos nome e altura e com o método sonhar. A partir dessa classe Pessoa, eu posso criar uma outra classe, chamada PessoaCantora , que herda de Pessoa. Ou seja, já virá automaticamente com os atributos nome e altura e com o método sonhar, mas poderá ter outro método exclusivo dela, como cantar.
+
+* Polimorfismo:
+
+O pilar polimorfismo permite que coisas diferentes aconteçam ao chamarmos objetos de classes filhas distintas de uma mesma super classe. Por exemplo, pense que existe a classe Pessoa, que possui um método dormir, só que esse método não é implementado (não possui nenhum código). Então são criadas duas outras classes: PessoaQueDormeDeBrucos e PessoaQueDormeDeLado, e ambas implementam o método dormir conforme seus nomes. Se em algum lugar do código eu espero um objeto da classe Pessoa, eu posso perfeitamente passar um objeto de uma classe filha (já que ele herda tudo que tem na classe Pessoa), ou seja, eu posso passar tanto um objeto da classe PessoaQueDormeDeBrucos quanto da classe PessoaQueDormeDeLado. Como o código esperava um objeto da classe Pessoa, qualquer um dos dois servem, mas se o método dormir for chamado, ele irá se comportar de forma diferente.
+
+* Exemplo de uma classe, com atributos e método em typescript:
+
+class Person {
+  name: string;
+  height: number;
+  weight?: number; // o caractere "?" indica um atributo opcional
+
+  constructor(n: string, h: number, w?: number) {
+    console.log(`Creating person ${n}`);
+    this.name = n;
+    this.height = h;
+    this.weight = w;
+  }
+
+  sleep() {
+    console.log(`${this.name}: zzzzzzz`);
+  }
+}
+
+const p1 = new Person('Maria', 171, 58);
+// aqui estamos passando somente dois parâmetros, atente-se ao valor do atributo p2.weight
+const p2 = new Person('João', 175);
+console.log(p1.name, p1.height, p1.weight);
+console.log(p2.name, p2.height, p2.weight);
+p1.sleep();
+p2.sleep();
+
+/*
+Saída:
+Creating person Maria
+Creating person João
+Maria 171 58
+João 175 undefined
+Maria: zzzzzzz
+João: zzzzzzz
+*/
+
+Para criar uma classe, basta utilizar a palavra reservada class, seguida do nome da classe e um par de chaves.
+
+Dentro das chaves podemos criar atributos: digitando o nome do atributo e seu tipo.
+
+Ainda entre as chaves da classe podemos criar métodos: digitando seu nome, os parênteses com os parâmetros e as chaves com o corpo, assim como uma função normal, só que sem precisar do function.
+
+Observe que com a classe Person, podemos criar dois (ou mais) objetos (duas pessoas) diferentes, p1 e p2.
+
+O método construtor (constructor) é chamado assim que utilizamos a sintaxe de criação de um objeto com a palavra reservada new. O construtor recebe os parâmetros n, h e w, que estão abreviados apenas para deixar explícito que o nome dos parâmetros não é diretamente relacionado ao nome dos atributos que eles populam. Normalmente, eles teriam o mesmo nome (ou seja, n seria name, etc).
+
+Um ponto muito importante é o uso da palavra reservada this. Lembra que você aprendeu que pode criar duas pessoas diferentes?
+
+Ou seja, elas são dois objetos de uma mesma classe e ambas compartilham dos mesmos atributos, mas com valores diferentes.
+
+O this serve justamente para representar o objeto em si. Quando, no construtor, escrevemos this.name = n, estamos dizendo que o atributo name do objeto que chamou o método irá possuir o valor n.
+
+Quando p1 é criada, this se refere a p1, logo, n e name passam a ser “Maria”.
+
+E quando p2 é criada, this se refere a p2, logo, n e name passam a ser “João”. Do lado de fora usamos a sintaxe objeto.atributo, mas como do lado de dentro não temos como saber qual é o objeto, precisamos utilizar a sintaxe this.atributo.
+
+O mesmo se aplica aos métodos, como é possível observar com o sleep: ao chamarmos, no final do arquivo, p1.sleep(), o método sleep sabe que o this se refere a p1, portanto this.name é “Maria”.
+
+Ao chamarmos p2.sleep(), o this se refere a p2, e p2.name é “João”.
+
+
+
