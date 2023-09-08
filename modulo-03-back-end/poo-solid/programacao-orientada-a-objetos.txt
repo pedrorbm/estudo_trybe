@@ -89,5 +89,212 @@ O mesmo se aplica aos métodos, como é possível observar com o sleep: ao chama
 
 Ao chamarmos p2.sleep(), o this se refere a p2, e p2.name é “João”.
 
+* encapsulamento  = A ideia é garantir que os processos internos da classe possam ocorrer sem que a pessoa que a utiliza altere atributos de forma indevida, o que poderia ocasionar em problemas no funcionamento. Para isso existem os modificadores de visibilidade do atributo, sendo os principais o public, o private, o protected e o readonly. O protected vai ser apresentado juntamente com herança.
+
+Os atributos criados sem modificadores de visibilidade são públicos por padrão, e podem ser acessados e alterados tanto dentro quanto fora da classe. Se quisermos deixar explícito que não esquecemos de colocar a visibilidade adequada, podemos utilizar a palavra reservada public na frente do atributo.
+
+Já os atributos criados com o modificador private só podem ser lidos e modificados dentro da classe. Isso significa que se você tentar utilizar a notação objeto.atributo do lado de fora das chaves que delimitam a criação da classe, você terá um erro do compilador.
+
+Por fim, os atributos criados com o modificador readonly podem ser lidos em qualquer lugar, mas só podem ser inicializados uma vez, no construtor. Apesar desse modificador não estar exatamente ligado a Orientação a Objetos, é importante entender seu funcionamento 😉.
+
+Para alterar atributos privados fora de uma classe, utilizamos os métodos. Eles validam as leituras e alterações, de forma a não comprometer o funcionamento da classe. Por exemplo, você pode ter uma classe Pessoa com o atributo dataDeNascimento privado, e possuir um método para mudar esta data de nascimento de forma a validar se é digitada uma data válida. Para ler os valores dos atributos, podemos criar os métodos getters, e para modificar, os métodos setters. É importante salientar que atributos privados não são obrigados a ter getters e setters. Eles só precisam destes métodos caso seja necessário alterá-los diretamente, podendo garantir uma validação do dado que foi passado. Veremos mais sobre isso na parte de sintaxe.
+
+EX:
+
+class Person {
+  name: string;
+  private _weight: number;
+  private _age: number;
+  readonly height: number;
+
+  constructor(name: string, height: number, weight: number, age: number) {
+    this.name = name;
+    this._weight = weight;
+    this._age = age;
+    this.height = height;
+  }
+
+// esta sintaxe permite acessar o valor retornado via person.getWeight()
+  getWeight() {
+    return this._weight;
+  }
+
+// esta sintaxe permite acessar o valor retornado via person.age (como se fosse um atributo normal)
+  get age() {
+    return this._age;
+  }
+
+// do mesmo modo, esta sintaxe permite modificar o valor com uma simples atribuição: person.age = 42
+// mesmo que esteja ocorrendo uma validação internamente
+  set age(newValue: number) {
+    if (newValue >= 0 && newValue < 200) {
+      this._age = newValue;
+    }
+  }
+
+  birthday() {
+    this._age += 1;
+  }
+
+}
+
+const p1 = new Person('Maria', 171, 58, 19);
+const p2 = new Person('João', 175, 66, 18);
+
+* Vamos agora a um exemplo de sintaxes que são válidas neste contexto:
+
+EX:
+
+// Alteração direta de variável pública
+p1.name = 'Mariah';
+// Acesso direto a variável pública
+console.log(p1.name);
+// Acesso a método público que manipula atributo privado
+console.log(p1.getWeight());
+// Acesso a método com getter para manipular atributo privado como se fosse público
+console.log(p2.age);
+// Acesso a método público que manipula atributo privado
+p2.birthday();
+console.log(p2.age);
+// Acesso a método com setter para manipular atributo privado como se fosse público
+p2.age = 17;
+console.log(p2.age);
+// Leitura de atributo readonly
+console.log(p1.height);
+
+/*
+Saída:
+Mariah
+58
+18
+19
+17
+171
+*/
+
+* Observe que há uma validação de dados no set age. É para este tipo de coisa que utilizamos atributos privados: para validar alterações nos dados. Considere, após o código anterior, rodar o seguinte código
+
+EX:
+
+p2.age = 300;
+console.log(p2.age);
+// Saída: 17
+
+A idade da pessoa p2 continua 17, pois a validação no set age impede que existam pessoas com 300 anos de idade. Esse é o poder do encapsulamento.
+
+* Agora um exemplo de sintaxes que são inválidas neste contexto:
+
+EX:
+
+// Acesso externo à classe a atributo privado
+p1._weight;
+p1._weight = 1;
+// Acesso a atributo inexistente
+p1.weight;
+p1.weight = 1;
+// Escrita em atributo readonly
+p1.height = 1;
+
+* Agora que você sabe os fundamentos de POO, vamos ver uma possível solução para o problema inicial?
+
+* Primeiramente vamos criar a classe Email. Ela será responsável por guardar os dados do e-mail na forma de atributos. Além disso, Email possui alguns métodos, sendo o mais importante deles o get content, que retorna uma string formatada com todo o corpo do e-mail.
+
+EX:
+
+class Email {
+  private _from: string;
+  private _to: string;
+  private _message: string;
+  private _subject: string;
+
+  constructor(
+    from: string,
+    to: string,
+    subject: string,
+    message: string,
+  ) {
+    this._from = from;
+    this._to = to;
+    this._message = message;
+    this._subject = subject;
+  }
+
+  set subject(newSubject: string) {
+    if (newSubject.length <= 40) this._subject = newSubject;
+  }
+
+  get subject(): string {
+    return this._subject;
+  }
+
+  get from(): string { return this._from; }
+
+  get to(): string { return this._to; }
+
+  get content(): string {
+    return `
+    From ${this._from} to ${this._to}
+    ${this.subject}
+
+    ${this._message}`;
+  }
+}
+
+É interessante observar o uso do encapsulamento na manipulação dos atributos, com destaque para a validação do comprimento do campo assunto.
+
+* Em seguida vem a criação da classe MailList, que representa uma lista de e-mails. Esta é uma classe muito interessante, pois nos permite manter todos os e-mails correlacionados em um único objeto. Além disso, nos permite filtrar os e-mails da lista de forma simplificada, utilizando abstração.
+
+Uma modelagem de representação genérica de um email
+
+Todo e-mail criado deve possuir os campos:
+
+Endereço de e-mail da pessoa remetente
+
+Endereço de e-mail da pessoa destinatária
+
+Assunto da mensagem, que não pode ter mais de 20 caracteres
+
+Mensagem
+
+Todo e-mail criado deve ter sua representação textual, que combina todos os dados em uma string única
+
+Uma representação genérica de uma lista de e-mails (mailList)
+
+A lista de e-mails deve ser capaz de retornar e-mails filtrados por pessoa remetente, destinatária ou por assunto.
+
+EX:
+
+class MailList {
+  // Essa sintaxe no construtor é chamada `Parameter Properties`
+  // É um atalho para declarar e automaticamente atribuir o valor que será recebido via parâmetro ao atributo privado `mailList`
+  constructor(private mailList: Email[] = []) { }
+
+  get all(): Email[] { return this.mailList; }
+
+  getEmailsBySender(mailAddress: string): Email[] {
+    return this.mailList.filter((mail) => mail.from === mailAddress);
+  }
+
+  getEmailsTo(mailAddress: string): Email[] {
+    return this.mailList.filter((mail) => mail.to === mailAddress);
+  }
+
+  getEmailsBySubject(searchString: string): Email[] {
+    return this.mailList
+      .filter((mail) => mail.subject.indexOf(searchString) !== -1);
+  }
+
+  addEmail(newMail: Email): void { this.mailList.push(newMail); }
+
+  removeEmail(mailToRemove: Email): void {
+    // note que como essa é uma comparação de objetos, esse filter só funcionará se a referência de `mail` e `mailToRemove` for a mesma
+    this.mailList = this.mailList.filter((mail) => mail !== mailToRemove);
+  }
+}
+
+Com isso conseguimos criar listas de e-mails diferentes, cada uma possuindo e-mails diferentes. Essas listas já são criadas com a possibilidade de filtrarmos os e-mails, o que é muito útil.
+
+
+
 
 
