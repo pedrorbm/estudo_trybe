@@ -1,0 +1,396 @@
+# POLIMORFISMO  = Polimorfismo vem do grego muitas formas, e nos remete às várias formas que um mesmo método pode possuir.
+
+Existe mais de uma forma de polimorfismo (seria isso polipolimorfismo? 🤣), mas vamos nos concentrar na mais comum: sobrescrita de métodos.
+
+Nesta situação, o polimorfismo ocorre quando um método implementado em uma superclasse é reimplementado numa subclasse, comportando-se de forma diferente.
+
+Como exemplo prático em classes TypeScript podemos criar uma classe ‘pai’ de nome Animals e teríamos em seguidas os tipos de Animals que possuem características particulares, mas mantém comportamentos diferenciados.
+
+Para ilustrar, no exemplo de código a seguir temos a representação TypeScript da classe Animal, a qual contém o método makeSound que representa o comportamento de emitir um som e atributo turns , o qual contabiliza a quantidade de vezes que o som foi emitido (quantas vezes o método makeSound foi executado):
+
+EX:
+
+class Animals {
+  declare turns: number;
+  public makeSound(sound: string) {
+      console.log('Som emitido:' + sound);
+  }
+}
+
+class Dogs extends Animals {
+  numberTurn(turns: number) {
+      return turns;
+  }
+
+  makeSound( sound: string): void {
+    const times = this.numberTurn(5);
+    console.log(`Som emitido: ${sound}, ${times} vezes`);
+  }
+}
+
+class Birds extends Animals {
+  declare specie: string;
+
+  makeSound (sound: string) {
+    this.specie = 'pássaro';
+      console.log(`O som emitido pelo ${this.specie} é ${sound}`);
+  }
+}
+
+const dogs = new Dogs();
+dogs.makeSound("au au au");
+
+const birds = new Birds();
+birds.makeSound("fiu fiu fiu fiu fiu");
+
+* A resposta ao executar o comando tsc index.ts && node index.js no terminal seria:
+
+EX:
+
+    Som emitido: au au au, 5 vezes
+    O som emitido pelo pássaro é fiu fiu fiu fiu fiu
+
+Podemos observar que ocorreu a sobrescrita do método mudando o seu comportamento e resultado final.
+
+* Sobrescrita de método
+
+Considere o seguinte exemplo:
+
+EX:
+
+class Animal {
+  constructor(public name: string) { }
+  move() { console.log(`${this.name} está se movendo.`); }
+}
+class Bird extends Animal {
+  move() { console.log(`${this.name} está voando.`); }
+}
+class Mammal extends Animal {
+  move() { console.log(`${this.name} está andando.`); }
+}
+
+const a = new Animal('Tubarão');
+const b = new Bird('Papagaio');
+const m = new Mammal('Tatu');
+
+const myMove = (animal: Animal) => {
+  animal.move();
+}
+myMove(a);
+myMove(b);
+myMove(m);
+
+/*
+Saída:
+Tubarão está se movendo.
+Papagaio está voando.
+Tatu está andando.
+*/
+
+Observe que myMove recebe como parâmetro um animal da classe Animal e chama o método move.
+
+Conforme você viu na aula passada, sabe que podemos passar uma subclasse quando uma superclasse é esperada, visto que ela possui todos os métodos que a superclasse possui.
+
+Neste caso em específico, as classes Ave e Mamífero sobrescrevem o método move da classe Animal, e quando passamos um objeto de uma dessas classes, uma implementação diferente do método move é utilizado.
+
+* Uso do super
+
+Ontem você viu como utilizar o super para chamar o construtor da superclasse dentro da subclasse.
+
+Uma outra coisa que você pode fazer é, ao sobrescrever um método qualquer, chamar a implementação dele na superclasse por meio do super.
+
+EX:
+
+class Animal {
+  constructor(public name: string) { }
+  move() { console.log(`${this.name} está se movendo.`); }
+}
+class Bird extends Animal {
+  move() {
+    super.move();
+    console.log(`${this.name} está voando.`);
+  }
+}
+class Mammal extends Animal {
+  move() { console.log(`${this.name} está andando.`); }
+}
+
+const a = new Animal('Tubarão');
+const b = new Bird('Papagaio');
+const m = new Mammal('Tatu');
+
+const myMove = (animal: Animal) => {
+  animal.move();
+}
+myMove(a);
+myMove(b);
+myMove(m);
+
+/*
+Saída:
+Tubarão está se movendo.
+Papagaio está se movendo.
+Papagaio está voando.
+Tatu está andando.
+*/
+
+Observe a chamada super.move() dentro de move, na classe Ave.
+
+É importante salientar que você pode chamar outros métodos da superclasse (caso existam), e não só o mesmo no qual você está na subclasse. Por exemplo, se a classe Animal tivesse, além do método move, um método sleep, dentro do método move na classe Ave você pode chamar o método sleep da classe Animal digitando super.sleep().
+
+* classes, métodos e atributos abstratos
+
+Por vezes, criamos classes que devem possuir métodos pensados para serem implementados em subclasses.
+
+A ideia é que a superclasse, mais genérica, não deve fazer ideia de como esse método deve funcionar, apenas saber que ele existe.
+
+Isso é o mesmo que quando há uma implementação de interface, com a diferença na interface nenhum método é implementado, e aqui queremos selecionar alguns métodos para que não sejam implementados.
+
+Para isso, utilizamos classes abstratas, e estas possuem métodos abstratos.
+
+As classes abstratas não podem ser instanciadas, ou seja, você não pode criar um objeto a partir de uma classe abstrata.
+
+Métodos abstratos só podem existir em classes abstratas, e eles devem ser implementados na subclasse.
+
+* No exemplo abaixo temos uma classe abstrata Employee que possui um atributo abstrato(MIN_SALARY) e um método abstrato (work()) que se aplica a seus subtipos. No caso da Trybe, temos pessoa instrutora, pessoa especialista e pessoa facilitadora. Portanto, ao criar as classes de cada subtipo, estendemos a partir da classe abstrata Employee e implementamos o atributo e o método de acordo com suas particularidades.
+
+EX:
+
+/*
+Dicionário en-pt:
+- employee: pessoa empregada/funcionária
+*/
+
+abstract class Employee {
+  constructor(public name: string) { }
+
+  /* Aqui temos um atributo abstrato que implica às classes
+  filhas atribuírem, de maneira obrigatória, um valor do tipo 'number' */
+  abstract MIN_SALARY: number
+
+  /* Já aqui temos um método abstrato que implica às classes filhas 
+  implementá-la, de maneira obrigatória, de acordo com a utilidade da classe filha  */
+  abstract work(): void
+}
+
+class Instructor extends Employee {
+  constructor(public name: string) {
+    super(name); 
+  }
+  MIN_SALARY = 10000;
+  work() { console.log(`${this.name} está auxiliando as pessoas estudantes em mentorias.`); }
+}
+
+class Specialist extends Employee {
+  constructor(public name: string) {
+    super(name); 
+  }
+  MIN_SALARY = 20000;
+  work() { console.log(`${this.name} está ministrando uma aula ao vivo.`); }
+}
+
+class Facilitator extends Employee {
+  constructor(public name: string) {
+    super(name); 
+  }
+  MIN_SALARY = 50000;
+  work() { console.log(`${this.name} está conduzindo um 1:1.`); }
+}
+
+const instructor = new Instructor('Victor');
+const specialist = new Specialist('Gus');
+const facilitator = new Facilitator('Silvinha');
+
+instructor.work(); // Victor está auxiliando as pessoas estudantes em mentorias.
+specialist.work(); // Gus está ministrando uma Aula Ao Vivo.
+facilitator.work(); // Silvinha está conduzindo um 1:1.
+
+* métodos e atributos estáticos
+
+Uma outra funcionalidade interessante é o que chamamos de método estático.
+
+Um método estático nada mais é do que uma função que não precisa acessar nenhum atributo do objeto.
+
+A diferença semântica de um método estático para uma função é que o método estático tem a ver com a classe. Isso significa que fica um pouco “sem sentido” você disponibilizar um método sozinho, pois, por mais que ele não precise manipular uma instância, ele está muito ligado à classe.
+
+Além de métodos, podemos ter atributos estáticos, que são acessados manipulando a classe, não a instância.
+
+Agora vamos ver outro exemplo com uma classe Employee que possui um atributo estático chamado employeeCount, responsável por armazenar a quantidade total de pessoas funcionárias, e um método estático chamado de addEmployee(), responsável por incrementar a contagem de pessoas funcionárias. Com esse exemplo é possível notar que a cada instanciação de Employee o atributo employeeCount é incrementado:
+
+EX:
+
+/*
+Dicionário en-pt:
+- static: estático
+*/
+
+class Employee {
+/* Atributo estático, que pertence a classe */
+private static employeeCount = 0
+
+  /* Aqui temos o exemplo de um atributo comum que, em contraste com o atributo estático,
+  é utilizado pelas instâncias e não pela classe */
+  private employeeName: string;
+
+  constructor(name: string) {
+    /* Pelo fato do o método addEmployee() ser estático, ou seja, acessível 
+    apenas a partir da própria classe e não de suas instâncias, é que a
+    chamamos a partir de Employee e não do 'this' */
+    Employee.addEmployee();
+
+    // Nesse caso, o 'this' se refere à instância dessa classe, que está sendo construída
+    this.employeeName = name;
+  }
+
+  // Esse é um método exclusivo da classe, por isso estático 
+  private static addEmployee() {
+    /* Nesse caso, como o atributo é estático, melhor forma de acessar
+    o atributo é a partir do nome da classe.  */
+    Employee.employeeCount += 1;
+    console.log(`Total de pessoas funcionárias: ${Employee.employeeCount}`)
+  }
+
+  /* Aqui temos o exemplo de método comum que, em contraste com o método estático,
+  é utilizado pelas instâncias e não pela classe */
+  public getName(): string { 
+    // Novamente, o 'this' se referindo à instância
+    return this.employeeName
+  }
+}
+
+const employee1 = new Employee('Kissyla'); // Total de pessoas funcionárias: 1
+const employee2 = new Employee('Calaça'); // Total de pessoas funcionárias: 2
+const employee3 = new Employee('Setinha'); // Total de pessoas funcionárias: 3
+
+classe com método estático
+
+Observe que usamos o nome da classe para acessar o atributo employeeCount dentro do método addEmployee() da classe Employee. Poderíamos utilizar o this para acessá-lo, mas como boa prática, mantemos o nome da classe para acessar atributos e métodos estáticos em qualquer ponto do código. Isso acontece para deixar nítido, para outras pessoas desenvolvedoras, que aquele atributo ou método é estático.
+
+Resumindo:
+
+Os métodos e atributos estáticos pertencem a classe e não aos objetos da classe.
+Se um atributo estático tiver seu valor alterado em algum objeto da classe, a alteração se aplicará a todos os objetos já instanciados e os que serão instanciados.
+
+Entretanto, é importante salientar que na maioria das vezes é preferível criar uma função normal, no mesmo módulo que a classe está sendo criada, exportando-as de forma separada. Isso facilita a vida de quem vai usar.
+
+* Polimorfismo com interfaces
+
+O polimorfismo com interfaces se dá da mesma forma que o com herança.
+
+Duas classes diferentes implementam a mesma interface, implementando também os métodos obrigatórios que a interface estipula.
+
+Por exemplo, podemos enviar a uma função um parâmetro com o tipo da interface e passar em seu lugar um objeto de uma classe que implementa tal interface.
+
+Há uma garantia de que tudo o que a interface estipula está implementado na classe e, consequentemente, no objeto.
+
+* Classes diferentes irão implementar determinados métodos de formas diferentes. No exemplo abaixo, o método showIdentification é implementado de forma diferente nas classes PessoaFísica e PessoaJurídica.
+
+EX:
+
+interface Person {
+  id: number;
+  name: string;
+  showIdentification(): void;
+}
+
+class PhysicalPerson implements Person {
+  private static lastId = 0;
+  private _name;
+  private _id;
+  private _cpf;
+
+  constructor(name: string, cpf: string) {
+    this._id = PhysicalPerson.newId();
+    this._name = name;
+    this._cpf = cpf;
+  }
+
+  private static newId() { return this.lastId++; }
+  get id() { return this._id; }
+  get name() { return this._name; }
+  get cpf() { return this._cpf; }
+  showIdentification() { console.log(this.id, this._cpf); }
+}
+
+class LegalPerson implements Person {
+  private static lastId = 0;
+  private _name;
+  private _id;
+  private _cnpj;
+
+  constructor(name: string, cnpj: string) {
+    this._id = LegalPerson.newId();
+    this._name = name;
+    this._cnpj = cnpj;
+  }
+
+  private static newId() { return this.lastId++; }
+  get id() { return this._id; }
+  get name() { return this._name; }
+  get cnpj() { return this._cnpj; }
+  showIdentification() { console.log(this.id, this._cnpj); }
+}
+
+const pp0 = new PhysicalPerson('John', '123456789');
+const pp1 = new PhysicalPerson('Jenny', '987654321');
+const lp = new LegalPerson('International Sales SA', '834729384723');
+
+const showIdentification = (person: Person) => {
+  person.showIdentification();
+}
+showIdentification(pp0);
+showIdentification(pp1);
+showIdentification(lp);
+
+/*
+Saída:
+0 123456789
+1 987654321
+0 834729384723
+*/
+
+* Garantia de tipo com generics
+
+Agora imagine que você queira agora criar uma classe Contrato, que vai possuir uma pessoa corretora, que pode ser tanto uma pessoa física quanto uma pessoa jurídica.
+
+Ao passar simplesmente Pessoa como tipo da pessoa corretora, você perde a capacidade de acessar elementos específicos das classes PessoaFísica e PessoaJurídica.
+
+EX:
+
+class Contract {
+  static _number = 0;
+  constructor(public broker: Person){}
+  static get number() { return this._number; }
+}
+
+const c1 = new Contract(pp0);
+console.log(c1.broker.cpf); // Erro, pois não existe cpf em Person
+Para garantir o tipo utilizado, podemos utilizar generics.
+
+É bem simples:
+
+* Escolhemos uma letra para representar o elemento e a colocamos entre sinais de menor e maior que (<>) após o nome da classe
+Utilizamos esta letra no lugar do tipo Pessoa
+
+EX:
+
+class Contract<T> { // Agora a classe recebe o genérico T
+  static _number = 0;
+  constructor(public broker: T) { } // T no lugar de Person
+  static get number() { return this._number; }
+}
+
+// Tipo inferido (não explícito)
+const c1 = new Contract(pp0); // TypeScript "advinha" que pp0 é pessoa física
+console.log(c1.broker.cpf); // Okay
+
+// Tipagem explícita
+const c2: Contract<LegalPerson> = new Contract(lp); // Deixo explícito que lp é pessoa jurídica
+console.log(c2.broker.cnpj); // Okay
+
+/*
+Saída:
+123456789
+834729384723
+*/
+
