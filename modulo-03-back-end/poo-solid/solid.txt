@@ -12,3 +12,5 @@ Interface segregation principle (Princípio da segregação da interface): inter
 
 Dependency inversion principle (Princípio da inversão da dependência): entidades de alto nível não devem depender de entidades de baixo nível. Ambos devem depender de abstrações.
 
+Cada letra tem seu significado e uma origem.
+
