@@ -156,3 +156,438 @@ err = "Arquivo não encontrado"
 print(f"Erro aconteceu: {err}", file=sys.stderr)
 
 💡 Em Python, podemos fazer interpolação de variáveis e expressões utilizando f-string. Adicionamos um f antes das aspas e o valor de saída entre chaves. Essa dica é importante, pois é a maneira mais eficiente de formatar strings.
+
+
+# leitura e escrita de arquivos:
+
+* A função open é a responsável por abrir um arquivo, tornando possível sua manipulação. Seu único parâmetro obrigatório é o nome do arquivo. Por padrão, arquivos são abertos somente para leitura, mas podemos modificar isto passando o modo com que vamos abrir o arquivo. No exemplo abaixo, estamos utilizando mode="w", ou seja, estamos abrindo o arquivo para escrita:
+
+EX:
+
+file = open("arquivo.txt", mode="w")  
+
+ao abrir um arquivo para escrita, um novo arquivo é criado mesmo que ele já exista, sobrescrevendo o antigo.
+O objeto especial file gerado no código anterior será usado para fazermos leituras e escritas no arquivo, como veremos a seguir. Depois de realizarmos todas as operações desejadas, é imprescindível que o comando file.close() seja executado pois existe uma quantidade limite de arquivos que podemos abrir de uma só vez. Caso o limite seja excedido, o Sistema Operacional levantará um OSError.
+
+* Para ter um melhor controle da abertura de fechamento de arquivos, devemos utilizar os gerenciadores de contexto do Python. Essa funcionalidade é comum também em outros recursos que devemos utilizar e liberar ao final (conexões de bancos de dados, por exemplo).
+
+O with é a palavra reservada para gerenciamento de contexto no Python. Este gerenciamento (with) é utilizado para encapsular a utilização de um recurso, garantindo que certas ações sejam tomadas independentemente se ocorreu ou não um erro naquele contexto.
+
+A função open retorna um objeto que se comporta como um gerenciador de contexto de arquivo que será responsável por abrir e fechar o mesmo. Isto significa que o arquivo possui mecanismos especiais que, quando invocados utilizando with, alocam um determinado recurso — um arquivo — e o liberam quando o bloco for finalizado.
+
+EX:
+
+# Criamos um contexto, limitando o escopo onde o arquivo está aberto.
+# O uso do "as" aqui é somente para atribuir o valor utilizado no contexto à variável file
+with open("arquivo.txt", "w") as file:
+    # como estamos DENTRO do contexto, verificamos que o arquivo está ABERTO
+    # através do atributo booleano 'closed' (file.closed = False)
+    print(file.closed)
+# como estamos FORA do contexto, o arquivo está FECHADO (file.closed = True)
+print(file.closed)
+
+⚠️ A partir de agora, faremos todas as leituras e escritas de arquivo utilizando o gerenciador de contexto do Python.
+
+* Para escrevermos um conteúdo em um arquivo utilizamos a função write:
+
+EX:
+
+# with open("arquivo.txt", "w") as file:
+    # file.write("nome idade\n")
+
+    file.write("Maria 45\n")
+    file.write("Miguel 33\n")
+    
+💡 Só é possível escrever em um arquivo após abri-lo em um modo que permita escrita.
+
+* Assim como podemos redirecionar a saída do nosso programa para a saída de erros, podemos redirecionar o conteúdo digitado dentro de print para um arquivo. Ou seja, também podemos escrever em um arquivo através do print.
+
+EX:
+
+# with open("arquivo.txt", "w") as file:
+#     file.write("Miguel 33\n")
+
+
+    # Não precisa da quebra de linha, pois esse é um comportamento padrão do print
+    print("Túlio 22", file=file)
+    
+* Para escrever múltiplas linhas podemos utilizar a função writelines. Repare que a função espera que cada linha tenha seu próprio caractere de separação (\n):
+
+EX:
+
+# with open("arquivo.txt", "w") as file:
+#   ...
+
+    LINES = ["Alberto 35\n", "Betina 22\n", "João 42\n", "Victor 19\n"]
+    file.writelines(LINES)
+    
+* A leitura do conteúdo de um arquivo pode ser feita utilizando a função read. Para experimentar, vamos escrever em um arquivo e lê-lo logo em seguida!
+
+EX:
+
+# escrita
+with open("arquivo.txt", "w") as file:
+    file.write("Trybe S2")
+
+# leitura
+with open("arquivo.txt", "r") as file:
+    content = file.read()
+    print(content)
+    
+* Um arquivo é também um iterável, ou seja, pode ser percorrido em um laço de repetição. A cada iteração, uma nova linha é retornada. Vamos fazer igual ao exemplo anterior, porém dessa vez vamos escrever mais de uma linha!
+
+EX:
+
+# escrita
+with open("arquivo.txt", "w") as file:
+    LINES = ["Olá\n", "mundo\n", "belo\n", "do\n", "Python\n"]
+    file.writelines(LINES)
+
+# leitura
+with open("arquivo.txt", "r") as file:
+    for line in file:
+        print(line)  # não esqueça que a quebra de linha também é um caractere da linha
+        
+        
+# Erros de Sintaxe:
+
+Erros de sintaxe ocorrem quando o código utiliza recursos inexistentes da linguagem que não consegue interpretá-los. É como executar print{"Olá, mundo!"} em vez de print("Olá, mundo!").
+
+
+# Exceções:
+
+Já as exceções ocorrem durante a execução e resultam em mensagem de erro. Veja exemplos de exceções:
+
+EX:
+
+print(10 * (1 / 0))
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# ZeroDivisionError: division by zero
+print(4 + spam * 3)
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# NameError: name 'spam' is not defined
+print('2' + 2)
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# TypeError: can only concatenate str (not "int") to str
+
+Observe que, apenas no exemplo acima, podemos observar três exceções: ZeroDivisionError, NameError e TypeError. A lista completa de exceções já embutidas na linguagem pode ser vista aqui.
+
+* Tratamento de exceções
+
+Para tratar exceções utilizamos o conjunto de instruções try, com as palavras reservadas try e except. O funcionamento dessa cláusula ocorre da seguinte forma:
+
+Se nenhuma exceção ocorrer, a cláusula except é ignorada e a execução da instrução try é finalizada.
+Se ocorrer uma exceção durante a execução da cláusula try, as instruções remanescentes na cláusula são ignoradas. Se o tipo da exceção ocorrida tiver sido previsto em algum except, então essa cláusula será executada.
+Se não existir nenhum tratador previsto para tal exceção, trata-se de uma exceção não tratada e a execução do programa termina com uma mensagem de erro.
+
+Vamos agora ver um exemplo de tratamento de exceções:
+
+EX:
+
+while True:
+    try:
+        x = int(input("Por favor digite um número inteiro: "))
+        break
+    except ValueError:
+        # 'ValueError' é a exceção que ocorre quando a função int() recebe um
+        # valor que não pode ser traduzido para número inteiro
+        print("Oops! Esse não era um número inteiro. Tente novamente...")
+
+* Lidando com exceções enquanto manipulamos arquivos
+
+Vamos ver agora como podemos nos prevenir de possíveis erros que ocorrem quando manipulamos arquivos. Sempre devemos fechar um arquivo e podemos, em um bloco try, fazer isso utilizando a instrução finally ou else. O finally é uma outra cláusula do conjunto try, cuja finalidade é permitir a implementação de ações de limpeza, que sempre devem ser executadas independentemente da ocorrência de ações. Já o else ocorre sempre que todo o try for bem sucedido.
+
+EX:
+
+try:
+    with open("arquivo.txt", "r") as file:
+        print(file.read())
+except FileNotFoundError:
+    # será executado caso haja a exceção 'FileNotFoundError'
+    print("Arquivo inexistente")
+else:
+    # será executado se tudo ocorrer bem no try
+    print("Arquivo manipulado e fechado com sucesso")
+finally:
+    # será sempre executado, independentemente de erro
+    print("Fim da tentativa de ler o arquivo")
+    
+Como estamos abrindo o arquivo em modo de leitura, uma exceção será levantada caso ele não exista, executando as cláusulas except e finally. Entretanto, se alterarmos o modo para escrita, o arquivo será criado mesmo se inexistente, executando as cláusulas else e finally.
+
+
+# leitura e escrita de arquivos .json:
+
+Seus principais métodos para manipulação são: load, loads, dump, dumps.
+
+EX:
+
+import json  # json é um modulo que vem embutido, porém precisamos importá-lo
+
+
+with open("pokemons.json") as file:
+    content = file.read()  # leitura do arquivo
+    pokemons = json.loads(content)["results"]  # o conteúdo é transformado em estrutura python equivalente, dicionário neste caso.
+    # acessamos a chave results que é onde contém nossa lista de pokemons
+
+print(pokemons[0])  # imprime o primeiro pokemon da lista
+
+* A leitura pode ser feita diretamente do arquivo, utilizando o método load ao invés de loads. O loads carrega o JSON a partir de um texto e o load carrega o JSON a partir de um arquivo.
+
+EX:
+
+import json
+
+
+with open("pokemons.json") as file:
+    pokemons = json.load(file)["results"]
+
+print(pokemons[0])  # imprime o primeiro pokemon da lista
+
+* A escrita de arquivos no formato JSON é similar à escrita de arquivos comuns, porém temos que transformar os dados primeiro.
+
+EX:
+
+import json
+
+# Leitura de todos os pokemons
+with open("pokemons.json") as file:
+    pokemons = json.load(file)["results"]
+
+# Separamos somente os do tipo grama
+grass_type_pokemons = [
+    pokemon for pokemon in pokemons if "Grass" in pokemon["type"]
+]
+
+# Abre o arquivo para escrevermos apenas o pokemons do tipo grama
+with open("grass_pokemons.json", "w") as file:
+    json_to_write = json.dumps(
+        grass_type_pokemons
+    )  # conversão de Python para o formato json (str)
+    file.write(json_to_write)
+    
+    
+* Assim como a desserialização, que faz a transformação de texto em formato JSON para Python, a serialização (caminho inverso) possui um método equivalente para escrever em arquivos de forma direta.
+
+EX:
+
+import json
+
+# leitura de todos os pokemons
+with open("pokemons.json") as file:
+    pokemons = json.load(file)["results"]
+
+# separamos somente os do tipo grama
+grass_type_pokemons = [
+    pokemon for pokemon in pokemons if "Grass" in pokemon["type"]
+]
+
+# abre o arquivo para escrita
+with open("grass_pokemons.json", "w") as file:
+    # escreve no arquivo já transformando em formato json a estrutura
+    json.dump(grass_type_pokemons, file)
+    
+💡 Arquivos JSON não seguem a nomenclatura habitual de leitura e escrita (write e read), pois são considerados formatos de serialização de dados. Seguem então as mesmas nomenclaturas utilizadas em módulos como marshal e pickle, que também são formatos de serialização.
+
+
+# leitura e escrita em arquivos .csv:
+
+O módulo csv, contém duas principais funções:
+
+Um leitor (reader) que nos ajuda a ler o conteúdo, já fazendo as transformações dos valores para Python;
+
+E um escritor (writer) para facilitar a escrita nesse formato.
+
+EX:
+
+import csv
+
+with open("graduacao_unb.csv", encoding = "utf-8") as file:
+    # Os valores padrão de 'delimiter' e 'quotechar' são os mesmos utilizados 
+    # abaixo. Você pode removê-los ou alterá-los conforme necessidade
+    graduacao_reader = csv.reader(file, delimiter=",", quotechar='"')
+
+    # Usando o conceito de desempacotamento
+    header, *data = graduacao_reader
+
+print(data)
+
+Além do arquivo file, o leitor recebe parâmetros opcionais como os listados aqui.
+
+* Um leitor de .csv pode ser percorrido utilizando o laço de repetição for e, a cada iteração, retorna uma nova linha já transformada em uma lista Python com seus respectivos valores.
+
+Podemos fazer uma análise e verificar quantos cursos são ofertados por departamento. Em seguida salvamos o resultado também no formato .csv:
+
+EX:
+
+import csv
+
+with open("graduacao_unb.csv", encoding="utf8") as file:
+    graduacao_reader = csv.reader(file, delimiter=",", quotechar='"')
+    # Usando o conceito de desempacotamento
+    header, *data = graduacao_reader
+
+group_by_department = {}
+for row in data:
+    department = row[15]
+    if department not in group_by_department:
+        group_by_department[department] = 0
+    group_by_department[department] += 1
+
+# Escreve o relatório em .csv
+# Abre um arquivo para escrita
+with open("department_report.csv", "w", encoding = "utf-8") as file:
+    writer = csv.writer(file)
+
+    # Escreve o cabeçalho
+    headers = [
+        "Departamento",
+        "Total de Cursos",
+    ]
+    writer.writerow(headers)
+
+    # Escreve as linhas de dados
+    # Desempacotamento de valores
+    for department, grades in group_by_department.items():
+        # Agrupa o dado com o turno
+        row = [
+            department,
+            grades,
+        ]
+        writer.writerow(row)
+        
+        
+* Existem ainda o leitor e o escritor baseados em dicionários. A principal vantagem é que não precisamos manipular os índices para acessar os dados das colunas. A desvantagem é o espaço ocupado em memória (que é maior que o comum), devido à estrutura de dados utilizada.
+
+EX:
+
+import csv
+
+# lê os dados
+with open("graduacao_unb.csv", encoding = "utf-8") as file:
+    graduacao_reader = csv.DictReader(file, delimiter=",", quotechar='"')
+
+    # A linha de cabeçalhos é utilizada como chave do dicionário
+    # agrupa cursos por departamento
+    group_by_department = {}
+    for row in graduacao_reader:
+        department = row["unidade_responsavel"]
+        if department not in group_by_department:
+            group_by_department[department] = 0
+        group_by_department[department] += 1
+        
+💡 Ainda que a manipulação de arquivos seja algo trivial, caso precise fazer análises de dados, leve em consideração bibliotecas como Pandas. Elas foram construídas e são mantidas justamente para atender e facilitar este objetivo.
+
+
+# Testes automatizados
+
+Quem nunca arrumou um problema em um código e acabou atrapalhando o funcionamento dele em outro cenário? Ou ficou horas testando as mais diversas condições para um algoritmo e no meio do caminho teve de mexer no código e recomeçar tudo novamente.
+
+Através de testes automatizados, a pessoa desenvolvedora é capaz de identificar mais facilmente um bug ou verificar que alterações do código não afetaram o comportamento esperado do sistema.
+
+Em nosso curso utilizaremos a biblioteca pytest, um framework que facilita a escrita de testes simples, mas capazes de testar funcionalidades complexas em aplicações e bibliotecas.
+
+⚠️ Lembre-se de instalar a biblioteca somente no ambiente virtual do seu projeto.
+
+* A instalação é feita através do pip utilizando o comando:
+
+EX:
+
+python3 -m pip install pytest
+
+* E podemos verificar utilizando o comando:
+
+EX:
+
+python3 -m pytest --version
+
+A saída esperada é similar à apresentada abaixo.
+
+This is pytest version 5.3.0, imported from /home/cassiobotaro/projects/gerenciador-tarefas/.venv/lib/python3.8/site-packages/pytest.py
+
+* Que tal vermos um exemplo?
+
+codigo.py
+
+EX:
+
+def is_odd(number):
+    'Retorna True se um número é ímpar, senão False.'
+    return number % 2 != 0
+    
+test_codigo.py
+
+EX:
+
+from codigo import is_odd
+
+
+def test_is_odd_when_number_is_odd_returns_true():
+    'Para um número ímpar a função deve retornar o valor True'
+    assert is_odd(3) is True
+
+
+def test_is_odd_when_number_is_even_returns_false():
+    'Para um número par a função deve retornar o valor False'
+    assert is_odd(2) is False
+    
+Notem que o nome do arquivo de testes possui o prefixo test_, assim como a definição das funções de teste. Isto é necessário para que seus testes sejam descobertos pela ferramenta.
+
+Uma função de teste é similar a qualquer outra, porém tem o propósito de verificar se o resultado obtido foi o mesmo do esperado. No código, isto pode ser visto através da utilização da palavra reservada assert.
+
+O comando assert funciona da seguinte maneira: caso a expressão recebida seja verdadeira (avaliada como True), nada acontece. Porém, caso seja falsa (avaliada como False), uma exceção do tipo AssertionError é lançada. A pytest captura este erro e tenta apresentar uma comparação entre o esperado e o recebido da melhor maneira possível.
+
+Vamos rodar nossos testes e ver o resultado? Vamos utilizar o comando:
+
+EX:
+
+python3 -m pytest
+
+
+# Testando falhas:
+
+Erros acontecem e nem sempre são inesperados. O Python utiliza exceções para sinalizar que ocorreram erros durante a execução de um código e que nem sempre são fatais.
+
+Podemos escrever testes que verificam que um erro deve ocorrer a partir de uma determinada entrada.
+
+Um exemplo pode ser visto abaixo:
+
+codigo.py
+
+EX:
+
+# ...
+
+def divide(a_number, other_number):
+    "Retorna a divisão de a_number por other_number"
+    return a_number / other_number
+test_codigo.py
+
+EX:
+
+import pytest
+from codigo import is_odd, divide
+
+# ...
+
+def test_divide_when_other_number_is_zero_raises_an_exception():
+    with pytest.raises(ZeroDivisionError, match="division by zero"):
+        divide(2, 0)
+        
+Utilizamos a função raises da pytest para verificar se a exceção ocorreu. Caso contrário, ela lança um AssertionError, indicando que o teste não passou. Podemos verificar também se o texto retornado na exceção é o esperado através do parâmetro match, que pode receber uma expressão regular. No exemplo, temos uma divisão por zero, que lança a exceção esperada e o teste passa com sucesso.
+
+* Evoluindo nossos testes
+
+O ecossistema de testes do Python é extremamente poderoso e ainda nos fornece diversas outras ferramentas interessantes:
+
+pytest.fixtures: são funções que podemos criar e serão executadas antes e/ou depois dos nossos testes. Podemos usá-las para inicializar ou limpar um banco de dados, criar valores de mock reutilizáveis, capturar logs do terminal e muito mais! Se quiser aprofundar, veja a documentação oficial.
+
+unittest.mock: é uma biblioteca nativa que oferece diversas formas de simular comportamentos que queremos testar. São úteis quando estamos fazendo testes unitários e não queremos depender do funcionamento de outras partes da aplicação (como testar um Service sem depender de sua Model). Para aprofundar, veja a documentação oficial!
+
+hypothesis e faker: são 2 exemplos de bibliotecas externas (precisam ser instaladas com o pip) que nos ajudam a criar diversos valores de teste. A biblioteca hypothesis (documentação aqui) nos ajuda executando um teste para diversos valores a partir de uma regra como “números pares“ ou “dicionários com a chave ‘name’ sendo uma string“. Já a faker (documentação aqui) possui diversos geradores mais complexos (ex: email, telefone, endereço, CPF, cartão de crédito, etc.), e tudo isso com poucas linhas de código!
+
+
+
+
