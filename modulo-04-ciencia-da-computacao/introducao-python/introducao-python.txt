@@ -1,0 +1,557 @@
+# INTRODUÇÃO A PYTHON.
+
+* atualmente a versão atual do python é python 3.
+
+* para acessar o terminal usando o linux que já vem integrado ao sistema, assim como mac. Basta digitar o seguinte comando:
+
+EX:
+
+python3  = comando digitado no terminal.
+
+* operadores básicos:
+
+EX:
+
+2 + 2  = soma.
+2 - 2  = subtração.
+2 * 2  = multiplicação.
+2 / 2  = divisão retornando o resto, ou seja retornando a divisão completa com vírgula.
+2 // 2  = divisão retornando apenas o inteiro, ou seja apenas os números antes da vírgula.
+2 > 3  = compração de maior, retorn aum boolean.
+2 < 3  = comparação de menor, retorna um boolean.
+2 >= 3  = compração de maior ou igual, retorn aum boolean.
+2 <= 3  = comparação de menor ou igual, retorna um boolean.
+2 < 4 < 6  = para saber se o número do meio está entre o intervalo estabelecido.
+count = 2  = definindo uma variável, não precisa usar var, let ou const.
+count += 2  = incrementa mais 2 ao valor de count.
+count -= 2  = diminui 2 ao valor de count.
+count = count + 2  = incrementa 2, mas é uma forma menos simplificada.
+1 < count < 5  = saber se o valor de count está entre 1 e 5.
+or  = tem o valor de ou, mesma coisa de "||" no javascript.
+and  = valor de e, mesma coisa do "&&" no javascript.
+True  = é verdadeiro lembrando que começa com a letra maiúscula.
+False  = é falso lembrando que começa com a letra minúscula.
+
+# tipos de dados:
+
+
+* Booleanos (bool)
+Os valores booleanos True e False pertencem ao tipo embutido bool.
+
+
+* Números inteiros (int)
+O primeiro dos tipos numéricos é o int, ele representa um número inteiro, ou seja, é escrito sem parte fracionária.
+
+
+* Inicialize uma variável a = 5, digite o comando type(a) e observe o retorno.
+
+O método type(operando) corresponde ao operador typeof operando do JavaScript.
+
+
+* Assim como qualquer linguagem de programação, Python também possui uma grande quantidade de comandos que precisamos aprender. Para nos ajudar nessa tarefa, podemos digitar help() dentro da linha de comandos do Python que ele nos dará detalhes do comando passado por parâmetro.
+
+EX:
+
+help(list)
+O comando help() também pode ser utilizado em cláusulas if ou for, desde que colocado entre aspas e para sair de dentro do comando, basta apertar a tecla q.
+
+help("if")
+Números fracionários (float)
+O segundo tipo numérico é o float, também conhecido por ponto flutuante, ele representa um número decimal ou fracionário.
+
+Inicialize uma variável a = 5.0, digite o comando type(a) e observe o retorno.
+
+
+* Strings (str)
+Além dos tipos numéricos, temos o tipo de sequência de texto str. Ele representa uma cadeia de caracteres ou, como popularmente conhecida, uma string. As strings são definidas envolvendo um valor com aspas simples ou duplas. Exemplo: a = "Olá"
+
+
+* Temos ainda estruturas do tipo:
+
+sequência(list, tuple, range);
+conjuntos(set, frozenset);
+mapeamento(dict);
+sequências binárias(bytes, bytearray, memoryview).
+
+
+* Listas (list)
+
+Anota aí ✏️: uma lista é uma sequência mutável e ordenada de elementos. Ela pode armazenar elementos heterogêneos, ter seu tamanho variável e crescer à medida que itens são adicionados.
+
+EX:
+
+fruits = ["laranja", "maçã", "uva", "abacaxi"]  # elementos são definidos separados por vírgula, envolvidos por colchetes
+
+fruits[0]  # o acesso é feito por índices iniciados em 0
+
+fruits[-1]  # o acesso também pode ser negativo
+
+fruits.append("banana")  # adicionando uma nova fruta
+
+fruits.remove("abacaxi")  # removendo uma fruta
+
+fruits.extend(["pera", "melão", "kiwi"])  # acrescenta uma lista de frutas a lista original
+
+fruits.index("maçã")  # retorna o índice onde a fruta está localizada, neste caso, 1
+
+fruits.sort()  # ordena a lista de frutas
+Vamos continuar com os exercícios! 💪
+
+
+* Tuplas (tuple)
+
+São similares a listas, porém não podem ser modificados durante a execução do programa.
+
+EX:
+
+user = ("Will", "Marcondes", 42)  # elementos são definidos separados por vírgula, envolvidos por parênteses
+
+user[0]  # acesso também por índices
+
+
+* Conjuntos (set)
+
+Um conjunto é uma coleção de elementos únicos e não ordenados. Conjuntos implementam operações de união, intersecção e outras.
+
+EX:
+
+permissions = {"member", "group"}  # elementos separados por vírgula, envolvidos por chaves
+
+permissions.add("root")  # adiciona um novo elemento ao conjunto
+
+permissions.add("member")  # como o elemento já existe, nenhum novo item é adicionado ao conjunto
+
+permissions.union({"user"})  # retorna um conjunto resultado da união
+
+permissions.intersection({"user", "member"})  # retorna um conjunto resultante da intersecção dos conjuntos
+
+permissions.difference({"user"})  # retorna a diferença entre os dois conjuntos
+
+
+* Conjuntos imutáveis (frozenset)
+
+É uma variação do set, porém imutável, ou seja, seus elementos não podem ser modificados durante a execução do programa.
+
+EX:
+
+permissions = frozenset(["member", "group"])  # assim como o set, qualquer estrutura iterável pode ser utilizada para criar um frozenset
+
+permissions.union({"user"})  # novos conjuntos imutáveis podem ser criados à partir do original, mas o mesmo não pode ser modificado
+
+permissions.intersection({"user", "member"})  # retorna um conjunto resultante da intersecção dos conjuntos
+
+permissions.difference({"user"})  # retorna a diferença entre os dois conjuntos
+
+
+* Dicionários (dict)
+Estrutura que associa uma chave a um determinado valor. É a representação do tão famoso objeto que utilizamos em JavaScript.
+
+EX:
+
+people_by_id = {1: "Maria", 2: "Fernanda", 3: "Felipe"}  # elementos no formato "chave: valor" separados por vírgula, envolvidos por chaves
+
+people_by_name = {"Maria": 1, "Fernanda": 2, "Felipe": 3}  # outro exemplo, dessa vez usando strings como chaves. As aspas são necessárias para que o Python não ache que `Maria`, `Fernanda` e `Felipe` sejam variáveis.
+
+
+people_by_id[1]  # saída: Maria
+# elementos são acessados por suas chaves
+
+del people_by_id[1]  # elementos podem ser removidos com a palavra chave del
+
+people_by_id.items()  # dict_items([(2, "Fernanda"), (3, "Felipe")])
+# é retornada uma coleção iterável de tuplas contendo chaves e valores
+
+
+* Range (range)
+
+Estrutura capaz de gerar uma sequência numérica de um valor inicial até um valor final, modificando seu valor de acordo com o passo (step) definido. Pode ser declarado como range( [start], [stop], [step] ), em que start e step podem ser omitidos, possuindo valores iniciais iguais a 0 e 1 respectivamente.
+
+Anota aí ✏️: O stop não é incluído na sequência, portanto, caso queira uma sequência de 1 até 10 a chamada deverá ser range(1, 11)
+
+Seus valores são criados à medida que esta sequência é percorrida.
+
+EX:
+
+# vamos converter o range em uma lista para ajudar na visualização
+
+# definimos somente o valor de parada
+list(range(5))  # saída: [0, 1, 2, 3, 4]
+
+# definimos o valor inicial e o de parada
+list(range(1, 6))  # saída: [1, 2, 3, 4, 5]
+
+# definimos valor inicial, de parada e modificamos o passo para 2
+list(range(1, 11, 2))  # saída: [1, 3, 5, 7, 9]
+
+# podemos utilizar valores negativos para as entradas também
+list(range(10, 0, -1))  # saída: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+
+* Além dos tipos básicos, temos outros como datas, tuplas nomeadas, arrays, enumerações e outros, mas estes têm de ser importados de seus respectivos módulos.
+
+
+* Estruturas condicionais
+
+Vamos imaginar a seguinte situação: em uma análise de dados sobre pessoas desenvolvedoras, temos uma base de dados que contém o salário delas, mas não mostra a informação sobre sua senioridade.
+
+Para fazer um agrupamento por essa classificação de nível de experiência, precisamos criar uma nova coluna que será baseada no salário:
+
+Menor que R$2.000,00, pessoa desenvolvedora estagiária;
+
+Entre R$2.000,00 e R$5.800,00, pessoa desenvolvedora júnior;
+
+Entre R$5.800,00 e R$7.500,00, pessoa desenvolvedora pleno;
+
+Entre R$7.500,00 e R$10.500,00, pessoa desenvolvedora sênior;
+
+Qualquer valor acima do que já foi mencionado a pessoa desenvolvedora é considerada liderança.
+
+EX:
+
+position = ""
+if salary <= 2000:
+    position = "estagiário"
+elif 2000 < salary <= 5800:
+    position = "júnior"
+elif 5800 < salary <= 7500:
+    position = "pleno"
+elif 7500 < salary <= 10500:
+    position = "senior"
+else:
+    position = "líder"
+    
+A indentação do código deve ser feita com 4 espaços em vez de tabs.
+
+Você pode estar se perguntando: “Não está faltando alguma coisa nessa estrutura?”🤔
+
+Resposta: Note que if e elif são seguidos de uma expressão que se avaliada como verdadeira, o trecho de código será executado. Um outro detalhe é a ausência de chaves para definir o bloco. Utilizamos o caractere : para indicar abertura de um bloco e somente indentação para indicar o término.
+
+O bloco else será executado se nenhuma das condições anteriores for satisfeita.
+
+Agora que escrevemos mais linhas, notamos também a ausência do caractere ;. Pois bem, a filosofia da linguagem Python nos diz: “Legibilidade conta…”, então, com isso, não precisamos mais desse caractere.
+
+Com a senioridade em mãos, podemos criar uma nova coluna em nossa base dados com essa informação e realizar o agrupamento por cargo, desenhando lindos gráficos.
+
+Você pode estar se perguntando: “Posso modificar para uma estrutura switch?” Resposta: A estrutura condicional if e seu aninhamento com elif e else é tão simples e legível que não precisamos da estrutura switch.
+
+”Simples é melhor do que complexo” - Zen do python
+
+* Em alguns casos, em que não seja prejudicada a legibilidade, podemos criar estruturas de mapeamento (dicts) para simplificar o aninhamento de condicionais. Como o exemplo a seguir:
+
+EX:
+
+key = "id"
+from_to = {
+    "id": "identifier",
+    "mail": "email",
+    "lastName": "last_name",
+}
+from_to[key]
+
+
+* Estruturas de repetição
+
+*for
+
+Imagine um sistema que faça a listagem de restaurantes. Estes restaurantes possuem uma nota proveniente da avaliação dos seus clientes.
+
+EX:
+
+restaurants = [
+    {"name": "Restaurante A", "nota": 4.5},
+    {"name": "Restaurante B", "nota": 3.0},
+    {"name": "Restaurante C", "nota": 4.2},
+    {"name": "Restaurante D", "nota": 2.3},
+]
+
+Quando um cliente pede a listagem de restaurantes, ele pode escolher filtrar o resultado de acordo com a nota. Essa filtragem pode ocorrer percorrendo a lista de restaurantes ou criando uma nova lista com somente aqueles que atendem ao filtro, assim como mostra o exemplo abaixo:
+
+EX:
+
+filtered_restaurants = []
+min_rating = 3.0
+for restaurant in restaurants:
+    if restaurant["nota"] > min_rating:
+        filtered_restaurants.append(restaurant)
+print(filtered_restaurants)  # imprime a lista de restaurantes, sem o B e D
+
+Dado que a maior parte do tempo estamos percorrendo estruturas, os criadores do Python decidiram que o for each seria o laço de repetição principal na linguagem.
+
+Para cada repetição do nosso laço, um novo elemento da estrutura iterável é atribuído a variável de iteração. No exemplo acima, vemos que a cada iteração um novo restaurante é colocado na variável restaurant.
+
+* Em alguns casos, podemos ainda querer percorrer uma sequência numérica, e para isto iteramos sobre a estrutura de dados range.
+
+EX:
+
+for index in range(5):
+    print(index)
+    
+Além de listas, várias outras estruturas são iteráveis, como strings (str), tuplas (tuple), conjuntos (set), dicionários (dict) e até mesmo arquivos.
+
+
+* Compreensão de lista (list comprehension)
+
+A compreensão de listas em Python possui uma sintaxe fácil e compacta para criação de listas, seja a partir de uma string ou de outra lista. É uma maneira concisa de criação que executa uma operação em cada item da lista já existente.
+
+Quando uma nova lista é criada como resultado de uma iteração, podemos simplificar utilizando compreensão de listas.
+
+EX:
+
+min_rating = 3.0
+filtered_restaurants = [
+    restaurant
+    for restaurant in restaurants
+    if restaurant["nota"] > min_rating
+]
+print(filtered_restaurants)  # imprime a lista de restaurantes, sem o B e D
+
+A compreensão de listas é declarada da mesma maneira que uma lista comum, porém no lugar dos elementos nós colocamos a iteração que vai gerar os elementos da nova lista.
+
+É possível filtrar esses elementos utilizando o if.
+
+Poderíamos listar também somente o nome dos restaurantes, veja o exemplo abaixo:
+
+EX:
+
+# min_rating = 3.0
+filtered_restaurants = [restaurant["name"]]  # aqui pedimos somente o nome do restaurante
+#                        for restaurant in restaurants
+#                        if restaurant["nota"] > min_rating]
+# print(filtered_restaurants)  # imprime a lista de restaurantes, sem o B e D
+
+Conversão de loop for em compreensão de listas
+Conversão de loop for em compreensão de listas
+
+* A compreensão de listas também funciona com listas de strings. A seguinte cria uma nova lista de strings com os nomes que contém a letra ‘a’.
+
+EX:
+
+names_list = ['Duda', 'Rafa', 'Cris', 'Yuri']
+new_names_list = [name for name in names_list if 'a' in name]
+
+# Aqui o for percorre cada nome em "names_list", verifica se existe a letra "a" nele,
+# o adiciona à variável "name", e então gera nossa nova lista "new_names_list"
+print(new_names_list)
+
+# Saída
+['Duda', 'Rafa']
+
+* O exemplo a seguir usa uma compreensão de listas para criar uma lista com o quadrado dos números entre 1 e 10.
+
+EX:
+
+quadrados = [x*x for x in range(11)]
+print(quadrados)
+
+# Saída
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+Isto é equivalente às operações de map e filter em JavaScript.
+
+
+* while
+
+Com o while nós podemos executar um conjunto de declarações enquanto a condição for verdadeira.
+
+No código abaixo mostramos uma implementação da Sequência de Fibonacci, presente em diversas formas na natureza. Ela é uma sequência numérica começando por 0 e 1, e cada termo subsequente corresponde à soma dos dois anteriores.
+
+Podemos escrever esta sequência da seguinte maneira:
+
+EX:
+
+n = 10
+last, next = 0, 1
+while last < n:
+    print(last)
+    last, next = next, last + next
+    
+O laço de repetição while acontecerá enquanto a condição for satisfeita.
+
+Tenha cuidado ao manipular a variável presente na condicional ou entrará em uma repetição infinita.
+
+No exemplo anterior, estamos imprimindo os elementos da sequência até que atinja o valor 10. Neste caso, foi utilizado um truque chamado atribuição múltipla. Isto é, atribuição de vários valores a múltiplas variáveis ao mesmo tempo.
+
+De olho na dica👀: Este truque pode ser utilizado também para fazer a troca de valores entre variáveis: a, b = b, a.
+
+
+* enumerate
+
+Em Python, um loop for geralmente é escrito como um loop sobre um objeto iterável. Isso significa que você não precisa de uma variável de contagem para acessar itens no iterável.
+
+Porém, às vezes, pode acontecer de você querer uma variável que muda em cada iteração do loop. Em vez de criar e incrementar uma variável você mesmo, você pode usar enumerate() do Python para obter um contador e o valor do iterável ao mesmo tempo!
+
+EX:
+
+languages = ['Python', 'Java', 'JavaScript']
+
+enumerate_prime = enumerate(languages)
+
+# converte um objeto enumerate em uma lista
+print(list(enumerate_prime))
+
+# Saída: [(0, 'Python'), (1, 'Java'), (2, 'JavaScript')]
+
+* Você também pode desestruturar (unpack) os itens da lista ou tupla:
+
+EX:
+
+languages = ['Python', 'Java', 'JavaScript']
+
+for index, language in enumerate(['Python', 'Java']):
+    print(f'{index} - {language}')
+# Saída:
+0 - Python
+1 - Java
+
+De olho na dica: na linha 4 você deve ter reparado algo diferente neste código print(f'{index} - {language}'). A letra f usada dentro do print é chamada de f-string. Ela fornece uma maneira de incorporar expressões dentro de strings literais, usando uma sintaxe mínima. Lembre-se de ler a documentação em caso de dúvidas.
+
+* funções:
+
+Os parâmetros podem ser passados de forma:
+
+posicional: são aqueles definidos por meio da posição em que cada um é passado;
+nomeada: são definidos por meio de seus nomes.
+
+EX:
+
+def soma(x, y):
+    return x + y
+
+soma(2, 2)  # os parâmetros aqui são posicionais
+
+soma(x=2, y=2)  # aqui estamos nomeando os parâmetros
+Os parâmetros também podem ser variádicos, ou seja, variam em sua quantidade.
+
+* Parâmetros posicionais variádicos são acessados como uma tupla no interior de uma função, e parâmetros nomeados variádicos como um dicionário.
+
+EX:
+
+def concat(*strings):
+    # Equivalente a um ", ".join(strings), que concatena os elementos de um iterável em uma string utilizando um separador
+    # Nesse caso a string resultante estaria separada por vírgula
+    final_string = ""
+    for string in strings:
+        final_string += string
+        if not string == strings[-1]:
+            final_string += ', '
+    return final_string
+
+# pode ser chamado com 2 parâmetros
+concat("Carlos", "Cristina")  # saída: "Carlos, Cristina"
+
+# pode ser chamado com um número n de parâmetros
+concat("Carlos", "Cristina", "Maria")  # saída: "Carlos, Cristina, Maria"
+
+# dict é uma função que já vem embutida no python
+dict(nome="Felipe", sobrenome="Silva", idade=25)  # cria um dicionário utilizando as chaves passadas
+
+dict(nome="Ana", sobrenome="Souza", idade=21, turma=1)  # o número de parâmetros passados para a função pode variar
+As variáveis definidas dentro das funções tem escopo local. Porém, quando uma função não encontra um nome no escopo local, ela irá procurar no espaço de nomes global.
+
+* Em alguns casos, podemos querer limitar um parâmetro em nomeado ou posicional para evitar ambiguidades e/ou aumentar legibilidade.
+
+EX:
+
+len([1, 2, 3, 4])  # função len não aceita argumentos nomeados
+
+len(obj=[1, 2, 3, 4])  # este código irá falhar
+
+print("Coin", "Rodrigo", ", ")  # imprime Coin Rodrigo ,
+
+print("Coin", "Rodrigo", sep=", ")  # nomeando o terceiro parâmetro, agora temos a saída: Coin, Rodrigo
+
+* primeiro arquivo:
+
+Módulos são declarados utilizando snake case, ou seja, com nomes minúsculos e quando possuírem mais de uma palavra, devem ser separadas por underscore (_).
+
+* Vamos agora criar o arquivo area.py, declarando funções que calculam a área de algumas figuras geométricas.
+
+area.py
+
+EX:
+
+ PI = 3.14  # PI é uma "constante" em nosso módulo
+
+
+ def square(side):
+     '''Calculate area of square.'''
+     return side * side
+
+
+ def rectangle(length, width):
+     '''Calculate area of rectangle.'''
+     return length * width
+
+
+ def circle(radius):
+     '''Calculate area of circle.'''
+     return PI * radius * radius
+     
+Observe que esse código segue algumas boas práticas para legibilidade, tais como:
+
+Entre cada função temos um espaço de 2 linhas;
+
+As funções são declaradas com nomes em letras minúsculas;
+
+A constante PI é definida em letras maiúsculas.
+
+⚠️Aviso: Existe uma convenção de declarar valores considerados constantes com letras maiúsculas, e o respeito por outros programadores de não alterarem aquele valor.
+
+* Abra um terminal e para executar o módulo em python, escreva python3 area.py. Se não houve nenhum erro de digitação, nada deve ter acontecido. Neste módulo só temos definições das funções e valores, mas não estamos executando nenhuma delas. Isto é o que chamamos de execução do módulo como script.
+
+Hora de testá-lo! No fim do arquivo, vamos adicionar algumas linhas para imprimir a área de algumas figuras geométricas.
+
+EX:
+
+ print("Área do quadrado:", square(10))
+ print("Área do retângulo:", rectangle(2, 2))
+ print("Área do círculo:", circle(3))
+ 
+
+Nosso módulo quando executado exibe alguns valores de teste.
+
+* Vamos utilizar o nosso módulo de calcular área de figuras planas. Escreva um novo arquivo com nome people.py e ele será um script para calcular pessoas que estão presentes em um show, dado a área do mesmo.
+
+Este script será escrito da seguinte maneira:
+
+people.py
+
+EX:
+
+import area
+
+
+PEOPLE_PER_SQUARE_METER = 2  # numero de pessoas por metro quadrado em média
+FIELD_LENGTH = 60  # em metros
+FIELD_WIDTH = 45  # em metros
+people_at_concert = (
+    area.rectangle(FIELD_LENGTH, FIELD_WIDTH) * PEOPLE_PER_SQUARE_METER
+)
+
+print("Estão presentes no show aproximadamente", people_at_concert, "pessoas.")
+
+Anota aí ✏️: O import é utilizado para termos todas as funções do módulo disponíveis em outro arquivo. Uma outra maneira de utilizarmos é escrevendo from area import rectangle, por exemplo, se quisermos importar apenas rectangle a partir de area. Porém, tome cuidado com conflitos de nomes caso use essa segunda maneira.
+
+Ao executá-lo com o comando python3 people.py, vemos que a saída não foi bem como esperávamos.
+
+Execução exibe os testes feitos no módulo de área.
+Os nossos valores de teste estão sendo exibidos quando importamos o módulo. Mas não queremos que isso aconteça.
+
+* Para corrigir, podemos acrescentar uma condicional ao módulo para somente exibir esses valores de teste quando o módulo for executado como script.
+
+A variável __name__ é utilizada pelo interpretador Python para identificar o arquivo que esta sendo executado e seu valor será "__main__" quando invocamos um módulo como script.
+
+area.py
+
+EX:
+
+# ...
+
+if __name__ == "__main__":
+    print("Área do quadrado:", square(10))
+    print("Área do retângulo:", rectangle(2, 2))
+    print("Área do círculo:", circle(3))
+    
+Ao executarmos novamente nosso script, agora tudo está ok! 🎉
+
+

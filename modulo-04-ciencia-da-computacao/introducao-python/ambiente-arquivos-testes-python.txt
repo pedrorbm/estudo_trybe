@@ -1,0 +1,158 @@
+* Módulos:
+
+Um módulo é um arquivo que contém definições e instruções em Python. O nome do arquivo é um nome acrescido de .py. Você pode importar um módulo dentro de um outro arquivo Python e ter acesso às suas funções, classes, etc.
+
+Em linhas gerais, todo arquivo que é escrito com a linguagem Python e com a extensão .py é considerado um módulo.
+
+Observe o arquivo my_math.py abaixo:
+
+EX:
+
+def sum(a, b):
+  return a + b
+
+
+def pot(a, b):
+  return a ** b
+
+
+print(sum(2, 2))
+print(pot(2, 3))
+
+Este arquivo é um módulo Python, que pode ser executado como script com o comando python3 my_math.py. Se isso ocorrer, os retornos serão 4 e 8, respectivamente, devido às chamadas das funções dentro dos métodos print().
+
+Entretanto, as funções que criamos neste arquivo podem ser reaproveitadas por outros módulos através da declaração import.
+
+À medida que fomos avançando, esses conceitos ficarão cada vez mais nítidos.
+
+
+* Pacotes:
+
+Pacotes são módulos Python que contêm outros módulos e/ou pacotes, comumente separados por responsabilidades similares. Na prática, um pacote é um diretório que pode conter vários módulos (arquivos de extensão .py) e/ou outros pacotes.
+
+Exemplo de tipos diferentes de imports de pacotes:
+
+EX:
+
+import http  # importa o pacote http como um módulo
+
+from http import client  # importa o módulo client do pacote http
+
+
+from http.client import HTTP_PORT  # importa a constante HTTP_PORT do módulo client do pacote http
+
+
+* Ambiente Virtual
+
+Imagine que, em uma máquina, há um projeto Python que contém alguns pacotes de terceiros instalados e, dentre eles, há uma biblioteca na versão 1.4. Imagine também que, na mesma máquina, é iniciado um novo projeto que precisa da mesma biblioteca, mas dessa vez na versão 2.0. O que fazer? As versões são compatíveis? Se eu atualizar o sistema, a versão antiga vai continuar funcionando?
+
+O venv entra como resposta para essas perguntas! Ele é um módulo já embutido na linguagem, e serve para isolar ambientes de projetos. Ou seja, eu consigo ter dois projetos rodando em dois ambientes diferentes, que podem ter versões diferentes de uma mesma biblioteca.
+
+Na prática, vamos instalar as bibliotecas em um diretório que está relacionado ao projeto. Assim, cada projeto pode ter suas próprias bibliotecas na versão que quiser. A ideia é a mesma do npm que vocês já vêm usando.
+
+O comando para criação deste ambiente isolado é python3 -m venv .venv, sendo que .venv é o nome do ambiente isolado. Este comando deve ser executado na raiz do projeto.
+
+Caso o venv não esteja instalado, utilize o comando sudo apt install python3-venv.
+
+Este ambiente isolado será visto como um diretório criado na raiz do projeto. O ponto na frente do nome faz com que o diretório fique oculto.
+
+Depois de criado, temos que ativar este ambiente para usá-lo. Isto é importante pois sempre que decidirmos trabalhar neste projeto devemos repetir este passo.
+
+EX:
+
+source .venv/bin/activate
+
+Criação de um ambiente virtual.
+
+Você pode conferir se o comando de ativação do ambiente virtual deu certo com o seguinte comando:
+
+EX:
+
+which python3
+
+O resultado será o caminho para a pasta onde você criou seu ambiente virtual (pwd), acrescido de .venv/bin/python3.
+
+Pronto! Agora nosso ambiente está preparado para a instalação das bibliotecas que precisaremos nos nossos projetos.
+
+
+* Entrada
+
+Uma das maneiras que existem de receber valores em nossos programas é utilizando o módulo sys. Quando executamos um script e adicionamos parâmetros, os mesmos estarão disponíveis através de uma variável chamada sys.argv, que é preenchida sem que precisemos fazer nada. Na prática, podemos escrever o conteúdo abaixo em um arquivo e passar alguns parâmetros ao executá-lo.
+
+EX:
+
+import sys
+
+
+if __name__ == "__main__":
+    for argument in sys.argv:
+        print("Received -> ", argument)
+        
+* Podemos executar o código usando os parâmetros através do comando abaixo:
+
+EX:
+
+python3 arquivo.py 2 4 "teste"
+
+A saída será:
+
+Received ->  arquivo.py
+Received ->  2
+Received ->  4
+Received ->  teste
+
+Também é possível coletar dados do terminal através da função input, que vem embutida na própria linguagem. Esta função está vinculada à entrada padrão do sistema operacional e tem como parâmetro opcional o prompt que, caso seja fornecido, exibirá a mensagem passada para ele em tela. O valor recebido através da função será do tipo texto (str):
+
+EX:
+
+user_input = input("Digite uma mensagem: ")
+print('O valor recebido foi:', user_input)
+
+* Como já visto, a função print — que já vem embutida na linguagem — é a principal função para imprimirmos um valor em “tela”. Normalmente esta função escreve na saída padrão do sistema operacional, mas veremos que é possível modificar este e outros comportamentos.
+
+* Esta função recebe parâmetros de forma variável, ou seja, pode receber nenhum, um, dois ou n parâmetros durante sua invocação.
+
+EX:
+
+print("O resultado é", 42)  # saída: O resultado é 42
+print("Os resultados são", 6, 23, 42)  # saída: Os resultados são 6 23 42
+
+* O separador padrão dos argumentos é um espaço em branco, que pode ser alterado.
+
+EX:
+
+print("Maria", "João", "Miguel", "Ana")  # saída: Maria João Miguel Ana
+print("Maria", "João", "Miguel", "Ana", sep=", ")  # saída: Maria, João, Miguel, Ana
+
+* Além do separador, podemos também alterar o caractere de fim de linha que, por regra, é uma quebra de linha:
+
+EX:
+
+print("Em duas ")
+print("linhas.")
+
+Saída:
+Em duas
+linhas.
+
+* Alterando o padrão:
+
+EX:
+
+print("Na mesma", end=" ")
+print("linha.")
+
+Saída:
+Na mesma linha.
+Já sabemos que erros podem acontecer e o sistema operacional normalmente espera que um programa escreva seus erros na saída de erros.
+
+* Existe um parâmetro que nos permite modificar a saída padrão para a saída de erros:
+
+EX:
+
+import sys
+
+err = "Arquivo não encontrado"
+print(f"Erro aconteceu: {err}", file=sys.stderr)
+
+💡 Em Python, podemos fazer interpolação de variáveis e expressões utilizando f-string. Adicionamos um f antes das aspas e o valor de saída entre chaves. Essa dica é importante, pois é a maneira mais eficiente de formatar strings.
