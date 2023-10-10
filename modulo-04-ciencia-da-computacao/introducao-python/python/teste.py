@@ -38,4 +38,25 @@ def multiply_arrays(array1, array2):
 
 
 array = [1, 2, 3]
-print(multiply_arrays(array, array))
+# print(multiply_arrays(array, array))
+
+
+def count(n):
+    while n > 0:
+        print(n)
+        n -= 1
+    print("TEMPO ESGOTADO!")
+
+
+# count(10)
+
+
+def sum(n):
+    if n == 0:
+        return 0
+    else:
+        print(n)
+        return n + sum(n - 1)
+
+
+print(sum(4))

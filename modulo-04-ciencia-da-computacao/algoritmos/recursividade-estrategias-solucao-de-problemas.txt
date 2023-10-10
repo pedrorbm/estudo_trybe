@@ -1,0 +1,351 @@
+# Recursividade:
+
+* Definição de recursividade
+
+Durante seu cotidiano enquanto pessoa programadora, será demandado que você resolva problemas. Dito isso, podemos utilizar o método da recursividade para a resolução de problemas grandes.
+
+Anota aí 🖊: Uma função que chama a si mesma é chamada de recursiva. O processo para executar tal função recursiva é chamado de recursividade.
+
+Um problema submetido a uma solução recursiva, será quebrado em subproblemas menores até chegar a tal ponto que torna-se possível solucioná-lo trivialmente. Podemos fazer a analogia com as chamadas bonecas russas, que dentro de si tem diversas outras bonecas, cada vez menores.
+
+A função countdown abaixo tem como objetivo fazer uma contagem regressiva partindo de n até zero.
+
+EX:
+
+def countdown(n):
+    print(n)
+    countdown(n - 1)  # chamada recursiva
+
+countdown(5)
+
+Observe que dentro da implementação desta solução, a função chama ela mesma.
+
+Você pode estar se perguntando: “O que é isso!? “ 🤔
+
+Resposta: Isso é uma chamada recursiva! Lembre-se que a recursão é quando uma função chama ela mesma. Se você executar esse código, ele ficará em loop infinito!
+
+⚠️ Aviso: Caso tenha executado o código anterior, aperte Ctrl+C para parar a execução.
+
+Quando estamos escrevendo uma função recursiva, precisamos informar nossa condição de parada ou caso base da recursão. Nesse sentido, podemos separar uma função recursiva em:
+
+Caso base e Caso recursivo
+O caso recursivo é a chamada da própria função novamente.
+
+Então, como seria a correção desse código para que ele funcione de acordo com esperado?🤔 Observe a resposta abaixo:
+
+EX:
+
+def countdown(n):
+    if n == 0: # caso base
+        print("FIM!")
+    else:
+        print(n)
+        countdown(n - 1) # caso recursivo
+
+countdown(5)
+
+Pronto! Agora a função funciona corretamente!
+
+Anota aí 🖊:
+
+Se n é igual a 0, escreva “FIM!”
+
+Se n não for igual a 0, escreva n e chame a função novamente com n - 1
+
+Como vimos acima, não podemos construir um código recursivo sem validar algumas condições. Sendo assim, vamos a três leis importantes:
+
+1) Um algoritmo recursivo deve ter um caso base: quando falamos de recursão, devemos sempre lembrar do caso base, pois sem ele nosso algoritmo ficará executando infinitamente.
+
+O caso base é a condição de parada do algoritmo recursivo, ele é o menor subproblema do problema, tornando-o possível de resolver de forma direta/trivial;
+
+2) Um algoritmo recursivo deve mudar o seu estado e se aproximar do caso base: após o início da execução de um algoritmo recursivo, a cada nova chamada a ele mesmo, o seu estado deve se aproximar progressivamente do caso base.
+
+Vamos imaginar a seguinte situação: queremos criar um código que irá printar números a partir de 0 e terminar em 10. O caso base do algoritmo é 10, pois é onde nossa função recursiva deve parar a execução. A primeira chamada a função terá o número 0 passado de parâmetro. A cada nova chamada à função, nosso estado deve incrementar o valor 1 ao valor do estado anterior, até chegar ao número 10. Logo, o valor do estado na primeira chamada será 0, na segunda chamada será 1, na terceira chamada será 2, e assim por diante até chegar ao valor do caso base;
+
+3) Um algoritmo recursivo deve chamar a si mesmo, recursivamente: Essa lei é a própria definição de recursão.
+
+
+* Entendendo recursividade e colocando em prática
+
+Antes de vermos como acontece a “mágica” da recursividade, vamos ver como costuma ser uma estrutura básica de uma função recursiva:
+
+EX:
+
+Nome da função e parâmetro:
+    Condição de parada
+
+    Chamada de si mesma
+    
+Declaramos uma função com um parâmetro.
+
+Dentro da função criada, definimos qual é a condição de parada da função.
+A condição de parada faz uma comparação entre o valor da condição com o parâmetro que a função está recebendo. Caso a condição não se satisfaça, a função é chamada novamente com um novo parâmetro. Caso contrário a execução para na condição de parada.
+Vamos ver como isso acontece na prática ? Mas antes, você se lembra das suas aulas de matemática em que aprendeu sobre fatorial?
+
+Você sabia que a fatorial é uma função recursiva? Vamos relembrar:
+
+Fatorial de n é o produto dos números positivos consecutivos menores ou iguais a n.
+
+Sua notação é: n!
+
+Sua definição:
+
+0! = 1
+
+n! = n x (n - 1) x (n - 2) … 2 x 1
+
+Exemplo:
+
+5! = 5 x 4 x 3 x 2 x 1 = 120
+
+Certo! Agora que relembramos fatorial, vamos observar sua estrutura:
+
+Se
+
+5! = 5 x 4 x 3 x 2 x 1
+e
+
+4! = 4 x 3 x 2 x 1
+Podemos reescrever 5! como 5! = 5 x 4!
+
+Observando esse caso, vemos que a função 5! possui uma chamada de outra função fatorial dentro dela. Logo, temos uma recursão!
+
+Vamos escrever um código para resolvê-lo?
+
+EX:
+
+def factorial(n):
+    if n <= 1: # caso base
+        return 1
+    else:
+        return n * factorial(n - 1) # caso recursivo
+        
+O código acima funciona da seguinte maneira:
+
+A função se chama recursivamente até chegar no caso base onde n é igual a 1.
+
+Você pode estar se perguntando: “ Mas por quê?” 🤔
+
+Resposta: lembra da definição de fatorial? 0! é 1, certo? 1! também será 1. Então o tornaremos como caso base. Quando a função chegar no caso base, ela retornará 1 para a chamada anterior e fará a multiplicação com o n daquele contexto, que nesse caso será o 2. Em outras palavras, quando a chamada retornar da recursão acontecerá return 2 * 1. Esse valor também será retornado para a função que o chamou e assim acontecerá até que todos os casos sejam satisfeitos.
+
+
+* A pilha de chamadas:
+
+Antes de falarmos sobre a pilha de chamadas, precisamos entender um pouco a estrutura de dados chamada Pilha. Para isso, vamos a uma breve introdução sobre seu conceito.
+
+Imagine um conjunto de pratos que estão um sobre o outro, ou seja, empilhados. Quando queremos pegar um prato, vamos pegar o do topo da pilha, certo? Em outro momento, se você quiser adicionar outro prato àquela pilha, você também irá adicioná-lo ao topo da pilha.
+
+Logo, podemos observar que uma pilha tem duas ações triviais:
+
+Inserir (Push)
+
+Retirar (Pop)
+
+E todas essas ações são efetuadas no topo da pilha.
+
+Push e pop na Pilha
+Push e pop na Pilha.
+
+Pois bem, a nossa pilha de chamadas funciona da mesma forma! Vamos conhecê-la?
+
+A pilha de chamadas,também conhecida como call stack, organiza as sub-rotinas que estão executando no computador. Trazendo para o nosso contexto de recursividade, a pilha de chamadas registra a execução das funções, ou seja, qual está sendo executada, em que ponto ela deve retornar, qual é a proxima a ser chamada, etc.
+
+Resumindo, é como se a pilha de chamadas operasse com contextos. Exemplo:
+
+Uma função A está sendo executada e durante a sua execução ela precisa do resultado do processamento de outra função B a qual ela chama. Diante disso, a função A ficará aguardando na pilha de chamadas enquanto a função B executa. Quando B terminar, seu resultado voltará para Aque vai continuar sua execução.
+
+Anota aí 🖊:
+
+Toda vez que chamamos uma função em um programa, o sistema operacional reserva memória para as variáveis e parâmetros da função;
+
+Sempre quando uma função é executada, ela é guardada na pilha;
+
+Quando a função termina de ser executada, ela sai da pilha.
+
+Vamos utilizar esse código com recursão e visualizar o funcionamento da pilha de chamadas:
+
+EX:
+
+def saudacao():
+    print("Oi")
+
+def despedida():
+    print("Tchau")
+
+def init():
+    print("Inicio")
+    saudacao()
+    print("Fim")
+    despedida()
+
+init()
+
+Vamos ver outro exemplo? Que tal o nosso fatorialmencionado anteriormente ?
+
+De forma análoga, quando factorial é chamada, um novo dado é adicionado à uma pilha. Será adicionado à pilha todos os valores executados, do 5 ao 1, quando chegamos no caso base. Quando a execução acaba, os dados são retirados da pilha um a um de forma reversa (do 1 ao 5), multiplicando e retornando cada dado, até que a pilha esvazie e o processamento finalize.
+
+Vamos praticar os conteúdo visto até aqui por meio do exercício!?
+
+Exercício de fixação:
+
+Exercício: Faça um algoritmo recursivo de soma. Esse algoritmo deve receber um número de parâmetro e deve somar todos os números antecessores a ele.
+
+EX:
+
+def sum(n):
+    if n == 0:
+        return 0
+    else:
+        print(n)
+        return n + sum(n - 1)
+        
+        
+* Iterativo x Recursivo:
+
+Agora, vamos ver que é possível ter funções tanto recursivas, quanto iterativas para o mesmo problema. Para isso, utilizaremos os exemplos que já usamos nesse conteúdo.
+
+Vamos começar olhando para a função recursiva de contagem regressiva. Conseguimos montar uma função iterativa para ela? Sim! Vamos ver como fazer isso:
+
+EX:
+
+def iterative_countdown(n):
+    while n > 0:
+        print(n)
+        n = n - 1
+    print("FIM!")
+
+iterative_countdown(5)
+
+Vamos ver agora como fica o código iterativo de cálculo de fatorial:
+
+EX:
+
+def iterative_factorial(n):
+    fact = 1
+
+    for i in range(1, n + 1):
+        fact = fact * i
+
+    return fact
+
+iterative_factorial(5)
+
+Como vimos anteriormente, escolher entre uma solução recursiva ou iterativa depende muito do que estamos buscando.
+
+Escolher uma solução recursiva não significa ganho de performance, muito pelo contrário, grande parte das vezes, a solução iterativa será mais performática.
+
+Escolher a solução recursiva terá um ganho na diminuição de complexidade do código do seu projeto. Aqui, complexidade significa legibilidade. Ou seja, nosso código fica mais simples, mais harmonioso, quando utilizamos a recursividade.
+
+
+* Árvore de Recursão:
+
+O método da árvore de recursão pode ser utilizado para estimar o custo de um algoritmo. É um modo de analisarmos seu custo, o que nos ajuda a decidir se tal solução recursiva vale a pena ou não.
+
+Podemos visualizar nível a nível da estrutura de um algoritmo recursivo por meio de uma árvore recursiva. No final, tem-se a estimativa de tempo do problema.
+
+Vamos ver na prática como isso acontece:
+
+EX:
+
+def fibonacci(num):  # nome da função e parâmetro
+    if (num <= 1):  # condição de parada
+        return num
+    else:
+        return fibonacci(num - 2) + fibonacci(num - 1)  # chamada de si mesma com um novo valor
+        
+No exemplo acima, estamos fazendo um código recursivo para cálculo de Fibonacci.
+
+Cada nó da árvore acima representa o custo da solução de um subproblema. Quando olhamos para a árvore como um todo, ou seja, quando expandimos ela, podemos somar todos os custos de cada nível dessa árvore e então teríamos o resultado total do problema.
+
+O problema começa com apenas um nó e vai decompondo até alcançar os casos base, que são as “folhas” da árvore. Folhas são, basicamente, nós da estrutura que não possuem nenhum nó abaixo deles.
+
+Vamos ver agora, de forma interativa, como essa árvore chegou a esse resultado passo a passo:
+
+De olho na dica👀: desenhe todas as recursões do problema até chegar aos casos base e some as complexidades! Fique de olho nas proporções! Se cada subproblema é O(n) e você criou um para cada elemento da sua entrada de tamanho n, você tem aí uma complexidade O(n * n), ou seja, uma complexidade quadrática. Se, por outro lado, a cada subproblema você dividiu o tamanho do problema original por dois, você gerará log n subproblemas. Se cada um desses custa O(n), você teria uma complexidade O(n* log n)
+
+A forma de traduzir a lógica da árvore de recursão para uma notação puramente matemática se chama Teorema Mestre! Não é o nosso escopo por agora, ok? Mas fique à vontade para pesquisar a respeito e nos trazer todas as perguntas, se quiser!
+
+
+# Estratégias para solução de problemas
+
+Bora ver os tipos de estratégias:
+
+* Iterativa
+
+A solução iterativa é caracterizada pela repetição de uma determinada operação, procurando resolver algum problema encontrando sucessivas aproximações, a partir de uma suposição inicial.
+
+A ideia nesse tipo de processo é repetir um determinado cálculo várias vezes, obtendo-se a cada repetição, ou iteração, um resultado mais preciso que aquele obtido na iteração anterior.
+
+A cada iteração, utiliza-se o resultado da anterior como parâmetro de entrada para o cálculo seguinte. O resultado é uma sequência de valores aproximados, não exatos, mas que estão dentro de uma faixa de erro aceitável.
+
+
+* Força bruta
+
+A força bruta, também conhecida como tentativa e erro ou busca exaustiva, é a estratégia mais trivial e intuitiva para solução de problemas. Ela consiste basicamente em enumerar todas as combinações possíveis para uma solução e avaliar se satisfazem o problema. Dessa forma, é possível escolher a melhor das soluções,mas apesar de trivial, em alguns casos, a força bruta possui desempenho geralmente ruim.
+
+Vamos exemplificar essa estratégia, solucionando um problema chamado de problema da mochila:
+
+Dada uma mochila com capacidade C, e n objetos com peso (i = 1…n), deve ser possível preencher a mochila com o maior peso total, respeitando a capacidade C.
+
+Suponha uma mochila com capacidade de 15kg e objetos de peso 12kg, 2kg, 4kg e 8kg.
+
+Este problema possui mais que uma solução ótima, ou seja, possui soluções ótimas equivalentes:
+
+EX:
+
+Uma solução ótima: 12kg + 2kg = 14kg;
+
+Outra solução ótima: 8kg + 2kg + 4kg = 14kg.
+
+Soluções viáveis seriam, entre outras:
+
+EX:
+
+- 12kg;
+
+- 2kg;
+
+- 4kg;
+
+- 8kg;
+
+- 2kg + 4kg.
+
+# ...
+
+No caso acima, as soluções são viáveis, porém não são ótimas. Elas não são ótimas, pois a mochila está sendo preenchida, mas não está chegando mais próximo possível ao peso máximo. Por exemplo, uma das soluções que temos acima é preencher a mochila com um objeto de 2kg apenas, sendo que a mochila suporta 15kg.
+
+Observe mais uma possível solução:
+
+EX:
+
+- 12 kg + 4 kg = 16kg.
+
+O caso acima é inviável, pois o peso máximo que a mochila comporta é 15kg. Com isso, podemos concluir que o exemplo acima é inviável, pois ultrapassa os 15kg.
+
+Um método baseado em tentativa e erro testaria todas as combinações entre elementos checando:
+
+Se a solução é viável;
+
+Se a solução possui valor melhor que outra encontrada anteriormente.
+
+Para conseguir definir qual seria a melhor solução, todas devem ser enumeradas e registradas, e, ao final, os caminhos que não chegaram a um solução final, devem ser retirados.
+
+
+* Dividir e conquistar
+
+A estratégia dividir e conquistar, também chamada de divisão e conquista, consiste em dividir o problema em partes menores, encontrar soluções para as partes, e só então combinar as soluções obtidas em uma solução global.
+
+Usar essa estratégia para resolver problemas, nos quais os subproblemas são versões menores do problema original, geralmente leva à soluções eficientes e harmoniosas, especialmente quando é utilizado a recursividade.
+
+A estratégia emprega modularização de programas e frequentemente conduz a um algoritmo simples e eficiente. Esta técnica é bastante utilizada em desenvolvimento de algoritmos paralelos, onde os subproblemas são tipicamente independentes um dos outros, podendo assim serem resolvidos separadamente.
+
+Anota aí 🖊: A modularização de um programa consiste em dividi-lo em partes funcionais que conversam entre si, tornando o software mais eficiente.
+
+A técnica de Divisão e Conquista consistem em três passos:
+
+Divisão: dividir a instância do problema original em duas ou mais instâncias menores, considerando-as como subproblemas;
+
+Conquista: resolver cada subproblema recursivamente;
+
+Combinação: combinar as soluções encontradas em cada subproblema, compondo uma solução para o problema original.
