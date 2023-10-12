@@ -1,0 +1,173 @@
+# Método Construtor/Inicializador:
+
+* Após modelada nossa Classe do objeto, podemos partir para o construtor. O construtor é um método especial que roda automaticamente quando a gente cria (instancia) o objeto. Na maioria das linguagens, o construtor cria e devolve a instância do objeto e já inicializa os seus atributos.
+
+Em python, esta operação é dividida em dois métodos:
+
+EX:
+
+__new__ (Construtor)
+__init__ (Inicializador)
+Copiar
+class Exemplo:
+    def __init__(self):
+        print("Inicializando Exemplo")
+        self.__privado = "Eu sou privado"
+
+    def __new__(cls, *args, **kwargs):
+        print("Criando uma nova instância de Exemplo")
+        instance = super().__new__(cls)
+        return instance
+
+    def __metodo_privado(self):
+        print("Este é um método privado")
+
+    def metodo_publico(self):
+        print("Este é um método público")
+        self.__metodo_privado()
+        
+Observe que o nome do método privado começa com dois sublinhados __. Além disso, dentro do construtor __init__, há um atributo que começa com dois sublinhados __privado. Isso também é um exemplo de encapsulamento de dados. Para acessar o método privado de dentro da classe, podemos simplesmente chamar o método normalmente. Por exemplo, o método público metodo_publico chama o método privado __metodo_privado usando o self.__metodo_privado().
+
+O método __new__ é responsável por criar e retornar uma nova instância da classe. Ele é uma parte importante da metaprogramação em Python, pois permite que os desenvolvedores personalizem a criação de objetos e controlem como as instâncias são criadas. Ele também aceita quaisquer argumentos que seriam passados para o método __init__, que são capturados pelos parâmetros *args e **kwargs.
+
+No entanto, se tentarmos acessar o método privado a partir de fora da classe, receberemos um erro:
+
+EX:
+
+exemplo = Exemplo()
+exemplo.__metodo_privado() # Erro: AttributeError: 'Exemplo' object has no attribute '__metodo_privado'
+
+Isso ocorre porque o método privado só pode ser acessado dentro da própria classe.
+
+Em resumo, os métodos privados são úteis para manter a integridade do objeto, tornando certos métodos e atributos acessíveis somente dentro da classe, ocultando a implementação interna e evitando que outras partes do código interfiram no funcionamento da classe.
+
+Anota aí ✏️: O Python já implementa estes métodos por padrão para cada nova classe criada, mas você pode implementá-los novamente, ou seja, sobrescrevê-los. É desse modo que customizamos nosso construtor/inicializador.
+
+* Importante: Apesar do método __init__ ser “apenas” o inicializador, é comum ver referências a ele como o construtor. Isso acontece pois são raras as vezes que precisamos alterar o __new__ para customizar nossas classes. Como a comunidade já adotou que “o __init__ é o construtor de objetos no Python“, também vamos seguir essa convenção por aqui 😉
+
+Com isso vamos para o segundo passo: basta recriar o método __init__ dentro de nossa classe, conforme exemplo a seguir:
+
+EX:
+
+class Liquidificador:
+    def __init__(self, cor, potencia, tensao, preco):
+        self.preco = preco
+        self.cor = cor
+        self._potencia = potencia
+        self._tensao = tensao
+        self.__ligado = False
+        self.__velocidade = 0
+        self.__velocidade_maxima = 3
+        self.__corrente_atual_no_motor = 0
+        
+O primeiro parâmetro, o self, representa a instância do objeto, ou seja, tem acesso ao objeto na memória.
+
+De olho na dica 👀: Em muitas linguagens também é chamado de this, e como em Python é um parâmetro explícito, você pode chamá-lo como quiser, mas self é uma convenção adotada pela comunidade.
+
+Com o método __init__ inicializamos os atributos do objeto apenas atribuindo um valor a cada nova chave. Exemplo: self.__ligado = False.
+
+Os próximos parâmetros são os que permitem criar de forma customizada nosso objeto, como a cor: self.cor = cor.
+
+De olho na dica 👀: No exemplo self.cor = cor, o valor do parâmetro cor do método __init__ é atribuído ao atributo homônimo cor do objeto (self.cor). Entretanto o parâmetro cor poderia valorar um atributo qualquer. Um exemplo disso seria se armazenássemos a corrente máxima que o motor pode ter: self.corrente_maxima_no_motor = potencia / tensao. Observe como potencia e tensao são dois parâmetros utilizados para valorar um único atributo.
+
+* Agora podemos criar nossos primeiros liquidificadores:
+
+EX:
+
+meu_liquidificador = Liquidificador("Azul", 200, 127, 200)
+seu_liquidificador = Liquidificador(
+    cor="Vermelho", potencia=250, tensao=220, preco=100
+)
+
+Perceba que é possível ter atributos que não precisam ser passados por meio de parâmetros na chamada do construtor. Por exemplo, para o booleano __ligado e o inteiro __velocidade, o construtor vai iniciá-los sempre com os valores fixos (hard coded) False e 0, respectivamente.
+
+
+# Encapsulamento e Abstração
+
+Agora que já sabemos criar nossos objetos, é essencial sabermos como simplificar seu uso e esconder os detalhes de implementação.
+
+* Encapsulamento:
+O encapsulamento é um dos pilares da orientação a objetos. Por meio dele, é possível simplificar bastante a implementação da abstração. Assim, segmentamos nossos atributos e métodos em 3 categorias:
+
+Públicos: podem ser acessados livremente por qualquer parte da aplicação
+Protegidos: podem ser acessados apenas pela classe que os definem e, quando há herança envolvida, também pelas classes “abaixo” na hierarquia (veremos o tópico herança a seguir)
+Privados: podem ser acessados apenas pela classe que os definem
+Em Python não temos palavras reservadas como public, private e protected para declarar um atributo ou método como público, privado ou protegido, respectivamente. Para isso, existe uma convenção de nomenclatura para definir a acessibilidade de cada recurso:
+
+Nomes iniciados com _ (underline): são considerados “protegidos“, como os atributos _potencia e _tensao.
+⚠️ Isso é apenas uma convenção entre pessoas desenvolvedoras Python, pois ainda será possível fazer um acesso direto por fora da classe;
+Nomes iniciados com __ (dunder/duplo underline): são considerados “privados“, como os atributos __ligado e __velocidade.
+⚠️ Não será possível fazer o acesso diretamente por fora da classe, mas existem formas de burlar isso (caso queira saber mais pesquise name mangling);
+Quaisquer outros nomes válidos: são públicos.
+Para ilustrar, vamos voltar ao exemplo do liquidificador.
+
+Como podemos proteger o atributo ligado, de forma que fique simples e seguro alterá-lo? Resposta: com os métodos.
+
+Podemos criar os métodos ligar e desligar e daremos poderes para que eles consigam manipular os atributos.
+
+Observe o código a seguir:
+
+EX:
+
+class Liquidificador:
+    def __init__(self, cor, potencia, tensao, preco):
+        self.preco = preco
+        self.cor = cor
+        self._potencia = potencia
+        self._tensao = tensao
+        self.__ligado = False
+        self.__velocidade = 0
+        self.__velocidade_maxima = 3
+        self.__corrente_atual_no_motor = 0
+
+    def ligar(self, velocidade):
+        if velocidade > self.__velocidade_maxima or velocidade < 0:
+            raise ValueError(
+                f"Velocidade deve estar entre 0 e {self.__velocidade_maxima}"
+            )
+
+        self.__velocidade = velocidade
+        self.__corrente_atual_no_motor = (
+            (self._potencia / self._tensao) / self.__velocidade_maxima
+        ) * velocidade
+        self.__ligado = True
+
+    def desligar(self):
+        self.__ligado = False
+        self.__velocidade = 0
+
+    def esta_ligado(self):
+        return self.__ligado
+        
+        
+* Qual visibilidade usar:
+
+Diferentemente de linguagens mais rigorosas como o Java, onde a filosofia é criar atributos privados por padrão, no Python foi adotada a filosofia oposta: por padrão os atributos e métodos são públicos. Isso facilita muito a vida de quem está desenvolvendo, sem inserir complexidades desnecessárias.
+
+“Simples é melhor que complicado” - Zen do Python.
+
+Entretanto, muitas vezes precisamos indicar que algo não deve ser utilizado por quem não está dentro do contexto da classe, pois algo inesperado pode acontecer.
+Um exemplo é quando um atributo foi feito para ser somente lido por quem está fora da classe, mas sua valoração deve ser feita seguindo alguma lógica interna.
+Para esses casos, a convenção é utilizar somente um underline, sem proibir ninguém de acessar caso queira.
+
+Utilizar dois underlines quase nunca é necessário e não costuma acontecer, a não ser que você precise esconder algo até mesmo das subclasses.
+
+Observação importante: apesar da filosofia da linguagem ser a de deixar métodos e atributos públicos por padrão, isso não significa que você não deve se preocupar em torná-los privados. O ponto é simples: você começa criando as coisas de maneira pública para facilitar o desenvolvimento, e assim que observar que algo não deve ser acessado por fora da classe, você coloca um underline na frente. Não é pra simplesmente ignorar esse passo e nunca criar atributos protegidos ou privados.
+
+
+* Abstração:
+
+A abstração de dados é outro pilar da orientação a objetos, e oculta os detalhes da implementação mostrando apenas a funcionalidade para quem acessa os métodos, a fim de reduzir a complexidade do código.
+
+Perceba que, ao chamarmos o método ligar, não existe a necessidade de conhecer o cálculo interno. Aqui estamos aplicando a abstração, pois apenas o código da classe Liquidificador precisa se preocupar com a regra de negócio. Quando utilizarmos a classe em outra parte da aplicação, precisaremos apenas saber quais são os parâmetros necessários de cada método.
+
+EX:
+
+liquidificador_vermelho = Liquidificador("Vermelho", 250, 220, 100)
+liquidificador_vermelho.ligar(1)
+print("Está ligado?", liquidificador_vermelho.esta_ligado())
+# Está ligado? True
+liquidificador_vermelho.desligar()
+print("Está ligado?", liquidificador_vermelho.esta_ligado())
+# Está ligado? False
+
