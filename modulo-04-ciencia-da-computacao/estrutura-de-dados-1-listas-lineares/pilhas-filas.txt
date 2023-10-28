@@ -408,5 +408,128 @@ def solve_expression(expr):
 print(solve_expression("5 10 + 3 *"))
 
 
+# Filas:
+
+Assim como temos a mentalidade Last In, First Out (ou First In, Last Out) para problemas que são pilhas, precisamos de outra mentalidade para problemas que são filas: First In, First Out (FIFO) (ou Last In, Last Out). Quem chega primeiro recebe atendimento primeiro, nada mais justo. Assim, todos serão atendidos com uma demora mais parecida.
+
+Na computação também temos problemas que requerem a mentalidade FIFO. Por exemplo, já parou para pensar como é que um processador com um único núcleo consegue rodar um sistema operacional inteiro, e mais 17 programas ao mesmo tempo? Cada programa demanda uma série de operações, e um núcleo só pode executar uma de cada vez; ele coloca as operações em uma fila, e resolve estas operações uma por uma, garantindo assim que todos os programas consigam rodar e prosseguir em suas tarefas.
+
+Assim como a pilha, o TAD Fila (queue, em inglês) também pode ser implementada tanto em um array como em uma lista; o importante não é a forma que ela é implementada em código, mas sim a forma que ela se comporta; que métodos ela expõe. No caso da fila, as operações devem ser as seguintes:
+
+Enqueue: Adiciona um elemento no final da fila
+Dequeue: Remove e retorna o primeiro elemento da fila
+
+Implementação de uma fila utilizando Python
+Notou como a única diferença da fila é que a remoção ocorre no começo, em vez de no final? Apenas essa diferença causa um funcionamento totalmente diferente, que soluciona problemas diferentes! Para visualizar melhor essa situação, imagine que você vai entrar na fila de uma lanchonete drive thru. Seu carro vai entrar no começo, ou no final da fila? 🤔
+
+Por fim, ao entramos na fila, devemos nos posicionar ao final dela e esperarmos os carros da frente serem atendidos, até que chegue a nossa vez. Falando nisso, suponha que, após alguns minutos, finalmente chegou sua vez e você pegou seu pedido. Agora, você pode sair da fila e aproveitar seu lanche em casa. Isso só aconteceu porque você chegou ao início da fila, esperou sua vez de receber o pedido e, em seguida, te “removeram” da fila.
+
+Para observarmos como essas operações funcionam na prática, vamos declarar uma classe Queue em um arquivo queue.py. Filas em Python podem ser implementadas de diferentes maneiras, mas, para seguirmos um padrão, vamos usar o tipo built-in de lista para estudarmos as filas, assim como fizemos com as pilhas.
+
+queue.py
+
+EX:
+
+class Queue():
+    def __init__(self):
+        self.queue = list()
+        
+* Como nossa fila ainda está vazia, vamos começar pelo método enqueue (enfileirar, em português). É através dele que iremos incluir itens em nossa fila. E como estamos usando o tipo lista, podemos utilizar o método append, já que ele, naturalmente, inclui o elemento novo no final da lista.
+
+queue.py
+
+EX:
+
+    def enqueue(self, value):
+        self.queue.append(value)
+        
+Agora que temos um método que faz a inserção de itens na fila, precisamos do método responsável por removê-los. É aí que entra o X da questão! Na fila, não podemos simplesmente retirar um item a esmo. Como os itens estão enfileirados, devemos respeitar sua ordem.
+
+* Sempre que quisermos retirar um elemento de uma fila, esteja ele em um drive thu ou em um código, esse item deve ser o primeiro desta fila. E, para isso, vamos implementar o método dequeue (desenfileirar, em português). Como devemos remover o primeiro elemento, podemos nos guiar pelo seu índice, já que, em uma lista, ele sempre será 0.
+
+queue.py
+
+EX:
+
+    def dequeue(self):
+        # Se não houver mais itens na fila, o método retornará None
+        if len(self.queue) == 0:
+            return None
+        # O método pop remove e retorna o valor do índice fornecido
+        return self.queue.pop(0)
+        
+* Dessa maneira, concluímos a declaração da classe Queue com as duas operações principais do TAD Fila.
+
+queue.py
+
+EX:
+
+class Queue():
+    def __init__(self):
+        self.queue = list()
+
+    def enqueue(self, value):
+        self.queue.append(value)
+
+    def dequeue(self):
+        if len(self.queue) == 0:
+            return None
+        return self.queue.pop(0)
+        
+* Dependendo da nossa necessidade, podemos estender ainda mais essa classe, manipulando nossa fila de diversas outras maneiras. Vamos adicionar o método __str__ ao nosso código para testarmos essa implementação!
+
+queue.py
+
+EX:
+
+class Queue():
+    def __init__(self):
+        self._data = list()
+
+    def enqueue(self, value):
+        self._data.append(value)
+
+    def dequeue(self):
+        if len(self._data) == 0:
+            return None
+        return self._data.pop(0)
+
+    def __str__(self):
+        str_items = ""
+        for i in range(len(self._data)):
+            value = self._data[i]
+            str_items += str(value)
+            if i + 1 < len(self._data):
+                str_items += ", "
+
+        return "Queue(" + str_items + ")"
+
+if __name__ == "__main__":
+    elements = ["Milkshake", "Batata Frita", "Refrigerante"]
+    content_queue = Queue()
+
+    print(content_queue)
+    # Saída: Queue()
+    
+    for elem in elements:
+        content_queue.enqueue(elem)
+
+    print(content_queue)
+    # Saída: Queue(Milkshake, Batata Frita, Refrigerante)
+    
+    content_queue.dequeue()
+    print(content_queue)
+    # Saída: Queue(Batata Frita, Refrigerante) 
+    
+    print(content_queue.dequeue())
+    # Saída: Batata Frita
+    # porque "Milkshake" já foi removido e "Batata Frita" se tornou o primeiro elemento da fila 
+    
+Para testar, apenas rode o código com python3 -m queue.py 
+
+
+
+
+
 
 
